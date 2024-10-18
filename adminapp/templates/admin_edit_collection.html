@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Styles for error messages */
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .messages li {
+            padding: 10px;
+            background-color: #ffefef;
+            border-left: 4px solid #ff4d4d;
+            margin-bottom: 10px;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fc;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        label {
+            font-size: 14px;
+            color: #666;
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 8px 0px;
+            padding-left: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #80bdff;
+            outline: none;
+        }
+
+        input[type="file"] {
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .image-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .image-section img {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: cover;
+            margin: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .image-section img:hover {
+            transform: scale(1.05);
+        }
+
+        .image-preview-container {
+            display: block;
+            flex-direction: column;
+            align-items: center;
+        }
+        .image-preview-container1 {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #cropped-image {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 100%;
+            margin-top: 15px;
+        }
+
+        .action-button,
+        .save-button {
+            padding: 12px 20px;
+            border-radius: 8px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .action-button:hover,
+        .save-button:hover {
+            background-color: #218838;
+        }
+
+        #save-button {
+            width: auto;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Edit Product</h2>
+        <form id="edit-form" action="{% url 'admin_edit_collection' collection.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="collection-id" id="edit-collection-id" value="{{ collection.id }}">
+
+            <label for="collection-name">Collection Name</label>
+            <input type="text" id="edit-collection-name" name="collection" value="{{ collection.name }}">
+
+            <!-- Brand Selection -->
+            <label for="brand-name">Brand Name</label>
+            <select name="brand" id="edit-collection-brand">
+                {% for brand in brands %}
+                <option value="{{ brand.id }}" {% if brand.id == collection.brand.id %}selected{% endif %}>
+                    {{ brand.name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="save-button">Save Changes</button>
+        </form>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li style="list-style: none;">
+                {% if message.tags %}
+                Warning:
+                {% endif %}{{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - ChronoCrest</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+    {% include 'partials/error_pop_up.html' %}
+    <div class="container">
+        <img src="{% static 'images/image2.png' %}" alt="Sign Up Image">
+        <div class="form-container">
+            <h2>Sign Up</h2>
+            <form action="{% url 'user_signup' %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="FirstName" placeholder="First Name" value="{{ user.FirstName }}" required>
+                <input type="text" name="LastName" placeholder="Last Name" value="{{ user.LastName }}" required>
+                <input type="email" name="email" placeholder="Email" value="{{ user.email }}" required>
+                <input type="password" name="password1" placeholder="Password" value="{{ user.pass1 }}" required>
+                <input type="password" name="password2" placeholder="Confirm Password" value="{{ user.pass2 }}" required>
+                <span id="passwordError" style="color: red;"></span>
+                <button type="submit">Sign Up</button>
+            </form>
+            <div class="redirect-link">
+                <p>Already have an account?</p>
+                <a href="{% url 'user_login' %}">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("signupForm").addEventListener("submit", function(event) {
+            const password1 = document.getElementById("password1").value;
+            const password2 = document.getElementById("password2").value;
+            const errorSpan = document.getElementById("passwordError");
+            
+            // Reset the error message
+            errorSpan.textContent = "";
+    
+            // Check if password length is at least 6 characters
+            if (password1.length < 6) {
+                errorSpan.textContent = "Password must be at least 6 characters long.";
+                event.preventDefault(); // Prevent form submission
+                return;
+            }
+    
+            // Optionally: Check if the password contains digits
+            const hasDigits = /\d/.test(password1);
+            if (!hasDigits) {
+                errorSpan.textContent = "Password must contain at least one digit.";
+                event.preventDefault(); // Prevent form submission
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

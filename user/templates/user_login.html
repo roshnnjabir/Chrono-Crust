@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ChronoCrest</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+    {% load socialaccount %}
+    {% include 'partials/error_pop_up.html' %}
+    <div class="container">
+        <img src="{% static 'images/image1.png' %}" alt="Login Image">
+        <div class="form-container">
+            <h2>Login</h2>
+            <form action="{% url 'user_login' %}" method="post">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <div class="redirect-link">
+                <p>Don't have an account?</p>
+                <a href="{% url 'user_signup' %}">Sign up</a>
+            </div>
+            <a href="{% provider_login_url 'google' %}?next=/" class="google-login-btn">
+                <img src="{% static 'images/googlelogo.jpeg' %}" alt="Google Logo" width="30" height="30">
+                Login with Google
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification - ChronoCrest</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <style>
+        #resend-container {
+            display: none; /* Initially hide the resend link */
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/error_pop_up.html' %}
+    <div class="container">
+        <img src="{% static 'images/image1.png' %}" alt="OTP Image">
+        <div class="form-container">
+            <h2>OTP Verification</h2>
+            <form action="{% url 'verify_otp' %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="otp" placeholder="Enter OTP" required>
+                <button type="submit">Verify OTP</button>
+            </form>
+            <div id="timer-container">
+                <p id="timer-text">Wait before you request another OTP: <span id="timer">30</span> seconds</p>
+            </div>
+            <div id="resend-container" class="redirect-link">
+                <p>Didn't receive the OTP?</p>
+                <a href="{% url 'resend_otp' %}">Resend OTP</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Countdown timer
+        let timerValue = 30;
+        const timerElement = document.getElementById('timer');
+        const resendContainer = document.getElementById('resend-container');
+
+        const countdown = setInterval(() => {
+            timerValue--;
+            timerElement.textContent = timerValue;
+
+            if (timerValue <= 0) {
+                clearInterval(countdown);
+                timerElement.textContent = ''; // Clear the timer
+                document.getElementById('timer-text').textContent = 'Request a new OTP:';
+                resendContainer.style.display = 'block'; // Show the resend link
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+}
+
+button {
+    cursor: pointer;
+    font-size: 16px;
+}
+p{
+    margin: 0;
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    z-index: 98;
+}
+
+.modal  {
+    position: fixed;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 99 !important;
+    width: 80%;
+    max-width: 800px;
+    max-height: 500px;
+}
+
+.modal-content {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    border: 0;
+}
+
+.modal-left {
+    width: 50%;
+}
+
+.modal-left img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-right {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 20px;
+    width: 50%;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.modal-right h2 {
+    width: 80%;
+    padding: 20px 0px;
+}
+.modal-right p {
+    margin: 20px 10px
+}
+
+.modal-right input {
+    padding: 10px;
+    margin: 10px 0;
+    width: 100%;
+}
+
+#login_form{
+    display: flex;
+    justify-content: center;
+}
+
+.modal-right button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #4CAF50, #45a049); /* Gradient background */
+    color: white;
+    border: none;
+    border-radius: 30px; /* Rounded corners */
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s, transform 0.3s ease-in-out; /* Smooth transition */
+}
+
+.modal-right button:hover {
+    background: linear-gradient(135deg, #45a049, #4CAF50); /* Reverse gradient on hover */
+    transform: scale(1.03); /* Slightly increase size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.close-modal {
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+}
+
+#signupbutton, #loginbutton {
+    color: linear-gradient(135deg, #4CAF50, #45a049);
+    padding: 0px 10px;
+    /*background-color: #008CBA; /* Blue background /
+    border: none;
+    border-radius: 30px; /* Rounded corners /
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s, transform 0.3s; /* Smooth transition /
+    margin-top: 10px; Space above */
+}
+
+#signupbutton:hover , #loginbutton:hover {
+    cursor: pointer;
+    color: linear-gradient(135deg, #45a049, #4CAF50);
+    /* background-color: #007B9E; /* Darker blue on hover /
+    transform: scale(1.03); /* Slightly increase size /
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+}
+
+#signupbutton-redirect, #loginbutton-redirect {
+    color: #008CBA;
+    /*background-color: #008CBA; /* Blue background /
+    border: none;
+    border-radius: 30px; /* Rounded corners /
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s, transform 0.3s; /* Smooth transition /
+    margin-top: 10px; Space above */
+}
+
+#signupbutton-redirect:hover , #loginbutton-redirect:hover {
+    cursor: pointer;
+    color: #007B9E;;
+    /* background-color: #007B9E; /* Darker blue on hover /
+    transform: scale(1.03); /* Slightly increase size /
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+}
+
+
+@media (max-width: 768px) {
+    .modal-content {
+        flex-direction: column;
+    }
+
+    .modal-left, .modal-right {
+        width: 100%;
+    }
+}

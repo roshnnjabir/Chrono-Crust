@@ -1,0 +1,821 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoCrest - Watches</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/product.css' %}">
+    <style>/* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        a {
+            color: #050505;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        /* Header Styles */
+        .header-top {
+            height: 43px;
+            background-color: #050505;
+            color: #666;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-top > nav > a {
+            color: #666;
+        }
+        
+        .left-text {
+            font-size: 14px;
+        }
+        
+        .nav {
+            color: #666;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-item a {
+            font-family: 'Montserrat', sans-serif;
+            text-decoration: none;
+            color: #fff;
+        }
+        .left-options a{
+            color: #fff;
+        }
+        
+        /* Updated Second Part of the Header */
+        .header-bottom {
+            flex-direction: column;
+            padding: 0;
+            position: relative;
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            align-items: flex-start; /* Align content to the top */
+            height: 100vh;
+            font-size: 13px;
+        }
+        
+        .header-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('{% static "images/background.jpg" %}'); /* Set the background image */
+            background-size: cover; /* Cover the entire area */
+            background-position: center; /* Center the image */
+            z-index: 0; /* Behind other content */
+        }
+        
+        .header-content {
+            padding: 10px 20px;
+            flex-direction: column;
+            position: relative;
+            z-index: 1; /* Ensure content is above the background */
+            width: 100%; /* Full width for content */
+        }
+        
+        /* Other styles remain unchanged */
+        .header-upper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-nav{
+            width: 100%;
+        }
+
+        .header-logo {
+            width: 150px;
+            height: 150px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px; /* Space between icons */
+            padding: 20px 0;
+        }
+
+        /* Hamburger Icon */
+        .menu-icon-container {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Fullscreen Dropdown Menu */
+        .dropdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .dropdown-overlay.show {
+            display: flex;
+        }
+        
+        .dropdown-close-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .dropdown-menu-mobile {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background-color: white;
+            padding: 20px;
+            width: 80%;
+            text-align: center;
+        }
+        .desc-container{
+            width: 50%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        .desc-text-container{
+            font-size: 16px;
+            padding-top: 5%;
+            word-spacing: 5px;
+            font-weight: 100;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(to bottom right, #fff, #666);
+            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            color: #666;
+            float: right;
+            
+        }
+        .desc-text-container h2{
+            max-width: 400px;
+            font-size: 25px;
+            background: linear-gradient(to right, #fff, #666);
+            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            margin-bottom: 12px;
+        }
+        .desc-text-container p{
+            max-width: 440px;
+        }
+        .section-2-desc p{
+            background: linear-gradient(to bottom right, #fff, #666);
+            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            word-spacing: 5px;
+            float: right;
+        }        
+        .section-2{
+            display: flex;
+            width: 100%;
+            background-color: black;
+            padding-right: 5%;
+            min-height: 100vh;
+        }
+        .section-2-img{
+            width: 45%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .section-2-img-container{
+            width: 350px;
+            height: 80%;
+            box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+            border-radius: 10px;
+        }
+        .section-2-img-container img{
+            border-radius: 10px;
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover;
+        }
+        .section-2-desc{
+            width: 55%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section-3{
+            width: 100%;
+            height: 100vh;
+        }
+        .section-3 img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .section-3-button-container{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Media Queries for Responsiveness */
+        @media (max-width: 990px) {
+            .header-logo {
+                width: 130px;
+                height: 90px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-logo {
+                width: 150px;
+                height: 150px;
+            }
+        
+            .header-top {
+                height: 30px;
+            }
+        
+            .left-options {
+                display: none;
+            }
+        
+            .header-nav {
+                display: none;
+            }
+        }
+    </style>
+
+    <!-- Styles for view product pop-up  -->
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .popup {
+            display: none; /* Initially hidden */
+            flex-direction: column;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: scroll; /* Enable scrolling */
+            z-index: 1000; /* On top of other content */
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: black;
+        }
+
+        .product-view {
+            display: flex;
+            padding: 20px;
+            flex-direction: row;
+        }
+
+        .image-section {
+            display: flex;
+            flex-direction: column;
+            width: 40%; /* Adjust as needed */
+        }
+
+        .main-image-container {
+            position: relative;
+            overflow: hidden; /* Hide overflow */
+            height: 300px; /* Set a height for the container */
+            width: 100%; /* Set width to 100% */
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease; /* Zoom transition */
+        }
+
+        .arrow {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: black;
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1; /* Ensure arrows are above the image */
+        }
+        
+        .left-arrow {
+            left: 10px; /* Position on the left */
+        }
+        
+        .right-arrow {
+            right: 10px; /* Position on the right */
+        }
+        
+
+        .thumbnail-section {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            overflow-x: auto; /* Enable horizontal scroll */
+            overflow-y: hidden;
+            white-space: nowrap; /* Prevent line breaks */
+        }
+
+        .thumbnail-section img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail {
+            max-width: 60px;
+            height: auto;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: border 0.3s ease;
+        }
+
+        .thumbnail:hover {
+            border: 1px solid black;
+        }
+
+        .details-section {
+            width: 60%; /* Adjust as needed */
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            color: gray;
+            margin: 15px;
+        }
+
+        .add-to-cart {
+            background: black;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            font-family: 'Nunito', sans-serif;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+
+        .add-to-cart:hover {
+            background: linear-gradient(to right, white, black);
+            color: black;
+        }
+
+        .add-to-cart:before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: black;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .add-to-cart:hover:before {
+            transform: scaleX(1);
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0px;
+            font-size: 0.9rem; /* Decrease size */
+            width: 100%;
+        }
+
+        .feature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .feature-value {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .feature-name {
+            font-size: 0.8rem; /* Smaller font */
+            text-align: center;
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-evenly;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+
+        .option:hover span:after {
+            content: "";
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -5px;
+            height: 2px;
+            background: black;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .option:hover span:after {
+            transform: scaleX(1);
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            z-index: 100; /* Ensure it's above other content */
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <!-- First part of the header -->
+        <div class="header-top d-flex justify-content-between align-items-center">
+            <div class="left-text">Free Shipping Worldwide</div>
+            <nav class="nav">
+                <a href="#" class="nav">Help & FAQs</a>
+                <a href="#" class="nav">Contact</a>
+                <a href="#" class="nav">Services</a>
+                <a href="#" class="nav">About</a>
+            </nav>
+        </div>
+
+        <!-- Second part of the header -->
+        <div class="header-bottom">
+            <div class="header-background"></div> <!-- Background Image -->
+            <div class="header-content d-flex justify-content-between align-items-center .flex-column">
+                <div class="header-upper d-flex justify-content-between pb-2 w-100">
+                    <div class="left-options d-none d-lg-flex align-items-center gap-5">
+                        <a href="#"><img src="{% static 'svg/globe.svg' %}" width="20" height="20" alt="Globe"> English - USD</a>
+                        <a href="#"><img src="{% static 'svg/phone.svg' %}" width="20" height="20" alt="Phone"> (1-866-273-3477)</a>
+                    </div>
+                    <div class="icon-container gap-4">
+                        <div class="icon">
+                            <img src="{% static 'svg/cart.svg' %}" alt="Cart Icon">
+                        </div>
+                        <div class="icon">
+                            <img src="{% static 'svg/wishlist.svg' %}" alt="Wishlist Icon">
+                        </div>
+                        <div class="icon open-modal" data-modal="login-modal">
+                            <img src="{% static 'svg/myaccount.svg' %}" alt="My Account Icon">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-nav d-none d-lg-flex justify-content-around align-items-center py-3 px-5 w-90">
+                    <nav class="left-nav d-flex gap-5">
+                        <div class="nav-item">
+                            <a href="#">For Men</a>
+                            <span class="oblong"></span>
+                        </div>
+                        <div class="nav-item">
+                            <a href="#">For Her</a>
+                            <span class="oblong"></span>
+                        </div>
+                        <!-- <div class="nav-item">
+                            <a href="#">Unisex</a>
+                            <span class="oblong"></span>
+                        </div> -->
+                    </nav>
+                    <nav class="right-nav d-flex gap-5">
+                        <div class="nav-item">
+                            <a href="#">Brands</a>
+                            <span class="oblong"></span>
+                        </div>
+                        <div class="nav-item">
+                            <a href="#">Boutiques</a>
+                            <span class="oblong"></span>
+                        </div>
+                        <!-- <div class="nav-item">
+                            <a href="#">Collections</a>
+                            <span class="oblong"></span>
+                        </div> -->
+                    </nav>
+                </div>
+
+                <!-- Logo in the center -->
+                <div class="header-logo position-absolute top-50 start-50 translate-middle" id="logo">
+                    <img src="{% static 'images/logo1.png' %}" alt="ChronoCrest Logo" width="100%" height="100%">
+                </div>
+
+                <!-- Hamburger Menu for smaller screens -->
+                <div class="menu-icon-container d-lg-none position-absolute end-0 top-0 p-3" id="menuIcon">
+                    <img src="{% static 'svg/menu.svg' %}" class="menu-icon" alt="Menu" width="30" height="30">
+                </div>
+
+                <!-- Fullscreen Dropdown Menu -->
+                <div class="dropdown-overlay" id="dropdownMenu">
+                    <div class="dropdown-close-container text-end p-3" id="closeIcon">
+                        <img src="{% static 'svg/close.svg' %}" class="close-icon" alt="Close" width="30" height="30">
+                    </div>
+                    <div class="dropdown-menu-mobile d-flex flex-column align-items-center">
+                        <a href="#">For Men</a>
+                        <a href="#">For Women</a>
+                        <a href="#">Unisex</a>
+                        <a href="#">Brands</a>
+                        <a href="#">Boutiques</a>
+                    </div>
+                </div>
+            </div>
+            <video width="320" height="240" controls>
+                <source src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div style="width: 100%; height: 100vh; position: absolute; display: flex; align-items: baseline;"><img style="height: 100%; width: 100%; object-fit: cover;" src="{{ product.image.url }}" alt="admin"></div>
+            <div class="desc-container">
+                <div class="desc-text-container"><h2>Presenting The New {{product.collection.brand.name}} {{product.collection.name}} {{product.name}}</h2>
+                    <p>The new Zenith Defy Skyline Chronograph impresses with its high frequency El Primero 3600 movement that ensures 1/10th of a second function, and choice of dials in black, blue, and silver</p></div>
+            </div>
+        </div>
+        <div class="section-2">
+            <div class="section-2-img">
+                <div class="section-2-img-container">
+                    <img src="{{ product.image3.url }}" alt="image">
+                </div>
+            </div>
+            <div class="section-2-desc">
+                <div class="desc-text-container">
+                    <h2>Precision Perfection</h2>
+                    <p>The Zenith Defy Skyline Chronograph features a 42mm stainless steel case with a modernised octagonal shape, which borrows much from the history of the iconic Defy, only to become even more refined, robust, and reliable. The pushers of the Defy Skyline Chronograph trace the case’s sharp lines, and the screw-down crown with Zenith’s star keeps things watertight up to 100m; a fine example of form and function.</p>
+                </div>
+                <p>Despite being a chronograph watch, the Defy Skyline Chronograph offers an option to choose from dials in metallic black, blue, and silver, displayed with an attractive sunray pattern. This dial appears uncluttered, and manages to be aesthetically impressive, courtesy the collection’s signature starry sky pattern with the traditional El Primero dial layout. It’s three slightly oversized, overlapping sub-dials handle the elapsed seconds and minutes of the chronograph, not to mention the constant running seconds. The dial also features hour markers, which are rhodium-plated, faceted, and coated with Super-LumiNova for easy timekeeping in dark conditions. Its date window appears at 4.30 and matches the dial colour, while the 12-facet flange ring with a 1/10th-of-a-second scale follows the lines and angles of the dodecagonal bezel, which also acts as an extension for the hour markers.</p>
+            </div>
+        </div>
+        <div class="section-3">
+            <div class="section-3-button-container">
+                <button onclick="openPopup()">Open Product View</button>
+            </div>
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        </div>
+
+        <!-- Product View Pop UP -->
+        <div class="overlay" id="overlay" style="display: none;"></div>
+        <div style="background-color: white; display: none; backdrop-filter: none;" class="popup" id="popup">
+            <div class="popup-header">
+                <span class="close-btn" onclick="closePopup()">×</span>
+            </div>
+            <div class="product-view">
+                <div class="image-section">
+                    <div class="main-image-container">
+                        <button class="arrow left-arrow" onclick="changeImage('left')">&#9664;</button>
+                        <img src="{{ product.image.url }}" alt="Product Image" class="main-image">
+                        <button class="arrow right-arrow" onclick="changeImage('right')">&#9654;</button>
+                    </div>                
+                    <div class="thumbnail-section">
+                        <img src="{{ product.image.url }}" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('{{ product.image1.url }}')">
+                        <img src="{{ product.image1.url }}" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('{{ product.image2.url }}')">
+                        <img src="{{ product.image2.url }}" alt="Thumbnail 3" class="thumbnail" onclick="changeImage('{{ product.image3.url }}')">
+                        <img src="{{ product.image3.url }}" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('{{ product.image4.url }}')">                        
+                    </div>                
+                </div>
+                <div class="details-section">
+                    <h1 class="product-name">The {{ product.collection.brand.name }} {{ product.collection.name }} {{ product.name }}</h1>
+                    <p class="price">{{ product.price }}</p>
+                    
+                    {% if product.is_listed is False %}
+                    <p style="font-size: 14px;" class="price">Currently Unavailable</p>
+                    {% elif product.stock <= 0 %}
+                    <p style="font-size: 14px;" class="price">Out Of Stock</p>
+                    {% endif %}
+                    
+                    <div style="width: 100%; display: flex; justify-content: center;">
+                        <button class="add-to-cart" onclick="addToCart()">{% if product.stock <= 0 or product.is_listed is false %} Notify Me When Available {% else %} Add To Cart {% endif %}</button>
+                    </div>
+                    <div class="options">
+                        <div class="option">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-9.19-.73L12 2 11.18 8.51 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                            <span>Add to Wishlist</span>
+                        </div>
+                        <div class="option">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M4 8h16v2H4zm0 4h10v2H4z"/>
+                            </svg>
+                            <span>Find In Store</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-value">
+                        <span>42</span>
+                        <span>MM</span>
+                    </div>
+                    <div class="feature-name">DIAMETER</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-value">
+                        <span>36000</span>
+                        <span>VpH</span>
+                    </div>
+                    <div class="feature-name">FREQUENCY</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-value">
+                        <span>60</span>
+                        <span>H</span>
+                    </div>
+                    <div class="feature-name">POWER RESERVE</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-value">
+                        <span>10</span>
+                        <span>ATM</span>
+                    </div>
+                    <div class="feature-name">WATER RESISTANCE</div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const images = [
+            '{{ product.image.url }}',
+            '{{ product.image1.url }}',
+            '{{ product.image2.url }}',
+            '{{ product.image3.url }}',
+        ];
+        
+        let currentIndex = 0; // Track the currently displayed image
+        let zoomDisabled = false; // To manage zoom state
+        
+        function openPopup() {
+            document.getElementById('popup').style.display = 'flex';
+            document.getElementById('overlay').style.display = 'flex';
+        }
+        
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+        
+        function changeImage(directionOrSrc) {
+            const mainImage = document.querySelector('.main-image');
+        
+            // Reset zoom whenever the image is changed
+            resetZoom(mainImage);
+        
+            // Handle if a thumbnail is clicked (image source is passed)
+            console.log(directionOrSrc)
+            if (typeof directionOrSrc === 'string' && directionOrSrc.includes('admin')) {
+                mainImage.src = `${directionOrSrc}?${new Date().getTime()}`; // Force reload
+                currentIndex = images.indexOf(directionOrSrc); // Update currentIndex
+            } else if (directionOrSrc === 'left') {
+                currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
+                mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`; // Force reload
+            } else if (directionOrSrc === 'right') {
+                currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
+                mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`; // Force reload
+            }
+        }
+        
+        function addToCart() {
+            alert('Product added to cart!');
+        }
+        
+        function resetZoom(mainImage) {
+            // Reset zoom effect
+            mainImage.style.transform = 'scale(1)';
+        }
+        
+        // Zoom effect for the main image
+        const mainImageContainer = document.querySelector('.main-image-container');
+        const mainImage = document.querySelector('.main-image');
+        
+        mainImageContainer.addEventListener('mousemove', function (e) {
+            if (zoomDisabled) return; // Stop zooming if the zoom is disabled
+        
+            const { width, height } = this.getBoundingClientRect();
+            const x = e.clientX - this.getBoundingClientRect().left;
+            const y = e.clientY - this.getBoundingClientRect().top;
+        
+            const percentX = (x / width) * 100;
+            const percentY = (y / height) * 100;
+        
+            mainImage.style.transformOrigin = `${percentX}% ${percentY}%`;
+            mainImage.style.transform = 'scale(1.5)'; // Set zoom level
+        });
+        
+        mainImageContainer.addEventListener('mouseleave', function () {
+            mainImage.style.transform = 'scale(1)'; // Reset zoom on mouse leave
+        });
+        
+        // Disable zoom when hovering over the arrows
+        const leftArrow = document.querySelector('.left-arrow');
+        const rightArrow = document.querySelector('.right-arrow');
+        
+        leftArrow.addEventListener('mouseenter', () => {
+            zoomDisabled = true; // Disable zoom while hovering over the arrow
+            resetZoom(mainImage); // Reset zoom on hover
+        });
+        
+        rightArrow.addEventListener('mouseenter', () => {
+            zoomDisabled = true; // Disable zoom while hovering over the arrow
+            resetZoom(mainImage); // Reset zoom on hover
+        });
+        
+        // Re-enable zoom after leaving the arrows
+        leftArrow.addEventListener('mouseleave', () => {
+            zoomDisabled = false;
+        });
+        
+        rightArrow.addEventListener('mouseleave', () => {
+            zoomDisabled = false;
+        });
+        
+        </script>
+    </header>
+    <script src="{% static 'js/body.js' %}"></script>
+</body>
+</html>

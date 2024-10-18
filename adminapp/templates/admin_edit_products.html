@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css"> <!-- Cropper.js CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fc;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        label {
+            font-size: 14px;
+            color: #666;
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 8px 0px;
+            padding-left: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #80bdff;
+            outline: none;
+        }
+
+        input[type="file"] {
+            margin-top: 12px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .image-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .image-section img {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: cover;
+            margin: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .image-section img:hover {
+            transform: scale(1.05);
+        }
+
+        .image-preview-container {
+            display: block;
+            flex-direction: column;
+            align-items: center;
+        }
+        .image-preview-container1 {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #cropped-image {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 100%;
+            margin-top: 15px;
+        }
+
+        .action-button,
+        .save-button {
+            padding: 12px 20px;
+            border-radius: 8px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .action-button:hover,
+        .save-button:hover {
+            background-color: #218838;
+        }
+
+        #save-button {
+            width: auto;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Edit Product</h2>
+        <form id="edit-form" action="{% url 'admin_edit_product' product.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="product-id" id="edit-product-id" value="{{ product.id }}">
+
+            <label for="product-name">Product Name</label>
+            <input type="text" id="edit-product-name" name="productname" value="{{ product.name }}">
+
+            <!-- Price of Product -->
+            <label for="product-name">Price of Product</label>
+            <input type="text" id="edit-product-price" name="price" value="{{ product.price }}">
+
+            <!-- Collection Selection -->
+            <label for="collection-name">Collection Name</label>
+            <select name="collection" id="edit-product-collection">
+                {% for collection in collections %}
+                <option value="{{ collection.id }}" {% if collection.id == product.collection.id %} selected {% endif %}>
+                    {{ collection.name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <label for="product-stock">Stock</label>
+            <input type="stock" id="edit-product-stock" name="stock" value="{{ product.stock }}">
+
+            <!-- Image Upload Section -->
+            <div class="image-section">
+                <label for="product-image">Product Images</label>
+                <div class="image-preview-container">
+                    <img id="image1" src="{{ product.image.url }}" alt="Product Image 1" onclick="chooseImage('image1')">
+                    <img id="image2" src="{{ product.image1.url }}" alt="Product Image 2" onclick="chooseImage('image2')">
+                    <img id="image3" src="{{ product.image2.url }}" alt="Product Image 3" onclick="chooseImage('image3')">
+                </div>
+                <input type="file" id="upload-image" accept="image/*" onchange="previewImage(event)">
+                <div class="image-preview-container1" id="cropped-image-container">
+                    <img id="cropped-image" alt="Cropped Image">
+                    <button type="button" id="save-button" class="action-button" style="display:none;" onclick="cropImage()">Crop Image</button>
+                </div>
+            </div>
+            
+            <input type="hidden" name="image1"  id="himage1" value="">
+            <input type="hidden" name="image2" id="himage2" value="">
+            <input type="hidden" name="image3" id="himage3" value="">
+
+            <button type="submit" class="save-button">Save Changes</button>
+        </form>
+    </div>
+
+    <script src="https://unpkg.com/cropperjs/dist/cropper.js"></script> <!-- Cropper.js -->
+
+    <script>
+        document.getElementById('edit-form').onsubmit = function() {
+            // Create a URL object for easier manipulation
+            const image1Src = new URL(document.getElementById('image1').src);
+            const image2Src = new URL(document.getElementById('image2').src);
+            const image3Src = new URL(document.getElementById('image3').src);
+        
+            // Set the input values to the pathname (which gives you the path)
+            // Strip out the '/media/' prefix
+            document.getElementById('himage1').value = image1Src.pathname.replace('/media/', ''); // This will give you the path without '/media/'
+            document.getElementById('himage2').value = image2Src.pathname.replace('/media/', ''); // Similarly for image2
+            document.getElementById('himage3').value = image3Src.pathname.replace('/media/', ''); // Similarly for image3
+        };      
+
+        let cropper;
+let selectedImageId;
+
+// Function to handle image selection and trigger file input
+function chooseImage(imageId) {
+    document.getElementById('upload-image').click(); // Trigger file input click
+    selectedImageId = imageId; // Store the selected image ID
+}
+
+// Function to preview the selected image and initialize Cropper.js
+function previewImage(event) {
+    const file = event.target.files[0];
+
+    if (file) {
+        // Check the file type (PNG and JPG allowed)
+        const validTypes = ['image/png', 'image/jpeg'];
+        if (!validTypes.includes(file.type)) {
+            alert('Only PNG and JPG files are allowed.');
+            return; // Stop further execution if the file type is invalid
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            // Replace the clicked image with the uploaded image
+            const selectedImage = document.getElementById(selectedImageId);
+            selectedImage.src = e.target.result;
+
+            // Show cropper on uploaded image
+            const cropImage = document.getElementById('cropped-image');
+            cropImage.src = e.target.result;
+            document.getElementById('cropped-image-container').style.display = 'flex';
+            document.getElementById('save-button').style.display = 'block';
+
+            // Initialize cropper
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1,
+                viewMode: 2
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Function to crop the image and upload it
+function cropImage() {
+    // Get the cropped canvas
+    const canvas = cropper.getCroppedCanvas();
+
+    // Convert the canvas to a blob
+    canvas.toBlob(function(blob) {
+        const formData = new FormData();
+        formData.append('image', blob, 'cropped_image.png'); // You can name the file as you prefer
+
+        // Send the blob to the server using fetch
+        fetch('/upload_cropped_image/', { // Update the URL as needed
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update the image source with the URL of the saved image
+                const croppedImage = document.getElementById(selectedImageId);
+                croppedImage.src = data.file_url; // Set the image source to the saved file URL
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading image:', error);
+        });
+
+        // Hide cropper preview after cropping
+        cropper.destroy();
+        document.getElementById('cropped-image-container').style.display = 'none';
+    }, 'image/png'); // You can change the format if needed
+}
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        button{
+            font-family: 'Nunito', sans-serif;
+            padding: 8px 20px;
+        }
+        a {
+            text-decoration: none;
+            color: #050505;
+        }
+        .container {
+            display: flex;
+            padding: 40px;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .breadcrumbs {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #888;
+        }
+        .main-content {
+            display: flex;
+            gap: 30px;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .sidebar div {
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 15px;
+        }
+        .sidebar div:hover {
+            background-color: #e8e8e8;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar div.selected {
+            background-color: #050505;
+            color: #fff;
+        }
+        .dropdown {
+            display: none;
+        }
+        .content {
+            flex: 1;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #050505;
+            margin-bottom: 20px;
+        }
+        .box {
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #050505;
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+        }
+        .box-header button {
+            background-color: #d0d0d0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .box-header button:hover {
+            background-color: #ebebeb;
+            transform: scale(1.05);
+        }
+        .info-layout {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            align-items: center;
+        }
+        .info-label {
+            flex: 1;
+            font-weight: 600;
+            text-align: left;
+            color: #555;
+        }
+        .info-value {
+            flex: 1;
+            text-align: right;
+            color: #666;
+            padding-left: 20px;
+        }
+        .logout {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .logout a {
+            color: #ff4d4d;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #ffecec;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .logout a:hover {
+            background-color: #ff4d4d;
+            color: #fff;
+        }
+        #editbutton{
+            max-width: 60px;
+            max-width: 90px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .sidebar {
+                display: none;
+            }
+            .dropdown {
+                display: block;
+                margin-bottom: 20px;
+            }
+            .dropdown select {
+                width: 100%;
+                padding: 15px;
+                font-size: 16px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                border: none;
+                background-color: #fff;
+            }
+            .logout {
+                text-align: center;
+                margin-top: 20px;
+            }
+        }
+
+        /* Styles for Max-Width 480px */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            .box {
+                padding: 15px;
+            }
+            .box-header {
+                padding: 10px;
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            .box-header button {
+                margin-top: 10px;
+            }
+            h3{
+                margin: 15px;
+            }
+            .info-layout {
+                flex-direction: row;
+                text-align: left;
+                padding: 12px;
+            }
+            .info-value {
+                text-align: left;
+                padding-left: 0;
+            }
+            h2 {
+                font-size: 20px;
+            }
+        }
+
+        /* Styles for Max-Width 400px */
+        @media (max-width: 400px) {
+            .container {
+                padding: 10px;
+            }
+            .box {
+                padding: 10px;
+            }
+            .box-header {
+                padding: 8px;
+            }
+            .box-header button {
+                padding: 8px 12px;
+            }
+            .info-layout {
+                padding: 10px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            .info-value {
+                font-size: 14px;
+            }
+            .logout a {
+                padding: 8px 12px;
+            }
+        }
+
+
+        /* styles for modal */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            align-items: center;
+            justify-self: center;
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .modal-header {
+            margin: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            margin: 0;
+        }
+        .close {
+            color: #aaa;
+            cursor: pointer;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #savechanges{
+            margin-top: 20px;
+            margin-left: 10px;
+            padding: 8px 20px;
+            border-radius: 5px;
+            background-color: #28221E;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #savechanges:hover{
+            background-color: #4A423E;
+        }
+
+        @media (max-width: 480px) {
+            /* Modal Overlay */
+            .modal-overlay {
+                padding: 20px; /* Add some padding for smaller screens */
+            }
+        
+            /* Modal Content */
+            .modal-content {
+                width: 90%; /* Use 90% of the screen width */
+                max-width: 400px; /* Set a max width for the modal */
+                margin: 10% auto; /* Center the modal with some margin from the top */
+                padding: 15px; /* Add padding inside the modal */
+                border-radius: 10px; /* Rounded corners */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            }
+        
+            /* Modal Header */
+            .modal-header {
+                font-size: 20px; /* Adjust header font size */
+                margin-bottom: 15px; /* Space below header */
+            }
+        
+            /* Modal Form Inputs */
+            input[type="text"],
+            input[type="email"],
+            input[type="password"] {
+                width: 100%;/* Full width for inputs */
+                max-width: 280px; 
+                padding: 10px; /* Add padding */
+                border-radius: 5px; /* Rounded corners */
+                border: 1px solid #ccc; /* Border styling */
+            }
+        
+            /* Modal Button */
+            button {
+                padding: 10px; /* Add padding */
+                border-radius: 5px; /* Rounded corners */
+                background-color: #28221E; /* Button color */
+                color: white; /* Text color */
+                border: none; /* No border */
+                cursor: pointer; /* Pointer cursor */
+            }
+        
+            button:hover {
+                background-color: #4A423E; /* Darker shade on hover */
+            }
+        
+            /* Close Button */
+            .close-btn {
+                font-size: 18px; /* Adjust close button font size */
+            }
+
+            #savechanges{
+                margin-top: 15px;
+                margin-left: 5px;
+            }
+            #savechanges:hover{
+                background-color: #4A423E;
+            }
+            /* Info Layout Adjustments */
+            .info-layout {
+                flex-direction: column; /* Change flex direction to column */
+                align-items: flex-start;
+                border: none; /* Remove border */
+            }
+        }
+        
+        @media (max-width: 400px) {
+            /* Modal Overlay */
+            .modal-overlay {
+                padding: 15px; /* Reduce padding for smaller screens */
+            }
+        
+            /* Modal Content */
+            .modal-content {
+                width: 95%; /* Use 95% of the screen width */
+                max-width: 350px; /* Set a max width for the modal */
+                margin: 15% auto; /* Center the modal with more margin from the top */
+                padding: 10px; /* Add padding inside the modal */
+                border-radius: 8px; /* Rounded corners */
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            }
+        
+            /* Modal Header */
+            .modal-header {
+                font-size: 18px; /* Adjust header font size */
+                margin-bottom: 10px; /* Space below header */
+            }
+        
+            /* Modal Form Inputs */
+            input[type="text"],
+            input[type="email"],
+            input[type="password"] {
+                max-width: 250px;
+                padding: 8px; /* Reduce padding for inputs */
+                font-size: 14px; /* Adjust font size for inputs */
+            }
+        
+            /* Modal Button */
+            button {
+                padding: 8px; /* Reduce padding for the button */
+                font-size: 16px; /* Adjust font size for the button */
+            }
+        
+            /* Close Button */
+            .close-btn {
+                font-size: 16px; /* Adjust close button font size */
+            }
+
+            #savechanges{
+                margin-top: 10px;
+                margin-left: 0px;
+            }
+        }
+        
+        
+    </style>
+</head>
+<body>
+    {% include 'partials/error_pop_up.html' %}
+<div class="container">
+    <div class="breadcrumbs">
+        <a href="{% url 'user_home' %}">Home</a> / <span>My Profile</span>
+    </div>
+
+    <!-- Dropdown for Sidebar on Mobile -->
+    <div class="dropdown">
+        <select id="mobile-nav" onchange="navigateTo(this.value)">
+            <option value="overview" selected>Overview</option>
+            <option value="personal-wallet">Personal Wallet</option>
+            <option value="address-book">Address Book</option>
+            <option value="change-password">Change Password</option>
+            <option value="order-history">Order History</option>
+        </select>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <div class="nav-item selected" id="overview">Overview</div>
+            <div class="nav-item" id="personal-wallet">Personal Wallet</div>
+            <div class="nav-item" id="address-book">Address Book</div>
+            <div class="nav-item" id="change-password">Change Password</div>
+            <div class="nav-item" id="order-history">Order History</div>
+        </div>
+
+        <div class="content" >
+            <h2>My Account</h2>
+            <div class="box">
+                <div class="box-header">
+                    <h3>Account Overview</h3>
+                    <a class="edit_button" id="edit_button" href=""><button >EDIT</button></a>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">First Name:</div>
+                    <div class="info-value">{{user.first_name}}</div>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">Last Name:</div>
+                    <div class="info-value">{{user.last_name}}</div>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">Date of Birth:</div>
+                    <div class="info-value">{{user.date_of_birth}}</div>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">Phone Number:</div>
+                    <div class="info-value">{{user.phone}}</div>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">Email Address:</div>
+                    <div class="info-value">{{user.email}}</div>
+                </div>
+            </div>
+
+            <div class="logout">
+                <a href="{% url 'user_logout' %}">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Editing User Info -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit User Information</h3>
+            <span class="close" id="close_modal">&times;</span>
+        </div>
+        <form action="{% url 'user_profile_update' %}" method="post" id="editForm">
+            {% csrf_token %}
+            <div class="info-layout">
+                <div class="info-label">First Name:</div>
+                <input type="text" name="FirstName" id="editFirstName" value="{{ user.first_name }}" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Last Name:</div>
+                <input type="text" name="LastName" id="editLastName" value="{{ user.last_name }}" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Date of Birth:</div>
+                <input type="date" name="Date_of_birth" id="editDob" value="{{ date_of_birth }}" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Phone Number:</div>
+                <input type="tel" id="editphone" name="Phone" maxlength="10" pattern="\d{10}" inputmode="numeric" value="{{ user.phone }}" required  oninvalid="this.setCustomValidity('Integer only, 10 digits')" 
+                oninput="this.setCustomValidity('')" 
+                title="Integer only, 10 digits">
+            </div>
+            <input type="hidden" name="Email" id="editEmail" value="{{ user.email }}" required>
+            <button id="savechanges" type="submit">Save Changes</button>
+        </form>        
+    </div>
+</div>
+
+<script>
+    // Highlight selected nav item
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            navItems.forEach(i => i.classList.remove('selected')); // Remove selected from all
+            item.classList.add('selected'); // Add selected to clicked item
+        });
+    });
+
+    // Dropdown navigation for mobile
+    function navigateTo(option) {
+        // Handle navigation logic here
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('selected'));
+        document.getElementById(option).classList.add('selected');
+    }
+
+    // Open modal
+    const editButton = document.getElementById('edit_button');
+    const editModal = document.getElementById('modal');
+    const closeModal = document.getElementById('close_modal');
+
+    editButton.addEventListener('click', function() {
+        editModal.style.display = "flex"; // Show modal
+    });
+
+    closeModal.onclick = function() {
+        editModal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == editModal) {
+            editModal.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

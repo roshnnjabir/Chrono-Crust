@@ -1,0 +1,295 @@
+body { 
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.featured-products {
+    position: relative;
+    overflow: hidden;
+    height: 100vh; /* Full viewport height */
+}
+
+.product-slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.product {
+    min-width: 100%;
+    height: 100vh; /* Full viewport height */
+    position: relative;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image scales without distortion */
+}
+
+/* Text styling */
+.product-name {
+    position: absolute;
+    left: 10%; /* Adjusted for spacing from the left */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2.5rem; /* Default font size */
+    color: black;
+    z-index: 2; /* Ensure text is above the image */
+}
+
+.product-description {
+    position: absolute;
+    left: 10%; /* Adjusted for spacing from the left */
+    top: calc(50% + 40px);
+    color: black;
+    max-width: 400px;
+    z-index: 2; /* Ensure description is above the image */
+}
+
+/* Navigation buttons */
+.prev-button,
+.next-button {
+    position: absolute; /* Position buttons absolutely */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for centering */
+    background: rgba(0, 0, 0, 0); /* Transparent background */
+    border: none;
+    cursor: pointer;
+    z-index: 10; /* Higher z-index to ensure visibility */
+    padding: 10px; /* Add some padding */
+    border-radius: 50%; /* Make buttons circular */
+}
+
+.prev-button img,
+.next-button img {
+    width: 30px; /* Adjust icon size */
+    height: 30px;
+}
+
+.prev-button {
+    left: 20px; /* Position on left */
+}
+
+.next-button {
+    right: 20px; /* Position on right */
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .product-name {
+        font-size: 2rem; /* Reduce font size */
+    }
+
+    .product-description {
+        font-size: 1rem; /* Reduce font size */
+        top: calc(50% + 30px);
+    }
+}
+
+@media (max-width: 768px) {
+    .product-name {
+        font-size: 1.5rem; /* Further reduce font size */
+    }
+
+    .product-description {
+        font-size: 0.9rem; /* Further reduce font size */
+        top: calc(50% + 20px);
+    }
+
+    .prev-button,
+    .next-button {
+        padding: 8px; /* Adjust button padding for smaller screens */
+    }
+
+    .prev-button img,
+    .next-button img {
+        width: 25px; /* Adjust icon size */
+        height: 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-name {
+        font-size: 1.2rem; /* Further reduce for mobile */
+        left: 5%; /* Adjust for mobile */
+    }
+
+    .product-description {
+        font-size: 0.8rem; /* Further reduce for mobile */
+        left: 5%;
+        top: calc(50% + 15px);
+    }
+
+    .prev-button,
+    .next-button {
+        padding: 6px; /* Smaller buttons on mobile */
+    }
+
+    .prev-button img,
+    .next-button img {
+        width: 20px; /* Smaller icons for mobile */
+        height: 20px;
+    }
+}
+
+/* Discover Now Button Styling */
+.discover-button {
+    position: absolute;
+    left: 80%; /* Positioned on the right side of the left part */
+    top: 80%; /* Adjust position relative to the bottom */
+    background-color: white; /* White background */
+    color: black; /* Black text */
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 50px; /* Rounded button */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Small white shadow */
+    text-decoration: none; /* Remove underline */
+    font-weight: 600; /* Make the text bold */
+    font-size: 1rem; /* Adjust font size */
+    z-index: 2; /* Ensure the button is above other elements */
+    transition: all 0.3s ease-in-out; /* Smooth transition */
+}
+
+/* Hover effect for the button */
+.discover-button:hover {
+    background-color: black; /* Change to black on hover */
+    color: white; /* Change text color to white */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Slightly larger shadow */
+}
+
+#discover-button-51 {
+    position: absolute;
+    left: 58%;
+    top: 80%;
+}
+
+#discover-button-52 {
+    position: absolute;
+    left: 72%;
+    top: 80%;
+}
+
+/* Responsive adjustments for the Discover Now button */
+@media (max-width: 768px) {
+    .discover-button {
+        left: 50%; /* Center horizontally */
+        transform: translateX(-50%); /* Center horizontally */
+        padding: 12px 24px; /* Slightly increase padding for easier touch targets */
+        font-size: 1rem; /* Maintain font size */
+    }
+}
+
+@media (max-width: 480px) {
+    .discover-button {
+        padding: 10px 20px; /* Adjust padding for mobile screens */
+        font-size: 0.9rem; /* Adjust font size for mobile */
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+/* Product 5 specific styling */
+#product5 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+    position: relative;
+}
+
+#product5 .product-image {
+    opacity: 0.8;
+}
+
+/* Adjusting the text size for the 5th slide */
+#product-name-5 {
+    font-size: 2.5rem; /* Responsive text size */
+    color: black;
+    z-index: 2;
+    margin-bottom: 15px;
+}
+
+#product5-description {
+    max-width: 600px;
+    font-size: 1rem; /* Responsive text size */
+}
+
+/* Button container on Product 5 */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Adds space between the buttons */
+    margin-top: 20px;
+    z-index: 2;
+}
+
+.button-container a {
+    background-color: white;
+    color: black;
+    padding: 12px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.button-container a:hover {
+    background-color: black;
+    color: white;
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive styling for the button container and its buttons */
+@media (max-width: 1024px) {
+    #product-name-5 {
+        font-size: 1.8rem; /* Adjust size for medium screens */
+    }
+
+    #product5-description {
+        font-size: 1rem; /* Adjust size for medium screens */
+    }
+
+    .button-container a {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+    #product-name-5 {
+        font-size: 1.5rem; /* Adjust size for smaller screens */
+    }
+
+    #product5-description {
+        font-size: 0.8rem; /* Adjust size for smaller screens */
+    }
+
+    .button-container {
+        flex-direction: column; /* Stack buttons vertically on smaller screens */
+    }
+
+    .button-container a {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        margin-bottom: 10px; /* Add space between stacked buttons */
+    }
+}
+
+@media (max-width: 480px) {
+    #product-name-5 {
+        font-size: 1.5rem; /* Further reduce for mobile */
+        top: 30%; /* Adjust vertical position */
+    }
+
+    #product5-description {
+        font-size: 1rem; /* Further reduce for mobile */
+    }
+
+    .button-container a {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+}
+

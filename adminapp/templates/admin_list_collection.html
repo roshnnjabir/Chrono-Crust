@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Include Cropper.js CSS and JS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: #050505;
+        }
+
+        .container {
+            display: flex;
+            padding: 40px;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .breadcrumbs {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #888;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-direction: row;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .sidebar div {
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .sidebar div:hover {
+            background-color: #e8e8e8;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar div.selected {
+            background-color: #050505;
+            color: #fff;
+        }
+
+        .admin-container {
+            flex: 1;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-container h1 {
+            margin-bottom: 20px;
+        }
+
+        .search {
+            display: flex;
+            margin-bottom: 20px;
+            justify-content: end;
+        }
+
+        .search input[type="search"] {
+            max-width: 200px;
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        /* Wrap for horizontal scroll */
+        .table-container {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            margin-bottom: 20px; /* Space below the table */
+            max-width: 800px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f8f8f8;
+        }
+
+        .action-button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .messages li {
+            padding: 10px;
+            background-color: #ffefef;
+            border-left: 4px solid #ff4d4d;
+            margin-bottom: 10px;
+        }
+
+        .logout-button {
+            background-color: #ff4d4d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #ff1a1a;
+        }
+        /* Delete Button Style */
+        .delete-button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #ff4d4d; /* Red for Delete */
+            border: none;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .delete-button:hover {
+            background-color: #e60000; /* Darker Red on Hover */
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .sidebar {
+                width: 100%; /* Make sidebar full-width */
+                display: flex;
+                justify-content: space-around; /* Turn it into a horizontal bar */
+                gap: 0;
+                padding: 10px;
+                border-radius: 12px;
+                background-color: transparent; /* Make the background transparent */
+                box-shadow: none;
+            }
+
+            .sidebar div {
+                padding: 12px 10px; /* Adjust padding for smaller screens */
+                border-radius: 10px;
+            }
+
+            .admin-container {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 12px;
+            }
+
+            .sidebar{
+                font-size: 10px;
+                padding: 10px 3px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .admin-container h1 {
+                margin-bottom: 15px;
+            }
+
+            .breadcrumbs {
+                font-size: 10px;
+            }
+
+            .search input[type="search"] {
+                padding: 8px;
+            }
+
+            table th,
+            table td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 380px){
+            body{
+                font-size: 10px;
+            }
+            .sidebar{
+                justify-content: space-between;
+                font-size: 8px;
+            }
+            .sidebar div {
+                padding: 6px;
+                border-radius: 7px;
+            }
+            .breadcrumbs{
+                font-size: 8px;
+            }
+            .search{
+                margin-bottom: 10px;
+            }
+            .search input[type="search"] {
+                padding: 7px;
+                font-size: 8px;
+            }
+            #live-search{
+                max-width: 100px;
+                max-height: 25px;
+            }
+            .admin-container h1 {
+                margin-bottom: 10px;
+            }
+        }
+
+        /* css for edit modal */
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+            transition: all 0.3s ease-in-out;
+        }
+    
+        .modal-content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 600px;
+            max-height: 500px;
+            width: 90%;
+            height: 90%;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow-x: auto;
+        }
+    
+        /* Close button */
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.3s;
+        }
+    
+        .close:hover {
+            color: #e60000;
+        }
+    
+        /* Form elements */
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+    
+        .modal-content label {
+            font-size: 16px;
+            color: #333;
+        }
+    
+        .modal-content input[type="text"],
+        .modal-content input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+    
+        /* Image display */
+        #edit-product-image {
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+        }
+    
+        /* Save button */
+        .save-button {
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+    
+        .save-button:hover {
+            background-color: #218838;
+        }
+    
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+    
+            .modal-content label {
+                font-size: 14px;
+            }
+    
+            .modal-content input {
+                font-size: 14px;
+                padding: 8px;
+            }
+    
+            .save-button {
+                padding: 8px 12px;
+            }
+    
+            .close {
+                font-size: 20px;
+            }
+        }
+    
+        @media (max-width: 480px) {
+            .modal-content {
+                width: 100%;
+                padding: 10px;
+                border-radius: 0;
+            }
+    
+            .modal-content label {
+                font-size: 12px;
+            }
+    
+            .modal-content input {
+                font-size: 10px;
+                padding: 6px;
+            }
+    
+            .save-button {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+    
+            .close {
+                font-size: 18px;
+            }
+            .action-button, .logout-button, .delete-button{
+                font-size: 9px;
+                padding: 5px 10px;
+            }
+        }
+
+        /* Cropper Js functionality */
+        @media (max-width: 768px) {
+            #edit-product-image {
+                width: 80%;
+            }
+        
+            #cropped-image {
+                width: 80%;
+            }
+        
+            #upload-image {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #edit-product-image {
+                width: 70%;
+            }
+        
+            #cropped-image {
+                width: 70%;
+            }
+        
+            #upload-image {
+                width: 100%;
+            }
+        }        
+    </style>
+</head>
+
+<body>
+    {% load static %}
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>List Collection </span>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="nav-item selected">Product Overview</div>
+                <div class="nav-item">Unlisted Products</div>
+                <div class="nav-item">Settings</div>
+            </div>
+
+            <div class="admin-container">
+                <h1>Collections</h1>
+                <div class="search">
+                    <input type="search" id="live-search" placeholder="Search..." autocomplete="off">
+                </div>
+
+                <div class="table-container">
+                    <table id="products">
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th colspan="2">Collection Name</th>
+                                <th colspan="2">Brand Name</th>
+                                <th colspan="3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            {% for collection in collections %}
+                            <tr>
+                                <td>{{ collection.id }}</td>
+                                <td>{{ collection.name }}</td>
+                                <td>
+                                    {% if collection.is_listed %}
+                                    Listed
+                                    {% else %}
+                                    Unlisted
+                                    {% endif %}
+                                </td>
+                                <td>{{ collection.brand }}</td>
+                                <td>
+                                    {% if collection.brand.is_listed %}
+                                    Listed
+                                    {% else %}
+                                    Unlisted
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'admin_list_unlist_collection' collection.id %}">
+                                        <button class="action-button">
+                                            {% if collection.is_listed %}
+                                            Unlist
+                                            {% else %}
+                                            List
+                                            {% endif %}
+                                        </button>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'admin_delete_collection' collection.id %}">
+                                        <button class="delete-button" aria-label="Delete product">Delete</button>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'admin_edit_collection' collection.id %}"><button>Edit</button></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li style="list-style: none;">
+                        {% if message.tags %}
+                        Warning:
+                        {% endif %}{{ message }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <a href="{% url 'admin_logout' %}">
+                    <button class="logout-button">Logout</button>
+                </a>
+                <a href="{% url 'admin_add_collection' %}" id="add-product-button">
+                    <button class="action-button">Add Collection</button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Highlight selected nav item
+        const navItem = document.querySelectorAll('.nav-item');
+        navItem.forEach(item => {
+            item.addEventListener('click', () => {
+                navItem.forEach(i => i.classList.remove('selected')); // Remove selected from all
+                item.classList.add('selected'); // Add selected to clicked item
+            });
+        });
+    </script>
+
+
+    <!-- script to live search -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#live-search').on('input', function () {
+                var query = $(this).val();
+                $.ajax({
+                    url: "{% url 'admin_list_product' %}", // Send request to the same view
+                    data: { 'query': query },
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#table-body').empty();
+                        if (data.length > 0) {
+                            $.each(data, function (index, product) {
+                                var row = '<tr>';
+                                row += '<td>' + product.product_id + '</td>';
+                                row += '<td><img src="' + product.image.url + '" alt="' + product.product_name + '"></td>';
+                                row += '<td>' + product.product_name + '</td>';
+                                row += '<td>' + product.collection__collection_name + '</td>';
+                                if (product.collection__is_listed) {
+                                    row += '<td>Listed</td>';
+                                } else {
+                                    row += '<td>Unlisted</td>';
+                                }
+                                row += '<td>' + product.brand_name__brand_name + '</td>';
+                                if (product.brand_name__is_listed) {
+                                    row += '<td>Listed</td>';
+                                } else {
+                                    row += '<td>Unlisted</td>';
+                                }
+                                row += '<td>' + product.stock + '</td>';
+                                // Check user.is_active in JavaScript and render the button accordingly
+                                console.log(product.is_listed)
+                                if (product.is_listed) {
+                                    row += '<td><a href="list_unlist_product/' + product.product_id + '"><button class="action-button">Unlist</button></a></td>';
+                                } else {
+                                    row += '<td><a href="list_unlist_product/' + product.product_id + '"><button class="action-button">List</button></a></td>';
+                                }
+                                row += '<td><a href="delete_product/' + product.product_id + '"><button class="delete-button">Delete</button></a></td>';
+                                row += '<td><button class="action-button edit-button" data-product-id="{{ product.product_id }}" data-product-name="{{ product.product_name }}" data-product-collection="{{ product.collection.collection_name }}" data-product-brand="{{ product.brand_name.brand_name }}" data-product-stock="{{ product.stock }}" data-product-image="{{ product.image.url }}">Edit</button></td>'
+                                row += '</tr>';
+                                $('#table-body').append(row);
+                            });
+                        } else {
+                            $('#table-body').append('<tr><td colspan="7">No products found</td></tr>');
+                        }
+                    },
+                    error: function () {
+                        $('#table-body').empty();
+                        $('#table-body').append('<tr><td colspan="7">Error retrieving data</td></tr>');
+                    }
+                });
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

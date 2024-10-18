@@ -1,0 +1,217 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoCrest - Watches</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/pop_up.css' %}"><!-- So that the styles of pop up get imported -->
+    <link rel="stylesheet" href="{% static 'css/productslider.css' %}">
+    <link rel="stylesheet" href="{% static 'css/product.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <!-- First part of the header -->
+        <div class="header-top d-flex justify-content-between align-items-center">
+            <div class="left-text">
+                Free Shipping Worldwide
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav">Help & FAQs</a>
+                <a href="#" class="nav">Contact</a>
+                <a href="#" class="nav">Services</a>
+                <a href="#" class="nav">About</a>
+            </nav>
+        </div>
+
+        <!-- Second part of the header -->
+        <div class="header-bottom border-bottom border-secondary">
+            <div class="header-upper d-flex justify-content-between pb-2">
+                <div class="left-options d-none d-lg-flex align-items-center gap-5">
+                    <a href="#"><img src="{% static 'svg/globe.svg' %}" width="20" height="20" alt="Globe"> English - USD</a>
+                    <a href="#"><img src="{% static 'svg/phone.svg' %}" width="20" height="20" alt="Phone"> (1-866-273-3477)</a>
+                </div>
+                <div class="icon-container gap-4">
+                    <!-- Cart Icon -->
+                    <div class="icon">
+                        <img src="{% static 'svg/cart.svg' %}" alt="Cart Icon">
+                    </div>
+                    <!-- Wishlist Icon -->
+                    <div class="icon">
+                        <img src="{% static 'svg/wishlist.svg' %}" alt="Wishlist Icon">
+                    </div>
+                    <!-- My Account Icon -->
+                    <a href="{% url 'user_profile' %}"><div class="icon">
+                        <img src="{% static 'svg/myaccount.svg' %}" alt="My Account Icon">
+                    </div></a>
+                </div>
+            </div>
+
+
+            <div class="header-nav d-none d-lg-flex justify-content-between align-items-center py-3 px-5">
+                <nav class="left-nav d-flex gap-5">
+                    <div class="nav-item">
+                        <a href="#">For Men</a>
+                        <span class="oblong"></span>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#">For Women</a>
+                        <span class="oblong"></span>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#">Unisex</a>
+                        <span class="oblong"></span>
+                    </div>
+                </nav>
+                <nav class="right-nav d-flex gap-5">
+                    <div class="nav-item">
+                        <a href="#">Brands</a>
+                        <span class="oblong"></span>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#">Boutiques</a>
+                        <span class="oblong"></span>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#">Collections</a>
+                        <span class="oblong"></span>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Logo in the center -->
+            <div class="header-logo position-absolute top-50 start-50 translate-middle" id="logo">
+                <img src="{% static 'images/logo.png' %}" alt="ChronoCrest Logo" width="100%" height="100%">
+            </div>
+
+            <!-- Hamburger Menu for smaller screens -->
+            <div class="menu-icon-container d-lg-none position-absolute end-0 top-0 p-3" id="menuIcon">
+                <img src="{% static 'svg/menu.svg' %}" class="menu-icon" alt="Menu" width="30" height="30">
+            </div>
+
+            <!-- Fullscreen Dropdown Menu -->
+            <div class="dropdown-overlay" id="dropdownMenu">
+                <!-- Close Icon Inside the Menu -->
+                <div class="dropdown-close-container text-end p-3" id="closeIcon">
+                    <img src="{% static 'svg/close.svg' %}" class="close-icon" alt="Close" width="30" height="30">
+                </div>
+                <div class="dropdown-menu-mobile d-flex flex-column align-items-center">
+                    <a href="#">For Men</a>
+                    <a href="#">For Women</a>
+                    <a href="#">Unisex</a>
+                    <a href="#">Brands</a>
+                    <a href="#">Boutiques</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Product Slider Section -->
+    <div class="featured-products">
+        <div class="product-slider">
+            <!-- Product 1 -->
+            <div class="product" id="product1">
+                <img src="{% static 'images/image1.png' %}" alt="Product 1" class="product-image">
+                <h2 class="product-name">Luxury Watch 1</h2>
+                <p class="product-description">This is a brief description of Luxury Watch 1. It offers a perfect blend of elegance and functionality.</p>
+                <a href="#" class="discover-button">Discover Now</a>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product" id="product2">
+                <img src="{% static 'images/image2.png' %}" alt="Product 2" class="product-image">
+                <h2 class="product-name">Luxury Watch 2</h2>
+                <p class="product-description">This is a brief description of Luxury Watch 2. The craftsmanship ensures quality and style.</p>
+                <a href="#" class="discover-button">Discover Now</a>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product" id="product3">
+                <img src="{% static 'images/image3.png' %}" alt="Product 3" class="product-image">
+                <h2 class="product-name">Luxury Watch 3</h2>
+                <p class="product-description">This is a brief description of Luxury Watch 3. Designed for the modern individual.</p>
+                <a href="#" class="discover-button">Discover Now</a>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product" id="product4">
+                <img src="{% static 'images/image4.png' %}" alt="Product 4" class="product-image">
+                <h2 class="product-name">Luxury Watch 4</h2>
+                <p class="product-description">This is a brief description of Luxury Watch 4. A timeless piece for every occasion.</p>
+                <a href="#" class="discover-button">Discover Now</a>
+            </div>
+
+            <!-- Product 5 -->
+            <div class="product" id="product5">
+                <img src="{% static 'images/image5.png' %}" alt="Product 5" class="product-image">
+                <h2 class="product-name">Discover Luxury Through Our Brands</h2>
+                <p class="product-description">At ChronoCrust, we curate a distinguished selection of luxury watches from renowned brands, each representing the pinnacle of craftsmanship and elegance. Explore our exclusive partnerships with industry-leading names that embody sophistication and style. Whether you seek timeless classics or contemporary masterpieces, our collection offers unparalleled quality and prestige. Immerse yourself in a world where luxury knows no bounds and find the perfect timepiece that resonates with your unique taste.</p>
+                <a href="#" class="discover-button">Discover Brands </a>
+            </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        <!-- Navigation buttons -->
+        <button class="prev-button">
+            <img src="{% static 'svg/previous.svg' %}" alt="Previous">
+        </button>
+        <button class="next-button">
+            <img src="{% static 'svg/next.svg' %}" alt="Next">
+        </button>
+
+        <div class="displayed-product-info">
+            <h2 class="displayed-product-name">Product Name 1</h2>
+            <p class="displayed-product-description">Description of Product 1.</p>
+        </div>
+    </div>
+
+    <!--FILTER AND SEARCH-->
+    <div class="header-upper d-flex justify-content-between px-4 pt-4">
+        <div>ALL Products</div>
+        <div class="right-options d-flex align-items-center justify-content-md-end gap-1 p-1">
+            <button class="btn btn-outline-dark">Filter</button>
+            <button class="btn btn-outline-dark">Search</button>
+        </div>
+    </div>
+        
+    <!-- Products -->
+    <div class="product-list">
+        {% for product in products %}
+        <div class="card">
+            <div class="image-container">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}"/>
+                <a href="view_product/{{product.id}}">
+                    <button class="btn-discover">Discover Now</button>
+                </a>
+            </div>
+            <div class="details-container">
+                <div class="price-wishlist-container">
+                    <span class="price">{{ product.collection.brand.name }}</span> <!-- Assuming you have a price field in your model -->
+                    <svg class="wishlist-icon" enable-background="new 0 0 32 32" height="32px" id="Layer_1" version="1.1" viewBox="0 0 32 32" width="32px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <rect style="width: 100%; height: 100%; fill: rgba(255, 255, 255, 0);">
+                            <title>Add To Wishlist</title>
+                        </rect>
+                        <g id="heart"> 
+                            <path clip-rule="evenodd" d="M29.193,5.265c-3.629-3.596-9.432-3.671-13.191-0.288   C12.242,1.594,6.441,1.669,2.81,5.265c-3.741,3.704-3.741,9.709,0,13.415c1.069,1.059,11.053,10.941,11.053,10.941   c1.183,1.172,3.096,1.172,4.278,0c0,0,10.932-10.822,11.053-10.941C32.936,14.974,32.936,8.969,29.193,5.265z M27.768,17.268   L16.715,28.209c-0.393,0.391-1.034,0.391-1.425,0L4.237,17.268c-2.95-2.92-2.95-7.671,0-10.591   c2.844-2.815,7.416-2.914,10.409-0.222l1.356,1.22l1.355-1.22c2.994-2.692,7.566-2.594,10.41,0.222   C30.717,9.596,30.717,14.347,27.768,17.268z"/>
+                            
+                        </g>
+                    </svg>
+                </div>
+                <div class="product-details-container">
+                    <h3 class="name">{{ product.collection.name }} {{ product.name }}</h3>
+                </div>
+                
+            </div>
+        </div>
+        {% endfor %}
+    </div>    
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/body.js' %}"></script>
+</body>
+</html>
