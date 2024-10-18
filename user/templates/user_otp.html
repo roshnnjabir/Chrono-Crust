@@ -17,7 +17,7 @@
     <div class="container">
         <img src="{% static 'images/image1.png' %}" alt="OTP Image">
         <div class="form-container">
-            <h2>OTP Verification</h2>
+            <h2>OTP Verifications</h2>
             <form action="{% url 'verify_otp' %}" method="post">
                 {% csrf_token %}
                 <input type="text" name="otp" placeholder="Enter OTP" required>
