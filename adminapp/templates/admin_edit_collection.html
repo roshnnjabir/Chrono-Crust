@@ -20,18 +20,21 @@
             border-left: 4px solid #ff4d4d;
             margin-bottom: 10px;
         }
-        
+
         body {
             font-family: 'Nunito', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f8f9fc;
             color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
 
         .container {
             max-width: 700px;
-            margin: 40px auto;
             padding: 30px;
             background-color: #ffffff;
             border-radius: 15px;
@@ -54,7 +57,6 @@
         }
 
         input[type="text"],
-        input[type="number"],
         select {
             padding: 8px 0px;
             padding-left: 5px;
@@ -68,59 +70,11 @@
         }
 
         input[type="text"]:focus,
-        input[type="number"]:focus,
         select:focus {
             border-color: #80bdff;
             outline: none;
         }
 
-        input[type="file"] {
-            margin-top: 12px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .image-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .image-section img {
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            max-width: 150px;
-            max-height: 150px;
-            object-fit: cover;
-            margin: 5px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .image-section img:hover {
-            transform: scale(1.05);
-        }
-
-        .image-preview-container {
-            display: block;
-            flex-direction: column;
-            align-items: center;
-        }
-        .image-preview-container1 {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #cropped-image {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            max-width: 100%;
-            margin-top: 15px;
-        }
-
-        .action-button,
         .save-button {
             padding: 12px 20px;
             border-radius: 8px;
@@ -135,19 +89,69 @@
             margin-bottom: 20px;
         }
 
-        .action-button:hover,
         .save-button:hover {
             background-color: #218838;
         }
 
-        #save-button {
-            width: auto;
-            padding: 10px 20px;
+        .breadcrumbs {
+            font-size: 14px;
+            margin: 20px 0px;
+            color: #888;
+        }
+        a {
+            text-decoration: none;
+            color: #050505;
+        }
+
+        /* Media queries for responsive design */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 90%;
+                padding: 20px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .save-button {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+
+            label {
+                font-size: 12px;
+            }
+
+            input[type="text"],
+            select {
+                font-size: 14px;
+            }
+
+            .save-button {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="breadcrumbs">
+        <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/list_product">List Product </a> / <span>Add Product </span>
+    </div>
     <div class="container">
         <h2>Edit Product</h2>
         <form id="edit-form" action="{% url 'admin_edit_collection' collection.id %}" method="post">
@@ -169,13 +173,13 @@
 
             <button type="submit" class="save-button">Save Changes</button>
         </form>
+
+        <!-- Error messages -->
         {% if messages %}
         <ul class="messages">
             {% for message in messages %}
             <li style="list-style: none;">
-                {% if message.tags %}
-                Warning:
-                {% endif %}{{ message }}
+                {% if message.tags %} Warning: {% endif %}{{ message }}
             </li>
             {% endfor %}
         </ul>

@@ -14,11 +14,14 @@
             padding: 0;
             background-color: #f8f9fc;
             color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
 
         .container {
             max-width: 700px;
-            margin: 40px auto;
             padding: 30px;
             background-color: #ffffff;
             border-radius: 15px;
@@ -43,7 +46,7 @@
         input[type="text"],
         input[type="number"],
         select {
-            padding: 8px 0px;
+            padding: 8px;
             padding-left: 5px;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -94,6 +97,7 @@
             flex-direction: column;
             align-items: center;
         }
+
         .image-preview-container1 {
             display: none;
             flex-direction: column;
@@ -131,10 +135,74 @@
             width: auto;
             padding: 10px 20px;
         }
+        .breadcrumbs {
+            font-size: 14px;
+            margin: 20px 0px;
+            color: #888;
+        }
+        a {
+            text-decoration: none;
+            color: #050505;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                max-width: 90%;
+                padding: 20px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                margin: 20px auto;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .action-button,
+            .save-button {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+
+            .image-section img {
+                max-width: 100px;
+                max-height: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            select {
+                font-size: 14px;
+            }
+
+            .action-button,
+            .save-button {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+
+            .image-section img {
+                max-width: 80px;
+                max-height: 80px;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div class="breadcrumbs">
+        <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/list_product">List Products </a> / <span>Add Product </span>
+    </div>
     <div class="container">
         <h2>Edit Product</h2>
         <form id="edit-form" action="{% url 'admin_edit_product' product.id %}" method="post">
@@ -176,7 +244,7 @@
                 </div>
             </div>
             
-            <input type="hidden" name="image1"  id="himage1" value="">
+            <input type="hidden" name="image1" id="himage1" value="">
             <input type="hidden" name="image2" id="himage2" value="">
             <input type="hidden" name="image3" id="himage3" value="">
 
@@ -188,96 +256,76 @@
 
     <script>
         document.getElementById('edit-form').onsubmit = function() {
-            // Create a URL object for easier manipulation
             const image1Src = new URL(document.getElementById('image1').src);
             const image2Src = new URL(document.getElementById('image2').src);
             const image3Src = new URL(document.getElementById('image3').src);
-        
-            // Set the input values to the pathname (which gives you the path)
-            // Strip out the '/media/' prefix
-            document.getElementById('himage1').value = image1Src.pathname.replace('/media/', ''); // This will give you the path without '/media/'
-            document.getElementById('himage2').value = image2Src.pathname.replace('/media/', ''); // Similarly for image2
-            document.getElementById('himage3').value = image3Src.pathname.replace('/media/', ''); // Similarly for image3
-        };      
+            document.getElementById('himage1').value = image1Src.pathname.replace('/media/', '');
+            document.getElementById('himage2').value = image2Src.pathname.replace('/media/', '');
+            document.getElementById('himage3').value = image3Src.pathname.replace('/media/', '');
+        };
 
         let cropper;
-let selectedImageId;
+        let selectedImageId;
 
-// Function to handle image selection and trigger file input
-function chooseImage(imageId) {
-    document.getElementById('upload-image').click(); // Trigger file input click
-    selectedImageId = imageId; // Store the selected image ID
-}
-
-// Function to preview the selected image and initialize Cropper.js
-function previewImage(event) {
-    const file = event.target.files[0];
-
-    if (file) {
-        // Check the file type (PNG and JPG allowed)
-        const validTypes = ['image/png', 'image/jpeg'];
-        if (!validTypes.includes(file.type)) {
-            alert('Only PNG and JPG files are allowed.');
-            return; // Stop further execution if the file type is invalid
+        function chooseImage(imageId) {
+            document.getElementById('upload-image').click();
+            selectedImageId = imageId;
         }
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            // Replace the clicked image with the uploaded image
-            const selectedImage = document.getElementById(selectedImageId);
-            selectedImage.src = e.target.result;
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const validTypes = ['image/png', 'image/jpeg'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Only PNG and JPG files are allowed.');
+                    return;
+                }
 
-            // Show cropper on uploaded image
-            const cropImage = document.getElementById('cropped-image');
-            cropImage.src = e.target.result;
-            document.getElementById('cropped-image-container').style.display = 'flex';
-            document.getElementById('save-button').style.display = 'block';
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const selectedImage = document.getElementById(selectedImageId);
+                    selectedImage.src = e.target.result;
 
-            // Initialize cropper
-            cropper = new Cropper(cropImage, {
-                aspectRatio: 1,
-                viewMode: 2
-            });
-        };
-        reader.readAsDataURL(file);
-    }
-}
+                    const cropImage = document.getElementById('cropped-image');
+                    cropImage.src = e.target.result;
+                    document.getElementById('cropped-image-container').style.display = 'flex';
+                    document.getElementById('save-button').style.display = 'block';
 
-// Function to crop the image and upload it
-function cropImage() {
-    // Get the cropped canvas
-    const canvas = cropper.getCroppedCanvas();
-
-    // Convert the canvas to a blob
-    canvas.toBlob(function(blob) {
-        const formData = new FormData();
-        formData.append('image', blob, 'cropped_image.png'); // You can name the file as you prefer
-
-        // Send the blob to the server using fetch
-        fetch('/upload_cropped_image/', { // Update the URL as needed
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Update the image source with the URL of the saved image
-                const croppedImage = document.getElementById(selectedImageId);
-                croppedImage.src = data.file_url; // Set the image source to the saved file URL
-            } else {
-                alert(data.message);
+                    cropper = new Cropper(cropImage, {
+                        aspectRatio: 1,
+                        viewMode: 2
+                    });
+                };
+                reader.readAsDataURL(file);
             }
-        })
-        .catch(error => {
-            console.error('Error uploading image:', error);
-        });
+        }
 
-        // Hide cropper preview after cropping
-        cropper.destroy();
-        document.getElementById('cropped-image-container').style.display = 'none';
-    }, 'image/png'); // You can change the format if needed
-}
+        function cropImage() {
+            const canvas = cropper.getCroppedCanvas();
+            canvas.toBlob(function (blob) {
+                const formData = new FormData();
+                formData.append('image', blob, 'cropped_image.png');
+                fetch('/upload_cropped_image/', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const croppedImage = document.getElementById(selectedImageId);
+                        croppedImage.src = data.file_url;
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                });
 
+                cropper.destroy();
+                document.getElementById('cropped-image-container').style.display = 'none';
+            }, 'image/png');
+        }
     </script>
 </body>
 

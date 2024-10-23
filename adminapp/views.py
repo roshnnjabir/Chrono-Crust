@@ -38,6 +38,23 @@ def admin_list_user(request):
     # Handle standard request (render the full page)
     return render(request, 'admin_list_user.html', {'users': users})
 
+def admin_list_blocked_user(request):
+    query = request.GET.get('query', '')  # Get the search query from GET request
+    if query:
+        users = CustomUser.objects.filter(
+            (Q(first_name__icontains=query) | Q(email__icontains=query) | Q(last_name__icontains=query)) & (Q(is_staff=False) & Q(is_active=False))
+        )  # Filter by first name or email
+    else:
+        users = CustomUser.objects.filter(Q(is_staff=False), Q(is_active=False))  # If no query, return all users
+
+    # Handle AJAX request
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        results = list(users.values('id', 'first_name', 'last_name', 'email', 'is_active'))  # Prepare JSON response
+        return JsonResponse(results, safe=False)  # Send JSON response for AJAX
+
+    # Handle standard request (render the full page)
+    return render(request, 'admin_list_blocked_user.html', {'users': users})
+
 
 def admin_logout(request):
     logout(request)
@@ -74,8 +91,48 @@ def admin_block_unblock_user(request, id):
 
 
 def admin_list_product(request):
-    products = Product.objects.all()
-    return render(request, 'admin_list_products.html', {'products': products})
+    query = request.GET.get('query', '')
+    brand_id = request.GET.get('brand_id', 'all')  # Get selected brand ID
+
+    # Filter products based on search query
+    if query:
+        products = Product.objects.filter(
+            (
+                Q(name__icontains=query) |
+                Q(collection__name__icontains=query) |
+                Q(collection__brand__name__icontains=query)
+            ) & Q(is_listed=True)
+        )
+    else:
+        products = Product.objects.all()
+
+    # Filter by brand if a specific brand is selected
+    if brand_id and brand_id != 'all':
+        products = products.filter(collection__brand__id=brand_id)
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        results = [
+            {
+                'id': product.id,
+                'image': request.build_absolute_uri(product.image.url),  # Full URL for the image
+                'name': product.name,
+                'is_listed': product.is_listed,
+                'collection__name': product.collection.name,
+                'collection__is_listed': product.collection.is_listed,
+                'collection__brand__name': product.collection.brand.name,
+                'collection_brand_is_listed': product.collection.brand.is_listed,
+                'stock': product.stock,
+                'price': product.price,
+            }
+            for product in products
+        ]
+        return JsonResponse(results, safe=False)
+
+    return render(request, 'admin_list_products.html', {
+        'products': products,
+        'brands': Brand.objects.all(),  # Pass all brands to the template
+    })
+
 
 
 def admin_add_product(request):

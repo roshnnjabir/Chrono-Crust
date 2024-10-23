@@ -436,7 +436,7 @@
             <div class="box">
                 <div class="box-header">
                     <h3>Account Overview</h3>
-                    <a class="edit_button" id="edit_button" href=""><button >EDIT</button></a>
+                    <button  class="edit_button" id="edit_button" onclick="openModal()">EDIT</button>
                 </div>
                 <div class="info-layout">
                     <div class="info-label">First Name:</div>
@@ -472,7 +472,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>Edit User Information</h3>
-            <span class="close" id="close_modal">&times;</span>
+            <span class="close" id="close_modal" onclick="closeModal()">&times;</span>
         </div>
         <form action="{% url 'user_profile_update' %}" method="post" id="editForm">
             {% csrf_token %}
@@ -516,25 +516,14 @@
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('selected'));
         document.getElementById(option).classList.add('selected');
     }
-
-    // Open modal
-    const editButton = document.getElementById('edit_button');
-    const editModal = document.getElementById('modal');
-    const closeModal = document.getElementById('close_modal');
-
-    editButton.addEventListener('click', function() {
-        editModal.style.display = "flex"; // Show modal
-    });
-
-    closeModal.onclick = function() {
-        editModal.style.display = "none";
+    function openModal() {
+        document.getElementById("modal").style.display = "flex";
     }
 
-    window.onclick = function(event) {
-        if (event.target == editModal) {
-            editModal.style.display = "none";
-        }
+    function closeModal() {
+        document.getElementById("modal").style.display = "none";
     }
+
 </script>
 
 </body>

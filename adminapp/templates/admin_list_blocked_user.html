@@ -264,14 +264,14 @@
         <div class="main-content">
             <!-- Sidebar acting as Navbar on small screens -->
             <div class="sidebar">
-                <div class="nav-item selected">User's Overview</div>
-                <a href="/admin/blocked_users"><div class="nav-item">Blocked Users</div></a>
+                <a href="/admin/list_user"><div class="nav-item">User's Overview</div></a>
+                <div class="nav-item selected">Blocked Users</div>
                 <div class="nav-item">Order History</div>
                 <div class="nav-item">Settings</div>
             </div>
 
             <div class="admin-container">
-                <h1>Members</h1>
+                <h1>Blocked Members</h1>
                 <div class="search">
                     <input type="search" id="live-search" placeholder="Search..." autocomplete="off">
                 </div>
@@ -351,7 +351,7 @@
             $('#live-search').on('input', function () {
                 var query = $(this).val();
                 $.ajax({
-                    url: "{% url 'admin_list_user' %}", // Send request to the same view
+                    url: "{% url 'admin_list_blocked_user' %}", // Send request to the same view
                     data: {
                         'query': query
                     },

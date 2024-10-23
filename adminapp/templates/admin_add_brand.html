@@ -29,11 +29,15 @@
             padding: 0;
             background-color: #f8f9fc;
             color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
 
         .container {
             max-width: 700px;
-            margin: 40px auto;
             padding: 30px;
             background-color: #ffffff;
             border-radius: 15px;
@@ -146,26 +150,30 @@
             width: auto;
             padding: 10px 20px;
         }
+        .breadcrumbs {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #888;
+        }
+        a {
+            text-decoration: none;
+            color: #050505;
+        }
     </style>
 </head>
 
 <body>
+    <div class="breadcrumbs">
+        <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/list_brand">List Brand </a> / <span>Add Brand </span>
+    </div>
     <div class="container">
-        <h2>Add Collection</h2>
-        <form id="edit-form" action="{% url 'admin_add_collection' %}" method="post" enctype="multipart/form-data">
+        <h2>Add Brand</h2>
+        <form id="edit-form" action="{% url 'admin_add_brand' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <label for="collection-name">Collection Name</label>
-            <input type="text" id="collection-name" name="collection" required>
-
             <label for="brand-name">Brand Name</label>
-            <select name="brand" id="collection-brand" required>
-                {% for brand in brands %}
-                <option value="{{ brand.id }}">
-                    {{ brand.name }}
-                </option>
-                {% endfor %}
-            </select>
+            <input type="text" id="brand-name" name="brand" required>
+
             <button type="submit" class="save-button">Add Collection</button>
         </form>
         {% if messages %}

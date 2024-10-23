@@ -179,6 +179,21 @@
         .delete-button:hover {
             background-color: #e60000; /* Darker Red on Hover */
         }
+         /* New Edit Button Style */
+        .edit-button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #ffd700; /* Yellow Background */
+            border: none;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #ffc107; /* Slightly darker yellow on hover */
+        }
+
 
         /* Responsive Styles */
         @media (max-width: 768px) {
@@ -449,7 +464,7 @@
     {% load static %}
     <div class="container">
         <div class="breadcrumbs">
-            <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>List Collection </span>
+            <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>List Brand </span>
         </div>
 
         <div class="main-content">
@@ -503,7 +518,9 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{% url 'admin_edit_brand' brand.id %}"><button>Edit</button></a>
+                                    <a href="{% url 'admin_edit_brand' brand.id %}">
+                                        <button class="edit-button" aria-label="Edit product">Edit</button>
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}

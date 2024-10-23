@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import CustomUser
-from adminapp.models import Product
+from adminapp.models import Product, Collection, Brand
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -11,11 +11,17 @@ from django.core.cache import cache
 from django.utils import timezone
 from datetime import timedelta
 from django.core.mail import send_mail
+from django.db.models import Q
 
 
 # Create your views here.
+
 def user_home(request):
-    products = Product.objects.filter(is_listed=True)
+    products = Product.objects.filter(
+        Q(is_listed=True),
+        Q(collection__is_listed=True),
+        Q(collection__brand__is_listed=True)
+    )
     return render(request, 'user_home.html', {'products': products})
 
 
@@ -39,7 +45,7 @@ def user_login(request):
 
                 # Store the OTP and timestamp in session
                 request.session['email'] = email
-                request.session['password'] = password
+                request.session['password'] = password  
                 request.session['otp'] = otp
                 request.session['otp_timestamp'] = timezone.now().isoformat()
                 messages.success(request, 'Otp Sent Successfully')
@@ -55,32 +61,42 @@ def user_login(request):
 def user_signup(request):
     if request.user.is_authenticated:
         return redirect('user_home')
+
     if request.method == 'POST':
         FirstName = request.POST.get('FirstName')
         LastName = request.POST.get('LastName')
         email = request.POST.get('email')
         pass1 = request.POST.get('password1')
         pass2 = request.POST.get('password2')
-        user = {
+
+        user_data = {
             'FirstName': FirstName,
             'LastName': LastName,
             'email': email,
             'pass1': pass1,
             'pass2': pass2
         }
+
         if CustomUser.objects.filter(email=email).exists():
-            messages.error(request, 'Email Already Exist')
-            return render(request, 'user_signup.html', {'user': user})
-        else:
-            if pass1 != pass2:
-                messages.error(request, "Your password and conform password are not Same!!")
-                return render(request, 'user_signup.html', {'user': user})
-            else:
-                user = CustomUser.objects.create_user(email=email, first_name=FirstName, last_name=LastName, password=pass1)
-                backend = get_backends()[0]
-                user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
-                login(request, user, backend=user.backend)
-                return redirect('user_profile')
+            messages.error(request, 'Email Already Exists')
+            return render(request, 'user_signup.html', {'user': user_data})
+
+        if pass1 != pass2:
+            messages.error(request, "Your password and confirm password do not match!")
+            return render(request, 'user_signup.html', {'user': user_data})
+
+        # If all checks pass, generate an OTP and send it to the user's email
+        otp = generate_otp()
+        send_otp_via_email(email, otp)
+
+        # Store user details and OTP in session for later verification
+        request.session['signup_data'] = user_data
+        request.session['otp'] = otp
+        request.session['otp_timestamp'] = timezone.now().isoformat()
+
+        messages.success(request, 'OTP sent successfully for verification!')
+        return redirect('otp_page')  # Redirect to the OTP verification page
+
     return render(request, 'user_signup.html')
 
 
@@ -130,12 +146,12 @@ def verify_otp(request):
                 if signup_data:
                     my_user = CustomUser.objects.create_user(
                         email=signup_data['email'],
-                        password=signup_data['password'],  # Use the stored password
+                        password=signup_data['pass1'],  # Use the stored password
                         first_name=signup_data['FirstName'],
                         last_name=signup_data['LastName'],
                     )
                     my_user.save()
-                    loguser = authenticate(email=signup_data['email'], password=signup_data['password'])
+                    loguser = authenticate(email=signup_data['email'], password=signup_data['pass1'])
                     login(request, loguser)
                     del request.session['signup_data']
                     messages.success(request, 'Your account has been created successfully!')
@@ -146,11 +162,11 @@ def verify_otp(request):
                         messages.success(request, 'Login Successful')
                     else:
                         messages.error(request, 'User Blocked By Admins')
+                    del request.session['password']
+                    del request.session['email']
                 
                 # Clean up session data
                 del request.session['otp']
-                del request.session['password']
-                del request.session['email']
                 del request.session['otp_timestamp']
                 return redirect('user_profile')
             else:

@@ -14,11 +14,14 @@
             padding: 0;
             background-color: #f8f9fc;
             color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
             max-width: 700px;
-            margin: 40px auto;
             padding: 30px;
             background-color: #ffffff;
             border-radius: 15px;
@@ -131,10 +134,22 @@
             width: auto;
             padding: 10px 20px;
         }
+        .breadcrumbs {
+            font-size: 14px;
+            margin: 20px 0px;
+            color: #888;
+        }
+        a {
+            text-decoration: none;
+            color: #050505;
+        }
     </style>
 </head>
 
 <body>
+    <div class="breadcrumbs">
+        <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/list_product">List Products </a> / <span>Add Product </span>
+    </div>
     <div class="container">
         <h2>Add Product</h2>
         <form id="edit-form" action="{% url 'admin_add_product' %}" method="post" enctype="multipart/form-data">

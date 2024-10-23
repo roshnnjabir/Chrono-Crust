@@ -17,6 +17,13 @@ class CustomUser(AbstractUser):
     otp_expiry = models.DateTimeField(blank=True, null=True)
     max_otp_try = models.CharField(max_length=2, default=3)
     otp_max_out = models.DateTimeField(blank=True, null=True)
+    profile_image = models.ImageField(upload_to='uploads/profile', null=True)
+
+    THEME_CHOICES = [
+        ('dark', 'Dark'),
+        ('light', 'Light'),
+    ]
+    theme = models.CharField(max_length=5, choices=THEME_CHOICES, default='light')
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

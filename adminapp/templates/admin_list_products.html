@@ -98,6 +98,40 @@
             border-radius: 8px;
         }
 
+        /* Style for the select dropdown */
+        #brand-filter {
+            width: 220px; /* Set width */
+            padding: 10px; /* Add padding */
+            border: 1px solid #ccc; /* Border color */
+            border-radius: 8px; /* Rounded corners */
+            background-color: #ffffff; /* Background color */
+            font-size: 16px; /* Font size */
+            color: #333; /* Text color */
+            cursor: pointer; /* Change cursor to pointer */
+            transition: border-color 0.3s ease, background-color 0.3s ease; /* Smooth transition */
+            margin-right: 10px;
+        }
+
+        /* Style for the option elements */
+        #brand-filter option {
+            padding: 10px; /* Padding for options */
+            background-color: #ffffff; /* Background for options */
+            color: #333; /* Text color for options */
+        }
+
+        /* Hover effect on the select */
+        #brand-filter:hover {
+            border-color: #888; /* Change border color on hover */
+        }
+
+        /* Focus effect */
+        #brand-filter:focus {
+            border-color: #007BFF; /* Change border color on focus */
+            outline: none; /* Remove default outline */
+            background-color: #f8f9fa; /* Light background on focus */
+        }
+
+
         /* Wrap for horizontal scroll */
         .table-container {
             overflow-x: auto; /* Enable horizontal scrolling */
@@ -179,6 +213,21 @@
         .delete-button:hover {
             background-color: #e60000; /* Darker Red on Hover */
         }
+         /* New Edit Button Style */
+        .edit-button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #ffd700; /* Yellow Background */
+            border: none;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #ffc107; /* Slightly darker yellow on hover */
+        }
+
 
         /* Responsive Styles */
         @media (max-width: 768px) {
@@ -462,8 +511,15 @@
             <div class="admin-container">
                 <h1>Products</h1>
                 <div class="search">
+                    <select id="brand-filter">
+                        <option value="all">All Brands</option>
+                        {% for brand in brands %}
+                        <option value="{{ brand.id }}">{{ brand.name }}</option>
+                        {% endfor %}
+                    </select>
                     <input type="search" id="live-search" placeholder="Search..." autocomplete="off">
                 </div>
+                
 
                 <div class="table-container">
                     <table id="products">
@@ -471,10 +527,11 @@
                             <tr>
                                 <th>Product ID</th>
                                 <th>Image</th>
-                                <th>Product Name</th>
+                                <th colspan="2">Product Name</th>
                                 <th colspan="2">Collection Name</th>
                                 <th colspan="2">Brand Name</th>
                                 <th>Stock</th>
+                                <th>Price</th>
                                 <th colspan="3">Action</th>
                             </tr>
                         </thead>
@@ -484,6 +541,13 @@
                                 <td>{{ product.id }}</td>
                                 <td><img style="width: 100%; height: 100%; object-fit: cover;" src="{{ product.image.url }}" alt="{{ product.product_name }}"></td>
                                 <td>{{ product.name }}</td>
+                                <td>
+                                    {% if product.is_listed %}
+                                    Listed
+                                    {% else %}
+                                    Unlisted
+                                    {% endif %}
+                                </td>
                                 <td>{{ product.collection.name }}</td>
                                 <td>
                                     {% if product.collection.is_listed %}
@@ -501,6 +565,7 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ product.stock }}</td>
+                                <td>${{ product.price }}</td>
                                 <td>
                                     <a href="{% url 'admin_list_unlist_product' product.id %}">
                                         <button class="action-button">
@@ -518,7 +583,9 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{% url 'admin_edit_product' product.id %}"><button>Edit</button></a>
+                                    <a href="{% url 'admin_edit_product' product.id %}">
+                                        <button class="edit-button" aria-label="Edit product">Edit</button>
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -566,57 +633,63 @@
 
     <script>
         $(document).ready(function () {
+            // Handle live search
             $('#live-search').on('input', function () {
-                var query = $(this).val();
+                updateProductList();
+            });
+        
+            // Handle brand filter change
+            $('#brand-filter').on('change', function () {
+                updateProductList();
+            });
+        
+            function updateProductList() {
+                var query = $('#live-search').val();
+                var brandId = $('#brand-filter').val();
+        
                 $.ajax({
                     url: "{% url 'admin_list_product' %}", // Send request to the same view
-                    data: { 'query': query },
+                    data: {
+                        'query': query,
+                        'brand_id': brandId // Send brand_id as a filter
+                    },
                     dataType: 'json',
                     success: function (data) {
                         $('#table-body').empty();
                         if (data.length > 0) {
                             $.each(data, function (index, product) {
                                 var row = '<tr>';
-                                row += '<td>' + product.product_id + '</td>';
-                                row += '<td><img src="' + product.image.url + '" alt="' + product.product_name + '"></td>';
-                                row += '<td>' + product.product_name + '</td>';
-                                row += '<td>' + product.collection__collection_name + '</td>';
-                                if (product.collection__is_listed) {
-                                    row += '<td>Listed</td>';
-                                } else {
-                                    row += '<td>Unlisted</td>';
-                                }
-                                row += '<td>' + product.brand_name__brand_name + '</td>';
-                                if (product.brand_name__is_listed) {
-                                    row += '<td>Listed</td>';
-                                } else {
-                                    row += '<td>Unlisted</td>';
-                                }
+                                row += '<td>' + product.id + '</td>';
+                                row += '<td><img style="width: 100%; height: 100%; object-fit: cover;" src="' + product.image + '" alt="' + product.name + '"></td>';
+                                row += '<td>' + product.name + '</td>';
+                                row += product.is_listed ? '<td>Listed</td>' : '<td>Unlisted</td>';
+                                row += '<td>' + product.collection__name + '</td>';
+                                row += product.collection__is_listed ? '<td>Listed</td>' : '<td>Unlisted</td>';
+                                row += '<td>' + product.collection__brand__name + '</td>';
+                                row += product.collection__brand__is_listed ? '<td>Listed</td>' : '<td>Unlisted</td>';
                                 row += '<td>' + product.stock + '</td>';
-                                // Check user.is_active in JavaScript and render the button accordingly
-                                console.log(product.is_listed)
-                                if (product.is_listed) {
-                                    row += '<td><a href="list_unlist_product/' + product.product_id + '"><button class="action-button">Unlist</button></a></td>';
-                                } else {
-                                    row += '<td><a href="list_unlist_product/' + product.product_id + '"><button class="action-button">List</button></a></td>';
-                                }
-                                row += '<td><a href="delete_product/' + product.product_id + '"><button class="delete-button">Delete</button></a></td>';
-                                row += '<td><button class="action-button edit-button" data-product-id="{{ product.product_id }}" data-product-name="{{ product.product_name }}" data-product-collection="{{ product.collection.collection_name }}" data-product-brand="{{ product.brand_name.brand_name }}" data-product-stock="{{ product.stock }}" data-product-image="{{ product.image.url }}">Edit</button></td>'
+                                row += '<td>' + product.price + '</td>';
+                                row += product.is_listed 
+                                    ? '<td><a href="/admin/list_unlist_product/' + product.id + '"><button class="action-button">Unlist</button></a></td>' 
+                                    : '<td><a href="/admin/list_unlist_product/' + product.id + '"><button class="action-button">List</button></a></td>';
+                                row += '<td><a href="/admin/delete_product/' + product.id + '"><button class="delete-button">Delete</button></a></td>';
+                                row += '<td><a href="/admin/edit_product/' + product.id + '"><button class="action-button">Edit</button></a></td>';
                                 row += '</tr>';
                                 $('#table-body').append(row);
                             });
                         } else {
-                            $('#table-body').append('<tr><td colspan="7">No products found</td></tr>');
+                            $('#table-body').append('<tr><td colspan="11">No products found</td></tr>');
                         }
                     },
                     error: function () {
                         $('#table-body').empty();
-                        $('#table-body').append('<tr><td colspan="7">Error retrieving data</td></tr>');
+                        $('#table-body').append('<tr><td colspan="11">Error retrieving data</td></tr>');
                     }
                 });
-            });
-        });
+            }
+        });        
     </script>
+    
 
 
 </body>
