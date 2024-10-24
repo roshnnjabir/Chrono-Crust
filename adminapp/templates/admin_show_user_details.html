@@ -94,15 +94,9 @@
             border-radius: 8px;
         }
 
-        /* Wrap for horizontal scroll */
         .table-container {
             overflow-x: auto; /* Enable horizontal scrolling */
             margin-bottom: 20px; /* Space below the table */
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
         }
 
         table {
@@ -172,6 +166,38 @@
         .add-button:hover {
             background-color: #ff1a1a;
         }
+
+        /* User Details Styles */
+        .user-details {
+            margin-top: 20px;
+        }
+
+        .user-info {
+            margin-bottom: 10px;
+        }
+
+        .back-button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .user-image {
+            width: 60px; /* Adjust size as needed */
+            height: 60px; /* Keep width and height equal for a circle */
+            border-radius: 50%; /* Make the image circular */
+            object-fit: cover; /* Ensure the image covers the circle */
+            margin-bottom: 15px; /* Space below the image */
+        }
+
 
         /* Responsive Styles */
         @media (max-width: 768px) {
@@ -282,52 +308,38 @@
             </div>
 
             <div class="admin-container">
-                <h1>Members</h1>
-                <div class="search">
-                    <input type="search" id="live-search" placeholder="Search..." autocomplete="off">
-                </div>
-
-                <!-- Table to be updated with live search results -->
-                <div class="table-container">
-                    <table id="customers">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Firstname</th>
-                                <th>Lastname</th>
-                                <th>Email</th>
-                                <th colspan="3">Action</th> <!-- Increase colspan to 3 for extra button -->
-                            </tr>
-                        </thead>
-                        <tbody id="table-body">
-                            {% for x in users %}
-                            <tr>
-                                <td>{{ x.id }}</td>
-                                <td>{{ x.first_name }}</td>
-                                <td>{{ x.last_name }}</td>
-                                <td>{{ x.email }}</td>
-                                <td>
-                                    <a href="{% url 'block_unblock_user' x.id %}">
-                                        <button class="action-button">
-                                            {% if x.is_active %}
-                                            Block
-                                            {% else %}
-                                            Unblock
-                                            {% endif %}
-                                        </button>
-                                    </a>
-                                </td>
-                                <td>
-                                    <a href="{% url 'admin_show_user_details' x.id %}">
-                                        <button class="action-button show-details-button">Show Details</button>
-                                    </a>
-                                </td>                                
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>                    
-                </div>
+                <h1>User Details</h1>
                 
+                <div>
+                    <img class="user-image" src="{{ user.profile_image.url }}" alt="{{ user.first_name }}">
+                </div>
+                <div>
+                    <p><strong>First Name:</strong> {{ user.first_name }}</p>
+                    <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Phone:</strong> {{ user.phone }}</p>
+                    <p><strong>Date Of Birth:</strong> {{ user.date_of_birth }}</p>
+                </div>
+            
+                <h2>Addresses</h2>
+                <div class="addresses">
+                    {% if addresses %}
+                        <ul>
+                            {% for address in addresses %}
+                                <li>
+                                    <strong>{{ address.street_address }}</strong>, {{ address.city }}, {{ address.state }} - {{ address.postal_code }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No addresses found for this user.</p>
+                    {% endif %}
+                </div>
+            
+                <a href="{% url 'admin_list_user' %}">
+                    <button class="back-button">Back to List</button>
+                </a>
+
                 {% if messages %}
                 <ul class="messages">
                     {% for message in messages %}
@@ -339,11 +351,7 @@
                     {% endfor %}
                 </ul>
                 {% endif %}
-
-                <a href="{% url 'admin_logout' %}">
-                    <button class="add-button">Logout</button>
-                </a>
-            </div>
+            </div>            
         </div>
     </div>
 
@@ -352,58 +360,11 @@
         const navItem = document.querySelectorAll('.nav-item');
         navItem.forEach(item => {
             item.addEventListener('click', () => {
-                navItem.forEach(i => i.classList.remove('selected')); // Remove selected from all
-                item.classList.add('selected'); // Add selected to clicked item
+                navItem.forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
             });
         });
     </script>
-
-
-    <!-- script to live search -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            $('#live-search').on('input', function () {
-                var query = $(this).val();
-                $.ajax({
-                    url: "{% url 'admin_list_user' %}", // Send request to the same view
-                    data: {
-                        'query': query
-                    },
-                    dataType: 'json',
-                    success: function (data) {
-                        $('#table-body').empty(); // Clear previous results
-                        if (data.length > 0) {
-                            $.each(data, function (index, user) {
-                                var row = '<tr>';
-                                row += '<td>' + user.id + '</td>';
-                                row += '<td>' + user.first_name + '</td>';
-                                row += '<td>' + user.last_name + '</td>';
-                                row += '<td>' + user.email + '</td>';
-                                var blockUrl = "{% url 'block_unblock_user' 0 %}".replace('0', user.id);
-                                var detailsUrl = "{% url 'admin_show_user_details' 0 %}".replace('0', user.id);
-                                // Block/Unblock button based on user.is_active
-                                if (user.is_active) {
-                                    row += '<td><a href="' + blockUrl + '"><button class="action-button">Block</button></a></td>';
-                                } else {
-                                    row += '<td><a href="' + blockUrl + '"><button class="action-button">Unblock</button></a></td>';
-                                }
-                                // Show Details button
-                                row += '<td><a href="' + detailsUrl + '"><button class="action-button show-details-button">Show Details</button></a></td>';
-                                row += '</tr>';
-                                $('#table-body').append(row);
-                            });
-                        } else {
-                            $('#table-body').append('<tr><td colspan="5">No users found</td></tr>');
-                        }
-                    }
-                });
-            });
-        });
-        
-    </script>
-
 </body>
 
 </html>

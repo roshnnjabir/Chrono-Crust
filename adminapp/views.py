@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import imghdr
+from django.shortcuts import render, get_object_or_404
 
 
 # Create your views here.
@@ -28,15 +29,26 @@ def admin_list_user(request):
             (Q(first_name__icontains=query) | Q(email__icontains=query) | Q(last_name__icontains=query)) & (Q(is_staff=False))
         )  # Filter by first name or email
     else:
-        users = CustomUser.objects.filter(is_staff=False)  # If no query, return all users
+        users = CustomUser.objects.filter(is_staff=False)
 
     # Handle AJAX request
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        results = list(users.values('id', 'first_name', 'last_name', 'email', 'is_active'))  # Prepare JSON response
-        return JsonResponse(results, safe=False)  # Send JSON response for AJAX
+        results = list(users.values('id', 'first_name', 'last_name', 'email', 'is_active'))
+        return JsonResponse(results, safe=False)
 
     # Handle standard request (render the full page)
     return render(request, 'admin_list_user.html', {'users': users})
+
+
+def admin_show_user_details(request, id):
+    user = get_object_or_404(CustomUser, id=id)
+    addresses = user.addresses.all()
+    context = {
+        'user': user,
+        'addresses': addresses,
+    }
+    return render(request, 'admin_show_user_details.html', context)
+
 
 def admin_list_blocked_user(request):
     query = request.GET.get('query', '')  # Get the search query from GET request

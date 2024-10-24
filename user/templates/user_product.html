@@ -402,7 +402,9 @@
             max-width: 100%; /* Responsive image */
             height: auto; /* Maintain aspect ratio */
         }
-        
+        .unit{
+            font-size: 14px;
+        }
     
         /* Media Queries for Responsiveness */
         @media (max-width: 990px) {
@@ -712,7 +714,7 @@
             <div style="width: 100%; height: 100vh; position: absolute; display: flex; align-items: baseline;"><img style="height: 100%; width: 100%; object-fit: cover;" src="{{ product.image.url }}" alt="admin"></div>
             <div class="desc-container">
                 <div class="desc-text-container"><h2>Presenting The New {{product.collection.brand.name}} {{product.collection.name}} {{product.name}}</h2>
-                    <p>The new Zenith Defy Skyline Chronograph impresses with its high frequency El Primero 3600 movement that ensures 1/10th of a second function, and choice of dials in black, blue, and silver</p></div>
+                    <p>{{ product.description }}</p></div>
             </div>
         </div>
         </header>
@@ -725,9 +727,9 @@
             <div class="section-2-desc">
                 <div class="desc-text-container">
                     <h2>Precision Perfection</h2>
-                    <p>The Zenith Defy Skyline Chronograph features a 42mm stainless steel case with a modernised octagonal shape, which borrows much from the history of the iconic Defy, only to become even more refined, robust, and reliable. The pushers of the Defy Skyline Chronograph trace the case’s sharp lines, and the screw-down crown with Zenith’s star keeps things watertight up to 100m; a fine example of form and function.</p>
+                    <p>{{product.description1}}</p>
                 </div>
-                <p>Despite being a chronograph watch, the Defy Skyline Chronograph offers an option to choose from dials in metallic black, blue, and silver, displayed with an attractive sunray pattern. This dial appears uncluttered, and manages to be aesthetically impressive, courtesy the collection’s signature starry sky pattern with the traditional El Primero dial layout. It’s three slightly oversized, overlapping sub-dials handle the elapsed seconds and minutes of the chronograph, not to mention the constant running seconds. The dial also features hour markers, which are rhodium-plated, faceted, and coated with Super-LumiNova for easy timekeeping in dark conditions. Its date window appears at 4.30 and matches the dial colour, while the 12-facet flange ring with a 1/10th-of-a-second scale follows the lines and angles of the dodecagonal bezel, which also acts as an extension for the hour markers.</p>
+                <p>{{product.description2}}</p>
             </div>
         </div>
         <div class="section-3">
@@ -789,29 +791,29 @@
             <div class="features">
                 <div class="feature">
                     <div class="feature-value">
-                        <span>42</span>
-                        <span>MM</span>
+                        <span>{{product.diameter}}</span>
+                        <span class="unit">MM</span>
                     </div>
                     <div class="feature-name">DIAMETER</div>
                 </div>
                 <div class="feature">
                     <div class="feature-value">
-                        <span>36000</span>
-                        <span>VpH</span>
+                        <span>{{product.freequency}}</span>
+                        <span class="unit">VpH</span>
                     </div>
                     <div class="feature-name">FREQUENCY</div>
                 </div>
                 <div class="feature">
                     <div class="feature-value">
-                        <span>60</span>
-                        <span>H</span>
+                        <span>{{product.power_reserve}}</span>
+                        <span class="unit">H</span>
                     </div>
                     <div class="feature-name">POWER RESERVE</div>
                 </div>
                 <div class="feature">
                     <div class="feature-value">
-                        <span>10</span>
-                        <span>ATM</span>
+                        <span>{{product.water_resistance}}</span>
+                        <span class="unit">ATM</span>
                     </div>
                     <div class="feature-name">WATER RESISTANCE</div>
                 </div>

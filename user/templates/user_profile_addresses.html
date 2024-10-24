@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <title>User Address Book</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -90,18 +90,6 @@
             padding: 15px;
             border-radius: 10px 10px 0 0;
         }
-        .box-header button {
-            background-color: #d0d0d0;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .box-header button:hover {
-            background-color: #ebebeb;
-            transform: scale(1.05);
-        }
         .info-layout {
             display: flex;
             justify-content: space-between;
@@ -138,8 +126,18 @@
             color: #fff;
         }
         #editbutton{
+            background-color: #d0d0d0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
             max-width: 60px;
             max-width: 90px;
+        }
+        #editbutton:hover{
+            background-color: #ebebeb;
+            transform: scale(1.05);
         }
 
         /* Responsive Styles */
@@ -287,6 +285,35 @@
         #savechanges:hover{
             background-color: #4A423E;
         }
+        .add-address-button {
+            background-color: #28221E; /* Button background color */
+            color: white; /* Text color */
+            padding: 10px 20px; /* Padding for the button */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            transition: background-color 0.3s ease; /* Transition for hover effect */
+            margin-bottom: 20px; /* Space below the button */
+        }
+        .add-address-button:hover {
+            background-color: #4A423E; /* Darker shade on hover */
+        }
+        .deletebutton {
+            color: #ff4d4d;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #ffecec;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px; /* Space between edit and delete button */
+        }
+        
+        .deletebutton:hover {
+            background-color: #ff4d4d;
+            color: #fff;
+        }        
 
         @media (max-width: 480px) {
             /* Modal Overlay */
@@ -402,123 +429,152 @@
                 margin-left: 0px;
             }
         }
-        
-        
     </style>
 </head>
 <body>
     {% include 'partials/error_pop_up.html' %}
-<div class="container">
-    <div class="breadcrumbs">
-        <a href="{% url 'user_home' %}">Home</a> / <span>My Profile</span>
-    </div>
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="{% url 'user_home' %}">Home</a> / <span>Address Book</span>
+        </div>
 
-    <!-- Dropdown for Sidebar on Mobile -->
-    <div class="dropdown">
-        <select id="mobile-nav" onchange="navigateTo(this.value)">
-            <option value="overview" selected>Overview</option>
-            <option value="personal-wallet">Personal Wallet</option>
-            <option value="address-book">Address Book</option>
-            <option value="change-password">Change Password</option>
-            <option value="order-history">Order History</option>
-        </select>
-    </div>
-
-    <div class="main-content">
-        <div class="sidebar">
-            <a href="{% url 'user_profile' %}" class="nav-item selected" id="overview">Overview</a>
-            <a href="{% url 'user_personal_wallet' %}" class="nav-item" id="personal-wallet">Personal Wallet</a>
-            <a href="{% url 'user_address_book' %}" class="nav-item" id="address-book">Address Book</a>
-            <a href="{% url 'user_forgot_password' %}" class="nav-item" id="change-password">Change Password</a>
-            <a href="{% url 'user_order_history' %}" class="nav-item" id="order-history">Order History</a>
-        </div>        
-
-        <div class="content" >
-            <h2>My Account</h2>
-            <div class="box">
-                <div class="box-header">
-                    <h3>Account Overview</h3>
-                    <button  class="edit_button" id="edit_button" onclick="openModal()">EDIT</button>
-                </div>
-                <div class="info-layout">
-                    <div class="info-label">First Name:</div>
-                    <div class="info-value">{{user.first_name}}</div>
-                </div>
-                <div class="info-layout">
-                    <div class="info-label">Last Name:</div>
-                    <div class="info-value">{{user.last_name}}</div>
-                </div>
-                <div class="info-layout">
-                    <div class="info-label">Date of Birth:</div>
-                    <div class="info-value">{{user.date_of_birth}}</div>
-                </div>
-                <div class="info-layout">
-                    <div class="info-label">Phone Number:</div>
-                    <div class="info-value">{{user.phone}}</div>
-                </div>
-                <div class="info-layout">
-                    <div class="info-label">Email Address:</div>
-                    <div class="info-value">{{user.email}}</div>
-                </div>
+        <div class="main-content">
+            <div class="sidebar">
+                <a href="{% url 'user_profile' %}" class="nav-item">Overview</a>
+                <a href="{% url 'user_personal_wallet' %}" class="nav-item">Personal Wallet</a>
+                <a href="{% url 'user_address_book' %}" class="nav-item selected">Address Book</a>
+                <a href="{% url 'user_change_password' %}" class="nav-item">Change Password</a>
+                <a href="{% url 'user_order_history' %}" class="nav-item">Order History</a>
             </div>
 
-            <div class="logout">
-                <a href="{% url 'user_logout' %}">Logout</a>
+            <div class="content">
+                <h2>My Addresses</h2>
+                <button class="add-address-button" onclick="openAddAddressModal()">Add Address</button>
+                <div class="box">
+                    {% for address in addresses %}
+                    <div class="info-layout">
+                        <div class="info-label">{{ address.street_address }}, {{ address.city }}, {{ address.state }}, {{ address.postal_code }}</div>
+                        <button id="editbutton" onclick="openEditModal({{ address.id }}, '{{ address.street_address }}', '{{ address.city }}', '{{ address.state }}', '{{ address.postal_code }}', '{{ address.country }}')">EDIT</button>
+                        <button class="deletebutton" onclick="confirmDelete({{ address.id }})">DELETE</button>
+                    </div>                    
+                    {% empty %}
+                        <p>No addresses found.</p>
+                    {% endfor %}
+                </div>
+
+                <div class="logout">
+                    <a href="{% url 'user_logout' %}">Logout</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal for Editing User Info -->
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Edit User Information</h3>
-            <span class="close" id="close_modal" onclick="closeModal()">&times;</span>
+    <!-- Modal for Adding Address -->
+    <div id="addAddressModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Address</h3>
+                <span class="close" onclick="closeAddAddressModal()">&times;</span>
+            </div>
+            <form id="addAddressForm" method="post" action="{% url 'add_user_address' %}">
+                {% csrf_token %}
+                <div class="info-layout">
+                    <div class="info-label">Street:</div>
+                    <input type="text" name="street_address" required>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">City:</div>
+                    <input type="text" name="city" required>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">State:</div>
+                    <input type="text" name="state" required>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">Country:</div>
+                    <input type="text" name="country" required>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">Postal Code:</div>
+                    <input type="text" name="postal_code" id="postal_code" pattern="\d{6}" title="Pincode must be exactly 6 digits" required>
+                </div>
+                <button id="saveAddress" type="submit">Save Address</button>
+            </form>
         </div>
-        <form action="{% url 'user_profile_update' %}" method="post" id="editForm">
-            {% csrf_token %}
-            <div class="info-layout">
-                <div class="info-label">First Name:</div>
-                <input type="text" name="FirstName" id="editFirstName" value="{{ user.first_name }}" required>
-            </div>
-            <div class="info-layout">
-                <div class="info-label">Last Name:</div>
-                <input type="text" name="LastName" id="editLastName" value="{{ user.last_name }}" required>
-            </div>
-            <div class="info-layout">
-                <div class="info-label">Date of Birth:</div>
-                <input type="date" name="Date_of_birth" id="editDob" value="{{ date_of_birth }}" required>
-            </div>
-            <div class="info-layout">
-                <div class="info-label">Phone Number:</div>
-                <input type="tel" id="editphone" name="Phone" maxlength="10" pattern="\d{10}" inputmode="numeric" value="{{ user.phone }}" required  oninvalid="this.setCustomValidity('Integer only, 10 digits')" 
-                oninput="this.setCustomValidity('')" 
-                title="Integer only, 10 digits">
-            </div>
-            <input type="hidden" name="Email" id="editEmail" value="{{ user.email }}" required>
-            <button id="savechanges" type="submit">Save Changes</button>
-        </form>        
     </div>
-</div>
 
-<script>
-    function navigateTo(value) {
-        const baseUrl = '/user_profile'; // Change this to the base URL for your user profile
-        const url = `${baseUrl}/${value}`; // Append the selected value to the base URL
-        window.location.href = url; // Redirect to the new URL
-    }
+    <!-- Modal for Editing Address -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Address</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <form id="editAddressForm" method="post" action="{% url 'user_address_book_edit' %}">
+                {% csrf_token %}
+                <input type="hidden" name="address_id" id="address_id">
+                <div class="info-layout">
+                    <div class="info-label">Street:</div>
+                    <input type="text" name="street" id="editStreet" required>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">City:</div>
+                    <input type="text" name="city" id="editCity" required>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">State:</div>
+                    <input type="text" name="state" id="editState" required>
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">Country:</div>
+                    <input type="text" name="country" id="editCountry" required> <!-- Added Country field -->
+                </div>
+                <div class="info-layout">
+                    <div class="info-label">Postal Code:</div>
+                    <input type="text" name="postal_code" id="editPostalCode" pattern="\d{6}" title="Pincode must be exactly 6 digits" required>
+                </div>
+                <button id="saveChanges" type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
 
-    function openModal() {
-        document.getElementById("modal").style.display = "flex";
-    }
+    <script>
+        function navigateTo(value) {
+            const baseUrl = '/user_profile'; // Change this to the base URL for your user profile
+            const url = `${baseUrl}/${value}`; // Append the selected value to the base URL
+            window.location.href = url; // Redirect to the new URL
+        }
 
-    function closeModal() {
-        document.getElementById("modal").style.display = "none";
-        document.getElementById("errorModal").style.display = "none";
-    }
+        function openAddAddressModal() {
+            document.getElementById("addAddressModal").style.display = "flex";
+        }
 
-</script>
+        function closeAddAddressModal() {
+            document.getElementById("addAddressModal").style.display = "none";
+        }
 
+        function openEditModal(id, street_address, city, state, postal_code, country) {
+            document.getElementById("address_id").value = id;
+            document.getElementById("editStreet").value = street_address;
+            document.getElementById("editCity").value = city;
+            document.getElementById("editState").value = state;
+            document.getElementById("editPostalCode").value = postal_code;
+            document.getElementById("editCountry").value = country; // Populate Country field
+            document.getElementById("editModal").style.display = "flex";
+        }        
+
+        function closeEditModal() {
+            document.getElementById("editModal").style.display = "none";
+        }
+    </script>
+    <script>
+        function confirmDelete(addressId) {
+            const confirmDelete = confirm("Are you sure you want to delete this address?");
+            if (confirmDelete) {
+                // Redirect to a delete view or call an API
+                window.location.href = `/user_profile/delete_address/${addressId}`; // Modify URL as needed for your delete action
+            }
+        }        
+    </script>
 </body>
 </html>

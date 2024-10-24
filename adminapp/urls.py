@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin_logout/', views.admin_logout, name='admin_logout'),
     path('admin_login/', views.admin_login, name='admin_login'),
     path('admin/list_user/', views.admin_list_user, name='admin_list_user'),
+    path('admin/show_user_details/<int:id>', views.admin_show_user_details, name='admin_show_user_details'),
     path('admin/blocked_users', views.admin_list_blocked_user, name='admin_list_blocked_user'),
     path('admin/block_unblock/<int:id>', views.admin_block_unblock_user, name="block_unblock_user"),
     

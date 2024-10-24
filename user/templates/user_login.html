@@ -14,21 +14,30 @@
         <img src="{% static 'images/image1.png' %}" alt="Login Image">
         <div class="form-container">
             <h2>Login</h2>
-            <form action="{% url 'user_login' %}" method="post">
+            <form id="login-form" action="{% url 'user_login' %}" method="post">
                 {% csrf_token %}
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <button type="submit">Login</button>
+                <input type="email" name="email" placeholder="Email" required aria-label="Email Address">
+                <input type="password" name="password" placeholder="Password" required aria-label="Password">
+                <button type="submit" id="login-btn" aria-label="Login to your account">Login</button>
             </form>
+            
             <div class="redirect-link">
-                <p>Don't have an account?</p>
-                <a href="{% url 'user_signup' %}">Sign up</a>
+                <p>Don't have an account? <a href="{% url 'user_signup' %}" class="link">Sign up</a></p>
+                <p>Forgot your password? <a href="{% url 'user_forgot_password' %}" class="link">Reset Password</a></p>
             </div>
+    
             <a href="{% provider_login_url 'google' %}?next=/" class="google-login-btn">
                 <img src="{% static 'images/googlelogo.jpeg' %}" alt="Google Logo" width="30" height="30">
                 Login with Google
             </a>
         </div>
-    </div>
+    </div>    
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = 'Logging in...'; // Optionally add a spinner here
+        });        
+    </script>
 </body>
 </html>

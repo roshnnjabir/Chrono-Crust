@@ -7,160 +7,185 @@
   <link rel="stylesheet" href="admin_home.css">
   <style>
     /* General styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-body {
-    background-color: #f4f4f4;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-.container {
-  display: flex;
-  padding: 40px;
-  flex-direction: column;
-  width: 100%;
-  margin: auto;
-}
-
-.breadcrumbs {
-  font-size: 14px;
-  margin-bottom: 20px;
-  color: #888;
-}
-
-.breadcrumbs a{
-  font-family: 'Nunito', sans-serif;
-  text-decoration: none;
-  color: #050505;
-}
-
-.admin-container {
-    width: 100%;
-    max-width: 1200px;
-    background: #ffffff;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-    border-radius: 15px;
-    padding: 2rem;
-    text-align: center;
-}
-
-.admin-header h1 {
-    font-size: 2.5rem;
-    color: #333;
-    margin-bottom: 2rem;
-}
-
-.admin-nav {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Always 3 items in a row */
-    gap: 2rem;
-}
-
-.nav-item {
-    text-decoration: none;
-    background: #f9f9f9;
-    color: #333;
-    padding: 1.5rem;
-    text-align: center;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, background-color 0.3s ease;
-    font-size: 1.25rem;
-}
-
-.nav-item:hover {
-    background-color: #e8e8e8;
-    transform: translateY(-5px);
-}
-
-.nav-icon {
-    font-size: 2rem;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-/* Media Queries for responsiveness */
-@media (max-width: 768px) {
-    .admin-nav {
-        grid-template-columns: repeat(2, 1fr); /* Still 3 items in a row */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
     }
-}
 
-@media (max-width: 480px) {
-    .admin-nav {
-        grid-template-columns: repeat(2, 1fr); /* Still 3 items in a row */
+    body {
+      background-color: #f4f4f4;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
+
+    .container {
+      display: flex;
+      padding: 40px;
+      flex-direction: column;
+      width: 100%;
+      margin: auto;
+    }
+
     .breadcrumbs {
-      font-size: 10px;
-  }
-  .container{
-    padding: 20px;
-  }
-}
-
-@media (max-width: 400px) {
-    .nav-icon {
-        margin-bottom: 0;
+      font-size: 14px;
+      margin-bottom: 20px;
+      color: #888;
     }
+
+    .breadcrumbs a {
+      font-family: 'Nunito', sans-serif;
+      text-decoration: none;
+      color: #050505;
+    }
+
+    .admin-container {
+      width: 100%;
+      max-width: 1200px;
+      background: #ffffff;
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .admin-header h1 {
+      font-size: 2.5rem;
+      color: #333;
+      margin-bottom: 2rem;
+    }
+
+    .admin-nav {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* Always 3 items in a row */
+      gap: 2rem;
+    }
+
     .nav-item {
-        font-size: 1rem; /* Adjust font size for smaller screens */
+      text-decoration: none;
+      background: #f9f9f9;
+      color: #333;
+      padding: 1.5rem;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      font-size: 1.25rem;
     }
-    .container{
-      padding: 15px;
-    }
-    .admin-container{
-      padding: 10px;
-    }
-}
 
+    .nav-item:hover {
+      background-color: #e8e8e8;
+      transform: translateY(-5px);
+    }
+
+    .nav-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Logout button styles */
+    .logout-container {
+      margin-top: 3rem;
+    }
+
+    .logout-button {
+      background-color: #ff4d4d;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+    }
+
+    .logout-button:hover {
+      background-color: #ff1a1a;
+    }
+
+    /* Media Queries for responsiveness */
+    @media (max-width: 768px) {
+      .admin-nav {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .admin-nav {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .breadcrumbs {
+        font-size: 10px;
+      }
+      .container {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .nav-icon {
+        margin-bottom: 0;
+      }
+      .nav-item {
+        font-size: 1rem; /* Adjust font size for smaller screens */
+      }
+      .container {
+        padding: 15px;
+      }
+      .admin-container {
+        padding: 10px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-      <div class="breadcrumbs">
-            <a href="/">Home </a> / <span>Admin </span>
-      </div>
-  <div class="admin-container">
-    <header class="admin-header">
-      <h1>Admin Dashboard</h1>
-    </header>
-
-    <div class="admin-nav">
-      <a href="/admin/list_user" class="nav-item">
-        <span class="nav-icon">👤</span>
-        Users
-      </a>
-      <a href="/admin/list_product" class="nav-item">
-        <span class="nav-icon">🛍️</span>
-        Products
-      </a>
-      <a href="/admin/list_collection" class="nav-item">
-        <span class="nav-icon">📦</span>
-        Collections
-      </a>
-      <a href="/admin/list_brand" class="nav-item">
-        <span class="nav-icon">🏷️</span>
-        Brands
-      </a>
-      <a href="/admin/orders" class="nav-item">
-        <span class="nav-icon">📑</span>
-        Orders
-      </a>
-      <a href="/admin/coupons" class="nav-item">
-        <span class="nav-icon">🎟️</span>
-        Coupons
-      </a>
+    <div class="breadcrumbs">
+      <a href="/">Home </a> / <span>Admin </span>
     </div>
-  </div>
+
+    <div class="admin-container">
+      <header class="admin-header">
+        <h1>Admin Dashboard</h1>
+      </header>
+
+      <div class="admin-nav">
+        <a href="/admin/list_user" class="nav-item">
+          <span class="nav-icon">👤</span>
+          Users
+        </a>
+        <a href="/admin/list_product" class="nav-item">
+          <span class="nav-icon">🛍️</span>
+          Products
+        </a>
+        <a href="/admin/list_collection" class="nav-item">
+          <span class="nav-icon">📦</span>
+          Collections
+        </a>
+        <a href="/admin/list_brand" class="nav-item">
+          <span class="nav-icon">🏷️</span>
+          Brands
+        </a>
+        <a href="/admin/orders" class="nav-item">
+          <span class="nav-icon">📑</span>
+          Orders
+        </a>
+        <a href="/admin/coupons" class="nav-item">
+          <span class="nav-icon">🎟️</span>
+          Coupons
+        </a>
+      </div>
+
+      <!-- Logout button -->
+      <div class="logout-container">
+        <a href="{% url 'admin_logout' %}" class="logout-button">Logout</a>
+      </div>
+    </div>
   </div>
 </body>
 </html>

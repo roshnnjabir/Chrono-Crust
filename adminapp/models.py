@@ -25,7 +25,7 @@ class Product(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=500, default='', blank=True, null=True)
     description1 = models.CharField(max_length=500, default='', blank=True, null=True)
-    description2 = models.CharField(max_length=500, default='', blank=True, null=True)
+    description2 = models.CharField(max_length=1000, default='', blank=True, null=True)
     stock = models.CharField(max_length=3)
     image = models.ImageField(upload_to='uploads/product')
     image1 = models.ImageField(upload_to='uploads/product')
@@ -38,3 +38,8 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class product_slider(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=500)
