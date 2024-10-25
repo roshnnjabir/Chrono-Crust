@@ -214,7 +214,7 @@
 
             <!-- Price of Product -->
             <label for="product-name">Price of Product</label>
-            <input type="text" id="edit-product-price" name="price" value="{{ product.price }}">
+            <input type="number" id="edit-product-price" name="price" min="0" value="{{ product.price }}">
 
             <!-- Collection Selection -->
             <label for="collection-name">Collection Name</label>
@@ -227,7 +227,7 @@
             </select>
 
             <label for="product-stock">Stock</label>
-            <input type="stock" id="edit-product-stock" name="stock" value="{{ product.stock }}">
+            <input type="number" id="edit-product-stock" name="stock" min="0" value="{{ product.stock }}">
 
             <!-- Image Upload Section -->
             <div class="image-section">

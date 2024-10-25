@@ -23,13 +23,18 @@
             
             <div class="redirect-link">
                 <p>Don't have an account? <a href="{% url 'user_signup' %}" class="link">Sign up</a></p>
+            </div>
+
+            <p style="width: 100%; display: flex; justify-content: center;">OR</p>
+
+            <a href="{% provider_login_url 'google' %}?next=/" class="google-login-btn">
+                <img src="{% static 'images/Google_logo.png' %}" alt="Google Logo">
+                <span>Continue with Google</span>
+            </a>
+
+            <div style="margin: 0; margin-top: 10px;" class="redirect-link">
                 <p>Forgot your password? <a href="{% url 'user_forgot_password' %}" class="link">Reset Password</a></p>
             </div>
-    
-            <a href="{% provider_login_url 'google' %}?next=/" class="google-login-btn">
-                <img src="{% static 'images/googlelogo.jpeg' %}" alt="Google Logo" width="30" height="30">
-                Login with Google
-            </a>
         </div>
     </div>    
     <script>

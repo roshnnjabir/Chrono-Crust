@@ -43,4 +43,6 @@ urlpatterns = [
     path('resend_otp', views.resend_otp, name='resend_otp'),
     
     path('view_product/<int:id>', views.view_product, name='view_product'),
+    path('user_add_to_cart/', views.user_add_to_cart, name='user_add_to_cart'),
+    path('cart_view/<int:user_id>', views.user_cart_view, name='user_cart_view'),
 ]

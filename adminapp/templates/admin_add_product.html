@@ -159,7 +159,7 @@
             <input type="text" id="edit-product-name" name="productname" required>
 
             <label for="product-name">Price of Product</label>
-            <input type="text" id="edit-product-price" name="price" required>
+            <input type="number" id="edit-product-price" name="price" min="0" required>
 
             <label for="collection-name">Collection Name</label>
             <select name="collection" id="edit-product-collection" required>
@@ -171,7 +171,7 @@
             </select>
 
             <label for="product-stock">Stock</label>
-            <input type="number" id="edit-product-stock" name="stock" required>
+            <input type="number" id="edit-product-stock" name="stock" min="0" required>
 
             <div class="image-section">
                 <label for="product-image">Product Images</label>
@@ -212,82 +212,82 @@
         };      
 
         let cropper;
-let selectedImageId;
-
-// Function to handle image selection and trigger file input
-function chooseImage(imageId) {
-    document.getElementById('upload-image').click(); // Trigger file input click
-    selectedImageId = imageId; // Store the selected image ID
-}
-
-// Function to preview the selected image and initialize Cropper.js
-function previewImage(event) {
-    const file = event.target.files[0];
-
-    if (file) {
-        // Check the file type (PNG and JPG allowed)
-        const validTypes = ['image/png', 'image/jpeg'];
-        if (!validTypes.includes(file.type)) {
-            alert('Only PNG and JPG files are allowed.');
-            return; // Stop further execution if the file type is invalid
+        let selectedImageId;
+            
+        // Function to handle image selection and trigger file input
+        function chooseImage(imageId) {
+            document.getElementById('upload-image').click(); // Trigger file input click
+            selectedImageId = imageId; // Store the selected image ID
         }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            // Replace the clicked image with the uploaded image
-            const selectedImage = document.getElementById(selectedImageId);
-            selectedImage.src = e.target.result;
-
-            // Show cropper on uploaded image
-            const cropImage = document.getElementById('cropped-image');
-            cropImage.src = e.target.result;
-            document.getElementById('cropped-image-container').style.display = 'flex';
-            document.getElementById('save-button').style.display = 'block';
-
-            // Initialize cropper
-            cropper = new Cropper(cropImage, {
-                aspectRatio: 1,
-                viewMode: 2
-            });
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-// Function to crop the image and upload it
-function cropImage() {
-    // Get the cropped canvas
-    const canvas = cropper.getCroppedCanvas();
-
-    // Convert the canvas to a blob
-    canvas.toBlob(function(blob) {
-        const formData = new FormData();
-        formData.append('image', blob, 'cropped_image.png'); // You can name the file as you prefer
-
-        // Send the blob to the server using fetch
-        fetch('/upload_cropped_image/', { // Update the URL as needed
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Update the image source with the URL of the saved image
-                const croppedImage = document.getElementById(selectedImageId);
-                croppedImage.src = data.file_url; // Set the image source to the saved file URL
-            } else {
-                alert(data.message);
+        
+        // Function to preview the selected image and initialize Cropper.js
+        function previewImage(event) {
+            const file = event.target.files[0];
+        
+            if (file) {
+                // Check the file type (PNG and JPG allowed)
+                const validTypes = ['image/png', 'image/jpeg'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Only PNG and JPG files are allowed.');
+                    return; // Stop further execution if the file type is invalid
+                }
+            
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // Replace the clicked image with the uploaded image
+                    const selectedImage = document.getElementById(selectedImageId);
+                    selectedImage.src = e.target.result;
+                
+                    // Show cropper on uploaded image
+                    const cropImage = document.getElementById('cropped-image');
+                    cropImage.src = e.target.result;
+                    document.getElementById('cropped-image-container').style.display = 'flex';
+                    document.getElementById('save-button').style.display = 'block';
+                
+                    // Initialize cropper
+                    cropper = new Cropper(cropImage, {
+                        aspectRatio: 1,
+                        viewMode: 2
+                    });
+                };
+                reader.readAsDataURL(file);
             }
-        })
-        .catch(error => {
-            console.error('Error uploading image:', error);
-        });
-
-        // Hide cropper preview after cropping
-        cropper.destroy();
-        document.getElementById('cropped-image-container').style.display = 'none';
-    }, 'image/png'); // You can change the format if needed
-}
+        }
+        
+        // Function to crop the image and upload it
+        function cropImage() {
+            // Get the cropped canvas
+            const canvas = cropper.getCroppedCanvas();
+        
+            // Convert the canvas to a blob
+            canvas.toBlob(function(blob) {
+                const formData = new FormData();
+                formData.append('image', blob, 'cropped_image.png'); // You can name the file as you prefer
+            
+                // Send the blob to the server using fetch
+                fetch('/upload_cropped_image/', { // Update the URL as needed
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update the image source with the URL of the saved image
+                        const croppedImage = document.getElementById(selectedImageId);
+                        croppedImage.src = data.file_url; // Set the image source to the saved file URL
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                });
+            
+                // Hide cropper preview after cropping
+                cropper.destroy();
+                document.getElementById('cropped-image-container').style.display = 'none';
+            }, 'image/png'); // You can change the format if needed
+        }
 
     </script>
 </body>

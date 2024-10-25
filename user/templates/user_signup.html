@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
 <body>
+    {% load socialaccount %}
     {% include 'partials/error_pop_up.html' %}
     <div class="container">
         <img src="{% static 'images/image2.png' %}" alt="Sign Up Image">
@@ -25,8 +26,15 @@
             </form>
             <div class="redirect-link">
                 <p>Already have an account?</p>
-                <a href="{% url 'user_login' %}">Login</a>
+                <a class="link" href="{% url 'user_login' %}">Login</a>
             </div>
+
+            <p style="width: 100%; display: flex; justify-content: center;">OR</p>
+
+            <a href="{% provider_login_url 'google' %}?next=/" class="google-login-btn">
+                <img src="{% static 'images/Google_logo.png' %}" alt="Google Logo">
+                <span>Sign up with Google</span>
+            </a>
         </div>
     </div>
 

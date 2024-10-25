@@ -1,0 +1,25 @@
+body {
+    background-color: #f0f0f0; /* Set background color */
+}
+
+h1 {
+    color: #333; /* Change the color of the heading */
+    font-size: 2.5em; /* Adjust font size */
+    text-align: center; /* Center the heading */
+}
+
+form {
+    background-color: #fff; /* Form background color */
+    padding: 20px; /* Add padding */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Box shadow */
+}
+
+button {
+    background-color: #007BFF; /* Button color */
+    color: #fff; /* Button text color */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add padding */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor */
+}

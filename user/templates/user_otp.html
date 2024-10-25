@@ -27,29 +27,51 @@
                 <p id="timer-text">Wait before you request another OTP: <span id="timer">30</span> seconds</p>
             </div>
             <div id="resend-container" class="redirect-link">
-                <p>Didn't receive the OTP?</p>
                 <a href="{% url 'resend_otp' %}">Resend OTP</a>
             </div>
         </div>
     </div>
 
     <script>
-        // Countdown timer
-        let timerValue = 30;
+        const timerDuration = 30; // Set the timer duration in seconds
         const timerElement = document.getElementById('timer');
         const resendContainer = document.getElementById('resend-container');
-
-        const countdown = setInterval(() => {
-            timerValue--;
-            timerElement.textContent = timerValue;
-
-            if (timerValue <= 0) {
-                clearInterval(countdown);
+        const timerText = document.getElementById('timer-text');
+    
+        // Get the previous timer start time from localStorage or set it to current time
+        const previousStartTime = localStorage.getItem('otpTimerStartTime');
+        const startTime = previousStartTime ? parseInt(previousStartTime, 10) : Date.now();
+        
+        // Save the start time if it's not already set
+        if (!previousStartTime) {
+            localStorage.setItem('otpTimerStartTime', startTime);
+        }
+    
+        // Calculate remaining time
+        function getRemainingTime() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            return Math.max(timerDuration - elapsed, 0);
+        }
+    
+        // Update timer every second
+        function updateTimer() {
+            let remainingTime = getRemainingTime();
+    
+            if (remainingTime > 0) {
+                timerElement.textContent = remainingTime;
+            } else {
+                clearInterval(countdownInterval);
                 timerElement.textContent = ''; // Clear the timer
-                document.getElementById('timer-text').textContent = 'Request a new OTP:';
+                timerText.textContent = 'Request a new OTP:';
                 resendContainer.style.display = 'block'; // Show the resend link
+                localStorage.removeItem('otpTimerStartTime'); // Clear timer start time
             }
-        }, 1000);
+        }
+    
+        // Run the timer and update every second
+        const countdownInterval = setInterval(updateTimer, 1000);
+        updateTimer(); // Initial call to set the timer right away
     </script>
+    
 </body>
 </html>

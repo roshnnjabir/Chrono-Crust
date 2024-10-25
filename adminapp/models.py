@@ -1,4 +1,5 @@
 from django.db import models
+from user.models import CustomUser
 
 
 class Brand(models.Model):
@@ -42,4 +43,36 @@ class Product(models.Model):
 
 class product_slider(models.Model):
     name = models.CharField(max_length=50)
+    product = models.OneToOneField(Product, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=500)
+
+
+class Cart(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Cart of {self.user}"
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name} in cart of {self.cart.user}"
+
+
+class Wishlist(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Wishlist of {self.user}"
+
+
+class WishlistItem(models.Model):
+    wishlist = models.ForeignKey(Wishlist, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.product.name} in wishlist of {self.wishlist.user}"

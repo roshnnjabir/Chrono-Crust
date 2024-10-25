@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import CustomUser, Address
-from adminapp.models import Product, Collection, Brand
+from adminapp.models import Product, Collection, Brand, Cart, CartItem
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.contrib.auth import get_backends
 from django.core.cache import cache
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from datetime import timedelta
 from django.core.mail import send_mail
 from django.db.models import Q
@@ -106,37 +107,63 @@ def user_forgot_password(request):
     if request.method == "POST":
         email = request.POST['email']
 
-        otp = generate_otp()
-
-        request.session['otp'] = otp
-        request.session['otp_timestamp'] = timezone.now().isoformat()
-        request.session['reset_pass_email'] = email
         if CustomUser.objects.filter(email=email).exists():
+            otp = generate_otp()
+
+            request.session['otp'] = otp
+            request.session['otp_timestamp'] = timezone.now().isoformat()
+            request.session['reset_pass_email'] = email
             send_otp_via_email(email=email, otp=otp)
             messages.success(request, 'OTP sent successfully for reset password!')
+            return redirect('otp_page')
         else:
             messages.error(request, 'Email Does Not Exist')
             return redirect('user_forgot_password')
-        return redirect('otp_page')
     return render(request, 'user_forgot_password.html')
 
 
 def user_reset_password(request):
     if request.method == "POST":
-        email = request.POST['email']
-        password = request.POST['password']
-        user = CustomUser.objects.get(email=email)
+        email = request.POST.get('email') or request.session.get('reset_email')
+        password = request.POST.get('password')
+        cpassword = request.POST.get('confirm_password')
+        
+        if email:
+            request.session['reset_email'] = email
+        
+        user = CustomUser.objects.filter(email=email).first()
+        
         if user is not None:
-            user.set_password = password
+            # Check if passwords match
+            if password != cpassword:
+                messages.error(request, 'Passwords do not match. Please try again.')
+                return render(request, 'user_reset_password.html', {'user': user})
+            
+            # Check if new password is different from the old one
+            if user.check_password(password):
+                messages.error(request, 'Password cannot be an existing password.')
+                return render(request, 'user_reset_password.html', {'user': user})
+            
+            # Set new password and log the user in
+            user.set_password(password)
             user.save()
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')  # Change this to your desired backend
-            messages.success(request, 'Your Password Was Reset')
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            request.session.pop('reset_email', None)  # Clear email from session after success
+            messages.success(request, 'Your password was reset successfully.')
             return redirect('user_profile')
-    return render(request, 'user_reset_password.html')
+        else:
+            messages.error(request, 'Email does not exist.')
+            return redirect('user_forgot_password')
+    
+    # Render form if GET request
+    else:
+        email = request.session.get('reset_email')
+        user = CustomUser.objects.filter(email=email).first() if email else None
+        return render(request, 'user_reset_password.html', {'user': user})
 
 
 def otp_page(request):
-    return render(request, 'user_otp.html')
+    return render(request, 'user_otp.html', {'start_timer': True})
 
 
 def generate_otp():
@@ -151,8 +178,26 @@ def send_otp_via_email(email, otp):
 
 def resend_otp(request):
     email = request.session.get('email')
+    signup_data = request.session.get('signup_data')
+    reset_password_email = request.session.get('reset_pass_email')
     otp = generate_otp()  # Generate a new OTP
-    if email:  # Check if email is present in session
+    if reset_password_email:
+        request.session['otp'] = otp
+        request.session['otp_timestamp'] = timezone.now().isoformat()
+        if CustomUser.objects.filter(email=reset_password_email).exists():
+            send_otp_via_email(email=reset_password_email, otp=otp)
+            messages.success(request, 'Otp Resent Successfully')
+        else:
+            messages.error(request, 'Email Does Not Exist')
+            return redirect('user_profile')
+    elif signup_data:  # Check if email is present in session
+        # Save the new OTP and current timestamp in the session
+        request.session['otp'] = otp
+        request.session['otp_timestamp'] = timezone.now().isoformat()
+        email = signup_data['email']
+        send_otp_via_email(email=email, otp=otp)
+        messages.success(request, 'Otp Resent Successfully')
+    elif email:  # Check if email is present in session
         # Save the new OTP and current timestamp in the session
         request.session['otp'] = otp
         request.session['otp_timestamp'] = timezone.now().isoformat()
@@ -160,6 +205,7 @@ def resend_otp(request):
             send_otp_via_email(email=email, otp=otp)
             messages.success(request, 'Otp Resent Successfully')
         else:
+            print('uep')
             messages.error(request, 'Email Does Not Exist')
             return redirect('user_profile')
     else:
@@ -169,22 +215,25 @@ def resend_otp(request):
 
 def verify_otp(request):
     if request.method == "POST":
-        user_otp = request.POST['otp']
+        user_otp = request.POST.get('otp')  # Use get() for safer access
         saved_otp = request.session.get('otp')
         otp_timestamp = request.session.get('otp_timestamp')
 
-        # Check if the OTP and timestamp are available
         if saved_otp and otp_timestamp:
             timestamp = timezone.datetime.fromisoformat(otp_timestamp)
 
-            # Check if the OTP is valid and hasn't expired
             if str(user_otp) == str(saved_otp) and (timezone.now() - timestamp <= timedelta(minutes=5)):
                 signup_data = request.session.get('signup_data')
                 reset_pass_email = request.session.get('reset_pass_email')
 
                 if reset_pass_email:
-                    user = CustomUser.objects.get(email=reset_pass_email)
-                    return render(request, 'user_reset_password.html', {'user': user})
+                    try:
+                        user = CustomUser.objects.get(email=reset_pass_email)
+                        del request.session['reset_pass_email']
+                        return render(request, 'user_reset_password.html', {'user': user})
+                    except CustomUser.DoesNotExist:
+                        messages.error(request, 'No user found with the provided email address.')
+                        return redirect('otp_page')
                 elif signup_data:
                     my_user = CustomUser.objects.create_user(
                         email=signup_data['email'],
@@ -194,20 +243,21 @@ def verify_otp(request):
                     )
                     my_user.save()
                     loguser = authenticate(email=signup_data['email'], password=signup_data['pass1'])
-                    login(request, loguser)
+                    if loguser:
+                        login(request, loguser)
+                        messages.success(request, 'Your account has been created successfully!')
+                    else:
+                        messages.error(request, 'Authentication failed. Please try again.')
                     del request.session['signup_data']
-                    messages.success(request, 'Your account has been created successfully!')
                 else:
-                    loguser = authenticate(email=request.session['email'], password=request.session['password'])
+                    loguser = authenticate(email=request.session.get('email'), password=request.session.get('password'))
                     if loguser and loguser.is_active:
                         login(request, loguser)
                         messages.success(request, 'Login Successful')
                     else:
-                        messages.error(request, 'User Blocked By Admins')
+                        messages.error(request, 'User Blocked By Admins or Invalid credentials.')
                     del request.session['password']
                     del request.session['email']
-
-                # Clean up session data
                 del request.session['otp']
                 del request.session['otp_timestamp']
                 return redirect('user_profile')
@@ -215,7 +265,6 @@ def verify_otp(request):
                 messages.error(request, 'Invalid OTP or OTP has expired. Please try again.')
         else:
             messages.error(request, 'No OTP found. Please request a new one.')
-
     return redirect('otp_page')
 
 
@@ -361,7 +410,35 @@ def user_logout(request):
     return redirect('user_home')
 
 
-@login_required(login_url='user_login')
 def view_product(request, id):
     product = Product.objects.get(id=id)
+    print(product.is_listed, product.collection.is_listed, product.collection.brand.is_listed, product.stock)
     return render(request, 'user_product.html', {'product': product})
+
+
+from django.http import HttpResponseRedirect
+
+
+def user_add_to_cart(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        product = get_object_or_404(Product, id=product_id)
+
+        # Get or create the user's cart
+        cart, created = Cart.objects.get_or_create(user=request.user)
+
+        # Check if the product is already in the cart
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+
+        if not created:
+            # If the item already exists, update the quantity
+            cart_item.quantity += 1  # Change this if you want to add a specific quantity
+            cart_item.save()
+        return redirect('cart_view')  # Redirect to a cart view or product detail page
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))  # Redirect back if not a POST request
+
+
+def user_cart_view(request, user_id):
+    if request.method == 'POST':
+        email = request.POST['email']
+        
