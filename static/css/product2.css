@@ -30,7 +30,7 @@ a {
     display: flex;
     gap: 10px;
 }
-.nav-item a {
+.nav-item button, .nav-item a {
     font-family: 'Montserrat', sans-serif;
     text-decoration: none;
     color: #fff;
@@ -448,7 +448,7 @@ body {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1; /* Ensure arrows are above the image */
+    z-index: 2; /* Ensure arrows are above the image */
 }
 
 .left-arrow {

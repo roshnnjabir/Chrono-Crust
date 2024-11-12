@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,409 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            color: #333;
-        }
-        button{
-            font-family: 'Nunito', sans-serif;
-            padding: 8px 20px;
-        }
-        a {
-            text-decoration: none;
-            color: #050505;
-        }
-        .container {
-            display: flex;
-            padding: 40px;
-            flex-direction: column;
-            max-width: 1200px;
-            margin: auto;
-        }
-        .breadcrumbs {
-            font-size: 14px;
-            margin-bottom: 20px;
-            color: #888;
-        }
-        .main-content {
-            display: flex;
-            gap: 30px;
-        }
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            width: 250px;
-            background-color: #ffffff;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-        }
-        .sidebar a {
-            padding: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 15px;
-        }
-        .sidebar a:hover {
-            background-color: #e8e8e8;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-        }
-        .sidebar a.selected {
-            background-color: #050505;
-            color: #fff;
-        }
-        .dropdown {
-            display: none;
-        }
-        .content {
-            flex: 1;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            color: #050505;
-            margin-bottom: 20px;
-        }
-        .box {
-            background-color: #f9f9f9;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        .box-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #050505;
-            color: white;
-            padding: 15px;
-            border-radius: 10px 10px 0 0;
-        }
-        .box-header button {
-            background-color: #d0d0d0;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .box-header button:hover {
-            background-color: #ebebeb;
-            transform: scale(1.05);
-        }
-        .info-layout {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            align-items: center;
-        }
-        .info-label {
-            flex: 1;
-            font-weight: 600;
-            text-align: left;
-            color: #555;
-        }
-        .info-value {
-            flex: 1;
-            text-align: right;
-            color: #666;
-            padding-left: 20px;
-        }
-        .logout {
-            margin-top: 30px;
-            text-align: center;
-        }
-        .logout a {
-            color: #ff4d4d;
-            font-weight: bold;
-            padding: 10px 15px;
-            border-radius: 5px;
-            background-color: #ffecec;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .logout a:hover {
-            background-color: #ff4d4d;
-            color: #fff;
-        }
-        #editbutton{
-            max-width: 60px;
-            max-width: 90px;
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-            .sidebar {
-                display: none;
-            }
-            .dropdown {
-                display: block;
-                margin-bottom: 20px;
-            }
-            .dropdown select {
-                width: 100%;
-                padding: 15px;
-                font-size: 16px;
-                border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-                border: none;
-                background-color: #fff;
-            }
-            .logout {
-                text-align: center;
-                margin-top: 20px;
-            }
-        }
-
-        /* Styles for Max-Width 480px */
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-            .box {
-                padding: 15px;
-            }
-            .box-header {
-                padding: 10px;
-                flex-direction: row;
-                align-items: flex-start;
-            }
-            .box-header button {
-                margin-top: 10px;
-            }
-            h3{
-                margin: 15px;
-            }
-            .info-layout {
-                flex-direction: row;
-                text-align: left;
-                padding: 12px;
-            }
-            .info-value {
-                text-align: left;
-                padding-left: 0;
-            }
-            h2 {
-                font-size: 20px;
-            }
-        }
-
-        /* Styles for Max-Width 400px */
-        @media (max-width: 400px) {
-            .container {
-                padding: 10px;
-            }
-            .box {
-                padding: 10px;
-            }
-            .box-header {
-                padding: 8px;
-            }
-            .box-header button {
-                padding: 8px 12px;
-            }
-            .info-layout {
-                padding: 10px;
-            }
-            h2 {
-                font-size: 20px;
-            }
-            .info-value {
-                font-size: 14px;
-            }
-            .logout a {
-                padding: 8px 12px;
-            }
-        }
-
-
-        /* styles for modal */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            align-items: center;
-            justify-self: center;
-            z-index: 1; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; /* 15% from the top and centered */
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%; /* Could be more or less, depending on screen size */
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        .modal-header {
-            margin: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .modal-header h3 {
-            margin: 0;
-        }
-        .close {
-            color: #aaa;
-            cursor: pointer;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        #savechanges{
-            margin-top: 20px;
-            margin-left: 10px;
-            padding: 8px 20px;
-            border-radius: 5px;
-            background-color: #28221E;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #savechanges:hover{
-            background-color: #4A423E;
-        }
-
-        @media (max-width: 480px) {
-            /* Modal Overlay */
-            .modal-overlay {
-                padding: 20px; /* Add some padding for smaller screens */
-            }
-        
-            /* Modal Content */
-            .modal-content {
-                width: 90%; /* Use 90% of the screen width */
-                max-width: 400px; /* Set a max width for the modal */
-                margin: 10% auto; /* Center the modal with some margin from the top */
-                padding: 15px; /* Add padding inside the modal */
-                border-radius: 10px; /* Rounded corners */
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-            }
-        
-            /* Modal Header */
-            .modal-header {
-                font-size: 20px; /* Adjust header font size */
-                margin-bottom: 15px; /* Space below header */
-            }
-        
-            /* Modal Form Inputs */
-            input[type="text"],
-            input[type="email"],
-            input[type="password"] {
-                width: 100%;/* Full width for inputs */
-                max-width: 280px; 
-                padding: 10px; /* Add padding */
-                border-radius: 5px; /* Rounded corners */
-                border: 1px solid #ccc; /* Border styling */
-            }
-        
-            /* Modal Button */
-            button {
-                padding: 10px; /* Add padding */
-                border-radius: 5px; /* Rounded corners */
-                background-color: #28221E; /* Button color */
-                color: white; /* Text color */
-                border: none; /* No border */
-                cursor: pointer; /* Pointer cursor */
-            }
-        
-            button:hover {
-                background-color: #4A423E; /* Darker shade on hover */
-            }
-        
-            /* Close Button */
-            .close-btn {
-                font-size: 18px; /* Adjust close button font size */
-            }
-
-            #savechanges{
-                margin-top: 15px;
-                margin-left: 5px;
-            }
-            #savechanges:hover{
-                background-color: #4A423E;
-            }
-            /* Info Layout Adjustments */
-            .info-layout {
-                flex-direction: column; /* Change flex direction to column */
-                align-items: flex-start;
-                border: none; /* Remove border */
-            }
-        }
-        
-        @media (max-width: 400px) {
-            /* Modal Overlay */
-            .modal-overlay {
-                padding: 15px; /* Reduce padding for smaller screens */
-            }
-        
-            /* Modal Content */
-            .modal-content {
-                width: 95%; /* Use 95% of the screen width */
-                max-width: 350px; /* Set a max width for the modal */
-                margin: 15% auto; /* Center the modal with more margin from the top */
-                padding: 10px; /* Add padding inside the modal */
-                border-radius: 8px; /* Rounded corners */
-                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-            }
-        
-            /* Modal Header */
-            .modal-header {
-                font-size: 18px; /* Adjust header font size */
-                margin-bottom: 10px; /* Space below header */
-            }
-        
-            /* Modal Form Inputs */
-            input[type="text"],
-            input[type="email"],
-            input[type="password"] {
-                max-width: 250px;
-                padding: 8px; /* Reduce padding for inputs */
-                font-size: 14px; /* Adjust font size for inputs */
-            }
-        
-            /* Modal Button */
-            button {
-                padding: 8px; /* Reduce padding for the button */
-                font-size: 16px; /* Adjust font size for the button */
-            }
-        
-            /* Close Button */
-            .close-btn {
-                font-size: 16px; /* Adjust close button font size */
-            }
-
-            #savechanges{
-                margin-top: 10px;
-                margin-left: 0px;
-            }
-        }
-        
-        
-    </style>
+    <link rel="stylesheet" href="{% static 'css/user_profile.css' %}">
 </head>
 <body>
-    {% include 'partials/error_pop_up.html' %}
+{% include 'partials/error_pop_up.html' %}
 <div class="container">
     <div class="breadcrumbs">
         <a href="{% url 'user_home' %}">Home</a> / <span>My Profile</span>
@@ -416,22 +18,18 @@
     <!-- Dropdown for Sidebar on Mobile -->
     <div class="dropdown">
         <select id="mobile-nav" onchange="navigateTo(this.value)">
-            <option value="overview" selected>Overview</option>
+            <option value="/" selected>Overview</option>
             <option value="personal-wallet">Personal Wallet</option>
             <option value="address-book">Address Book</option>
-            <option value="change-password">Change Password</option>
-            <option value="order-history">Order History</option>
+            <option value="user_forgot_password">Change Password</option>
+            <option value="user_cart_view">My Cart</option>
+            <option value="order-history">Wishlist</option>
+            <option value="user_order_history">Order History</option>
         </select>
     </div>
 
     <div class="main-content">
-        <div class="sidebar">
-            <a href="{% url 'user_profile' %}" class="nav-item selected" id="overview">Overview</a>
-            <a href="{% url 'user_personal_wallet' %}" class="nav-item" id="personal-wallet">Personal Wallet</a>
-            <a href="{% url 'user_address_book' %}" class="nav-item" id="address-book">Address Book</a>
-            <a href="{% url 'user_forgot_password' %}" class="nav-item" id="change-password">Change Password</a>
-            <a href="{% url 'user_order_history' %}" class="nav-item" id="order-history">Order History</a>
-        </div>        
+        {% include 'partials/sidebar.html' %}        
 
         <div class="content" >
             <h2>My Account</h2>
@@ -463,8 +61,13 @@
             </div>
 
             <div class="logout">
-                <a href="{% url 'user_logout' %}">Logout</a>
-            </div>
+                <a href="{% url 'user_logout' %}">
+                    <button class="logout-button">Logout</button>
+                </a>
+                <a href="{% url 'user_forgot_password' %}">
+                    <button class="change-password">Change Password</button>
+                </a>
+            </div>  
         </div>
     </div>
 </div>
@@ -520,5 +123,22 @@
 
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all elements with the class 'nav-item'
+        var navItems = document.querySelectorAll('.sidebar .nav-item');
+    
+        // Remove the 'selected' class from all nav-items
+        navItems.forEach(function(item) {
+            item.classList.remove('selected');
+        });
+    
+        // Add the 'selected' class to the 'overview' nav-item
+        var overviewLink = document.querySelector('.sidebar .overview');
+        if (overviewLink) {
+            overviewLink.classList.add('selected');
+        }
+    });    
+</script>
 </body>
 </html>

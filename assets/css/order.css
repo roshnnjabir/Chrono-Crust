@@ -1,0 +1,579 @@
+/* General styles */
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #f8f8f8;
+    color: #333;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.breadcrumbs span {
+    color: #999;
+}
+
+/* Mobile Dropdown Navigation */
+.dropdown {
+    display: none;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .dropdown {
+        display: block;
+    }
+
+    .sidebar {
+        display: none;
+    }
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+}
+
+.content {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Sidebar Navigation */
+.nav-item {
+    display: block;
+    padding: 12px 15px;
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+}
+
+.nav-item:hover {
+    background-color: #f0f0f0;
+}
+
+.selected {
+    background-color: #0066cc;
+    color: white;
+}
+
+/* Order History */
+h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.order-history-items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+    align-items: center;
+}
+
+.order-details {
+    flex: 2;
+}
+
+.order-details h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #0066cc;
+}
+
+.order-details p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.order-details ul {
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.order-details ul li {
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.order-status {
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+    font-size: 14px;
+}
+
+/* Status Colors */
+.order-status.pending {
+    background-color: #ffa500;
+}
+
+.order-status.shipped {
+    background-color: #0088cc;
+}
+
+.order-status.delivered {
+    background-color: #28a745;
+}
+
+.order-status.cancelled {
+    background-color: #dc3545;
+}
+
+.order-status.refunded {
+    background-color: #6c757d;
+}
+
+/* Order Actions */
+.order-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.view-details-button,
+.cancel-order-button {
+    padding: 8px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.view-details-button {
+    background-color: #0066cc;
+    color: white;
+}
+
+.view-details-button:hover {
+    background-color: #004a99;
+}
+
+.cancel-order-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.cancel-order-button:hover {
+    background-color: #b02a37;
+}
+
+/* Order Summary */
+.order-summary {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 20px;
+}
+
+/* Modal Styles */
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Darker overlay for better focus */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 30px;
+    width: 50%;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: slideDown 0.3s ease-out; /* Slide down animation */
+    overflow-y: auto;
+    max-height: 80vh; /* Ensure modal isn't too tall */
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+/* Modal Header */
+.modal-content h2 {
+    display: none;
+    font-size: 26px;
+    margin: 0px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    color: #333;
+}
+
+/* Order Details in Modal */
+#order-details-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+/* Order Summary Table */
+.order-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.order-summary-table th,
+.order-summary-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-summary-table th {
+    background-color: #f7f7f7;
+    color: #555;
+    font-weight: 600;
+}
+
+/* General Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    align-items: center;
+    justify-content: center;
+    z-index: 999; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+    backdrop-filter: blur(3px); /* Optional blur effect */
+}
+
+.modal-content {
+    background-color: #ffffff;
+    margin: 10% auto; /* 10% from the top and centered */
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    font-family: 'Nunito', sans-serif;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* Close Button */
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover, .close:focus {
+    color: #000000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Order Header Styles */
+.order-header {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 25px;
+}
+
+.order-id {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.order-date, .order-address, .order-status-text {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+animation: slideDown 0.3s ease-out;
+overflow-y: auto;
+
+/* Order Items List Styles */
+.order-items-list {
+    list-style-type: none;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eaeaea;
+    transition: background-color 0.3s;
+    margin: 1% 0;
+}
+
+.order-item:hover {
+    background-color: #f5f5f5;
+}
+
+.item-details {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 15px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.item-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.item-quantity, .item-price, .item-total-price {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+/* Order Total Price */
+.order-total-price {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: right;
+    color: #444;
+}
+
+/* Error Message */
+.error-message {
+    color: #dc3545; /* Red for error */
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    background-color: #f8d7da;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.order-status-pop-up-text {
+    font-weight: bold;
+    color: #28a745; /* Green for general status-pop-up */
+}
+
+.order-status-pop-up.pending {
+    color: #ffc107; /* Yellow for pending status-pop-up */
+}
+
+.order-status-pop-up.shipped {
+    color: #17a2b8; /* Blue for shipped status-pop-up */
+}
+
+.order-status-pop-up.delivered {
+    color: #28a745; /* Green for delivered status-pop-up */
+}
+
+.order-status-pop-up.canceled {
+    color: #dc3545; /* Red for canceled status-pop-up */
+}
+
+.order-status-pop-up.refunded {
+    color: #6c757d; /* Grey for refunded status-pop-up */
+}
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+
+    .item-image {
+        width: 50px;
+        height: 50px;
+    }
+
+    .item-name {
+        font-size: 1rem;
+    }
+
+    .item-quantity, .item-price, .item-total-price {
+        font-size: 0.85rem;
+    }
+}
+
+/* Add Additional Styles for Better Appearance */
+h2, h3 {
+    color: #333;
+}
+
+h3.order-id {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+ul.order-items-list {
+    margin-top: 15px;
+    padding: 0;
+}
+
+p {
+    margin: 8px 0;
+}
+
+strong {
+    color: #333;
+}
+
+button.view-details-button, button.cancel-order-button {
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button.view-details-button {
+    background-color: #007bff;
+    color: #fff;
+    margin-right: 10px;
+}
+
+button.view-details-button:hover {
+    background-color: #0056b3;
+}
+
+button.cancel-order-button {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+button.cancel-order-button:hover {
+    background-color: #c82333;
+}
+
+/* Address Section */
+.modal-address {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+.modal-address h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+/* Responsive adjustments for Modal */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 80%;
+    }
+
+    .modal-product-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .modal-product-info {
+        margin-top: 10px;
+    }
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .content {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 80%;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-content {
+        width: 95%;
+    }
+
+    .order-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .order-actions {
+        align-items: flex-start;
+        margin-top: 10px;
+    }
+}

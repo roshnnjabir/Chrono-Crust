@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin_home.css">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: #050505;
+        }
+
+        .container {
+            display: flex;
+            padding: 40px;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .breadcrumbs {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #888;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-direction: row;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .sidebar div {
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .sidebar div:hover {
+            background-color: #e8e8e8;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar div.selected {
+            background-color: #050505;
+            color: #fff;
+        }
+
+        .admin-container {
+            flex: 1;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-container h1 {
+            margin-bottom: 20px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f8f8f8;
+        }
+
+        .action-button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .show-details-button {
+            background-color: #007bff;
+            color: white;
+            font-family: inherit;
+            margin-top: 20px;
+            max-height: 40px;
+        }
+
+        .show-details-button:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .logout-button, .delete-button {
+            font-family: inherit;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-button:hover, .delete-button:hover {
+            background-color: #e04343;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .sidebar {
+                width: 100%;
+                display: flex;
+                justify-content: space-around;
+                gap: 0;
+                padding: 10px;
+                border-radius: 12px;
+                background-color: transparent;
+                box-shadow: none;
+            }
+
+            .admin-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>Coupon List</span>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="nav-item">User's Overview</div>
+                <div class="nav-item">Blocked Users</div>
+                <a href="/admin/coupons">
+                    <div class="nav-item selected">Coupon List</div>
+                </a>
+                <div class="nav-item">Settings</div>
+            </div>
+
+            <div class="admin-container">
+                <h1>Coupons</h1>
+
+                <div class="table-container">
+                    <table id="customers">
+                        <thead>
+                            <tr>
+                                <th>Coupon ID</th>
+                                <th>Code</th>
+                                <th>Maximum Discount</th>
+                                <th>Discount Percentage</th>
+                                <th>Status</th>
+                                <th colspan="3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            {% for coupon in coupons %}
+                            <tr>
+                                <td>{{ coupon.id }}</td>
+                                <td>{{ coupon.code }}</td>
+                                <td>{{ coupon.maximum_discount }}</td>
+                                <td>{{ coupon.discount_percentage }}</td>
+                                {% if coupon.active %}
+                                    <td>Active</td>
+                                {% else %}
+                                    <td>Inactive</td>
+                                {% endif %}
+                                <!--  -->
+                                <td>
+                                    <a href="{% url 'admin_delete_coupon' coupon.code %}">
+                                        <button class="action-button delete-button">Delete</button>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7">No coupons found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <a href="{% url 'admin_logout' %}">
+                    <button class="logout-button">Logout</button>
+                </a>
+                <a href="{% url 'admin_add_coupon' %}" id="add-coupon-button">
+                    <button class="action-button">Add Coupon</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

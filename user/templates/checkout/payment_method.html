@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Method Selection</title>
+</head>
+<body>
+    <h2>Select a Payment Method</h2>
+    
+    <!-- Payment Options -->
+    <form id="payment-form">
+        <h3>Online Payment</h3>
+        <label>
+            <input type="radio" name="payment_method" value="razorpay" checked>
+            Pay with Razorpay
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="payment_method" value="stripe">
+            Pay with Stripe
+        </label>
+        <br>
+    </form>
+    
+    <!-- Payment Buttons -->
+    <button id="continue-button">Continue</button>
+
+    <!-- Cash on Delivery Section -->
+    <p>Please select this option if you prefer to pay in cash upon delivery.</p>
+    <form action="{% url 'user_move_to_order' %}" method="post">
+        {% csrf_token %}
+        <button id="submitcod" type="submit">Cash On Delivery</button>
+    </form>    
+    
+    <p id="span" data-total_amount="{{ total_amount }}" data-order_id="{{ order_id }}">{{order_id}}{{wallet}} {{ total_amount }}</p>
+
+    <!-- Razorpay Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        let input = document.getElementById('span');
+        
+        var options = {
+            "key": 'rzp_test_ogXW1qOaXCrzZG',
+            "amount": input.dataset.total_amount,
+            "name": "Chrono Crust",
+            "description": "Test Transaction",
+            "order_id": input.dataset.order_id,
+            "handler": function (response) {
+                // Data to be sent to Django view only if payment is successful
+                let data = {
+                    order_id: input.dataset.order_id,
+                    payment_id: response.razorpay_payment_id,
+                    amount: input.dataset.total_amount
+                };
+        
+                // AJAX request to save order completion data in Django
+                fetch('/user_move_to_order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'  // Ensure CSRF protection
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        window.location = '/user_profile/user_order_history';
+                    } else {
+                        alert("Error saving order. Please contact support.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred. Please try again.");
+                    location.reload()
+                });
+            },
+            "prefill": {
+                "name": "Gaurav Kumar",
+                "email": "gaurav.kumar@example.com",
+                "contact": "9000090000"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        console.log(options.amount)
+        var rzp1 = new Razorpay(options);
+        
+        document.getElementById('continue-button').onclick = function(e) {
+            const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            if (selectedPaymentMethod === 'razorpay') {
+                rzp1.open();
+            } else if (selectedPaymentMethod === 'stripe') {
+                // Add Stripe payment initiation logic here
+                alert("Stripe payment is selected. Please proceed with Stripe payment.");
+            } else {
+                alert("Please select a valid payment method.");
+            }
+            e.preventDefault();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!-- Modal for Adding Address -->
+<div id="addAddressModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Address</h3>
+            <span class="close" onclick="closeAddAddressModal()">&times;</span>
+        </div>
+        <form id="addAddressForm" method="post" action="{% url 'add_user_address' %}">
+            {% csrf_token %}
+            <div class="info-layout">
+                <div class="info-label">Building Name:</div>
+                <input type="text" name="building_name" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Landmark:</div>
+                <input type="text" name="landmark" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">City:</div>
+                <input type="text" name="city" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">District:</div>
+                <input type="text" name="district" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">State:</div>
+                <input type="text" name="state" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Country:</div>
+                <input type="text" name="country" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Postal Code:</div>
+                <input type="text" name="postal_code" id="postal_code" pattern="\d{6}" title="Postal code must be exactly 6 digits" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Phone:</div>
+                <input type="text" name="phone" pattern="\d{10}" title="Phone number must be exactly 10 digits" required>
+            </div>
+            <button id="saveAddress" type="submit">Save Address</button>
+        </form>
+    </div>
+</div>
+<!-- Modal for Editing Address -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Address</h3>
+            <span class="close" onclick="closeEditModal()">&times;</span>
+        </div>
+        <form id="editAddressForm" method="post" action="{% url 'user_address_book_edit' %}">
+            {% csrf_token %}
+            <input type="hidden" name="address_id" id="address_id">
+            <div class="info-layout">
+                <div class="info-label">Building Name:</div>
+                <input type="text" name="building_name" id="editBuildingName" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Landmark:</div>
+                <input type="text" name="landmark" id="editLandmark" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">City:</div>
+                <input type="text" name="city" id="editCity" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">District:</div>
+                <input type="text" name="district" id="editDistrict" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">State:</div>
+                <input type="text" name="state" id="editState" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Country:</div>
+                <input type="text" name="country" id="editCountry" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Postal Code:</div>
+                <input type="text" name="postal_code" id="editPostalCode" pattern="\d{6}" title="Postal code must be exactly 6 digits" required>
+            </div>
+            <div class="info-layout">
+                <div class="info-label">Phone:</div>
+                <input type="text" name="phone" id="editPhone" pattern="\d{10}" title="Phone number must be exactly 10 digits" required>
+            </div>
+            <button id="saveChanges" type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+<script>
+    function openAddAddressModal() {
+        document.getElementById("addAddressModal").style.display = "flex";
+    }
+    function closeAddAddressModal() {
+        document.getElementById("addAddressModal").style.display = "none";
+    }
+    function openEditModal(id, building_name, landmark, city, district, state, postal_code, country, phone) {
+        document.getElementById("address_id").value = id;
+        document.getElementById("editBuildingName").value = building_name;
+        document.getElementById("editLandmark").value = landmark;
+        document.getElementById("editCity").value = city;
+        document.getElementById("editDistrict").value = district;
+        document.getElementById("editState").value = state;
+        document.getElementById("editPostalCode").value = postal_code;
+        document.getElementById("editCountry").value = country;
+        document.getElementById("editPhone").value = phone;
+        document.getElementById("editModal").style.display = "flex";
+    }        
+    function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+    function confirmDelete(addressId) {
+        const confirmDelete = confirm("Are you sure you want to delete this address?");
+        if (confirmDelete) {
+            window.location.href = `/user_profile/delete_address/${addressId}`;
+        }
+    }
+</script>

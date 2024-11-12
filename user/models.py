@@ -31,18 +31,16 @@ class CustomUser(AbstractUser):
 
 class Address(models.Model):
     user = models.ForeignKey(CustomUser, related_name="addresses", on_delete=models.CASCADE)
-    street_address = models.CharField(max_length=255)
+    building_name = models.CharField(max_length=100)
+    landmark = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
+    district = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
+    phone = models.CharField()
+    is_listed = models.BooleanField(default=True)
     is_default = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
-        # If the instance has a primary key, it means we're updating an existing address
-        if not self.pk and self.user.addresses.count() >= 3:
-            raise ValidationError("A user can only have 3 addresses.")
-        super().save(*args, **kwargs)
-
     def __str__(self):
-        return f"{self.street_address}, {self.city}, {self.country}"
+        return f"{self.building_name}, {self.city}, {self.country}"

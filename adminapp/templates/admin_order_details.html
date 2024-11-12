@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin_home.css">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: #050505;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .breadcrumbs {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #888;
+        }
+
+        .admin-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-container h1 {
+            margin-bottom: 20px;
+        }
+
+        .order-detail {
+            margin-bottom: 20px;
+        }
+
+        .order-detail p {
+            font-size: 16px;
+            margin: 8px 0;
+        }
+
+        .back-button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Products List Styles */
+        .products-list {
+            margin-top: 20px;
+        }
+
+        .products-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .products-list li {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        {% if show_orders %}
+            <div class="breadcrumbs">
+                <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/list_user">List User </a> / <span>User Details & Orders</span>
+            </div>
+        {% else %}
+            <div class="breadcrumbs">
+                <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/orders">Order List </a> / <span>Order Details</span>
+            </div>
+        {% endif %}
+
+        <div class="admin-container">
+            <h1>Order Details</h1>
+
+            <div class="order-detail">
+                <p><strong>Order ID:</strong> {{ order.id }}</p>
+                <p><strong>User:</strong> {{ order.user.first_name }} {{ order.user.last_name }}</p>
+                <p>
+                    <strong>Status:</strong>
+                    <select id="order-status" data-order-id="{{ order.id }}">
+                        {% if order.status == 'pending' %}
+                            <!-- Show all options if status is 'pending' -->
+                            {% for value, display in status_choices %}
+                                <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        {% elif order.status == 'shipped' %}
+                            <!-- Show all options except 'pending' if status is 'shipped' -->
+                            {% for value, display in status_choices %}
+                                {% if value != 'pending' %}
+                                    <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ display }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        {% elif order.status == 'delivered' %}
+                            <!-- Show 'delivered' and 'refunded' if status is 'delivered' -->
+                            <option value="delivered" selected>Delivered</option>
+                            <option value="refunded" {% if order.status == 'refunded' %}selected{% endif %}>Refunded</option>
+                        {% elif order.status == 'cancelled' %}
+                            <!-- Only show 'cancelled' if status is 'cancelled' -->
+                            <option value="cancelled" selected>Cancelled</option>
+                        {% elif order.status == 'refunded' %}
+                            <!-- Only show 'refunded' if status is 'refunded' -->
+                            <option value="refunded" selected>Refunded</option>
+                        {% endif %}
+                    </select>                    
+                </p>
+                <p>
+                    <strong>Payment Status:</strong>
+                    <select id="payment-status" data-order-id="{{ order.id }}">
+                        {% if order.payment_status == 'pending' %}
+                            <!-- Show all options if payment_status is 'pending' -->
+                            {% for value, display in payment_status_choices %}
+                                <option value="{{ value }}" {% if order.payment_status == value %}selected{% endif %}>{{ display }}</option>
+                            {% endfor %}
+                        {% elif order.payment_status == 'cod' %}
+                            <!-- Show 'pending', 'cod', 'paid', and 'refunded' if payment_status is 'cod' -->
+                            {% for value, display in payment_status_choices %}
+                                {% if value != 'pending' %}
+                                    <option value="{{ value }}" {% if order.payment_status == value %}selected{% endif %}>{{ display }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        {% elif order.payment_status == 'paid' %}
+                            <!-- Show 'paid' and 'refunded' if payment_status is 'paid' -->
+                            <option value="paid" selected>Paid</option>
+                            <option value="refunded" {% if order.payment_status == 'refunded' %}selected{% endif %}>Refunded</option>
+                        {% elif order.payment_status == 'refunded' %}
+                            <!-- Only show 'refunded' if payment_status is 'refunded' -->
+                            <option value="refunded" selected>Refunded</option>
+                        {% endif %}
+                    </select>                    
+                </p>                       
+                <p><strong>Date:</strong> {{ order.updated_at|date:"H:i:s D, d M Y" }}</p>
+                <p><strong>Total Amount:</strong> {{ order.total_amount }}</p>
+                <p><strong>Delivery Address:</strong> {{ order.address.building_name }}, {{ order.address.city }}, {{ order.address.state }}, {{ order.address.postal_code }}, {{ order.address.country }}</p>
+            </div>            
+
+            <h2>Products in this Order</h2>
+            <div class="products-list">
+                <ul>
+                    {% for item in order.items.all %}
+                    <li>{{ item.product.collection.brand.name }} {{ item.product.collection.name }} {{ item.product.name }} - Quantity: {{ item.quantity }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <a href="{% url 'admin_list_orders' %}">
+                <button class="back-button">Back to Order List</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const statusSelect = document.getElementById("order-status");
+            const paymentStatusSelect = document.getElementById("payment-status");
+        
+            // Function to handle order status change
+            statusSelect.addEventListener("change", function() {
+                const orderId = this.getAttribute("data-order-id");
+                const newStatus = this.value;
+        
+                // Confirmation prompt for status change
+                const confirmChange = confirm(`Are you sure you want to change the order status to "${newStatus}"? This cannot be undone.`);
+                if (!confirmChange) {
+                    // Revert to the original selection if not confirmed
+                    this.value = "{{ order.status }}";
+                    return;
+                }
+        
+                // Make the AJAX request to update the order status
+                fetch(`/admin/update-order-status/${orderId}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}",  // Include CSRF token
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);  // Display success message
+                    location.reload();
+                })
+                .catch(error => {
+                    alert('There was a problem updating the order status: ' + error.message);
+                });
+            });
+        
+            // Function to handle payment status change
+            paymentStatusSelect.addEventListener("change", function() {
+                const orderId = this.getAttribute("data-order-id");
+                const newPaymentStatus = this.value;
+        
+                // Confirmation prompt for payment status change
+                const confirmPaymentChange = confirm(`Are you sure you want to change the payment status to "${newPaymentStatus}"? This cannot be undone.`);
+                if (!confirmPaymentChange) {
+                    // Revert to the original selection if not confirmed
+                    this.value = "{{ order.payment_status }}";
+                    return;
+                }
+        
+                // Make the AJAX request to update the payment status
+                fetch(`/admin/update-payment-status/${orderId}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}",  // Include CSRF token
+                    },
+                    body: JSON.stringify({ payment_status: newPaymentStatus })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);  // Display success message
+                    location.reload();
+                })
+                .catch(error => {
+                    alert('There was a problem updating the payment status: ' + error.message);
+                });
+            });
+        });        
+    </script>    
+</body>
+
+</html>

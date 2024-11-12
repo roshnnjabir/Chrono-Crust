@@ -14,7 +14,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path
 from . import views
 
@@ -34,15 +33,32 @@ urlpatterns = [
     path('user_profile/address-book-add', views.add_user_address, name='add_user_address'),
     path('user_profile/delete_address/<int:address_id>', views.delete_user_address, name='delete_address'),
     path('user_profile/change-password/', views.change_password, name='user_change_password'),
-    path('user_profile/order-history/', views.order_history, name='user_order_history'),
+
+
+    path('user_profile/user_cart_view/', views.user_cart_view, name='user_cart_view'),
+    path("update-cart-item-quantity-ajax/", views.update_cart_item_quantity_ajax, name="update_cart_item_quantity_ajax"),
+    path('remove_from_cart/<int:item_id>/', views.remove_from_cart, name='user_remove_from_cart'),
+    path('user_profile/user_wishlist_view/', views.user_wishlist_view, name='user_wishlist_view'),
+    path('user_remove_from_wishlist', views.user_remove_from_wishlist, name='user_remove_from_wishlist'),
+    path('user_move_to_cart/', views.user_move_to_cart, name='user_move_to_cart'),
+    path('user_add_to_wishlist', views.user_add_to_wishlist, name='user_add_to_wishlist'),
+    path('user_move_to_wishlist/<int:item_id>', views.user_move_to_wishlist, name='user_move_to_wishlist'),
+    path('user_move_to_order', views.user_move_to_order, name='user_move_to_order'),
+    path('user_profile/user_order_history', views.user_order_history, name='user_order_history'),
+    path('user_profile/user_order_details/<str:order_id>/', views.user_order_details, name='user_order_details'),
+    path('user_order_cancel/<str:order_id>/', views.user_cancel_order, name='user_order_cancel'),
+    path('address/selection/', views.address_selection, name='user_address_selection'),
+    path('user_payment_method_selection/', views.user_payment_method_selection, name='user_payment_method_selection'),  # after payment is made...redirect to move to order...
+    # path('paymenthandler/', views.razor_payment_handler , name='paymenthandler'),
 
     path('user_logout/', views.user_logout, name='user_logout'),
 
     path('otp_page', views.otp_page, name='otp_page'),
     path('verify_otp', views.verify_otp, name='verify_otp'),
     path('resend_otp', views.resend_otp, name='resend_otp'),
-    
+
     path('view_product/<int:id>', views.view_product, name='view_product'),
     path('user_add_to_cart/', views.user_add_to_cart, name='user_add_to_cart'),
-    path('cart_view/<int:user_id>', views.user_cart_view, name='user_cart_view'),
+
+    path('user_profile/add_money_to_wallet/', views.add_money_to_wallet, name='add_money_to_wallet'),
 ]

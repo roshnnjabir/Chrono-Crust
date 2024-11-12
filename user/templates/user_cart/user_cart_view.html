@@ -1,0 +1,387 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/user_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+</head>
+<body>
+{% include 'partials/error_pop_up.html' %}
+<div class="container">
+    <div class="breadcrumbs">
+        <a href="{% url 'user_home' %}">Home</a> / <span>My Cart</span>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div class="dropdown">
+        <select id="mobile-nav" onchange="navigateTo(this.value)">
+            <option value="overview">Overview</option>
+            <option value="personal-wallet">Personal Wallet</option>
+            <option value="address-book">Address Book</option>
+            <option value="change-password">Change Password</option>
+            <option value="order-history" selected>My Cart</option>
+            <option value="wishlist">Wishlist</option>
+            <option value="order-history">Order History</option>
+        </select>
+    </div>
+
+    <div class="main-content">
+        {% include 'partials/sidebar.html' %}
+
+        <div class="content">
+            <h2>My Cart</h2>
+            <div>
+                <input type="checkbox" id="select-all"> Select All
+            </div>
+            <div class="cart-items">
+                {% for item in cart_items %}
+                    <div class="cart-item" data-item-id="{{ item.id }}">
+                        <input type="checkbox" class="item-select" data-item-id="{{ item.id }}" data-item-total-price="{{ item.total_price }}" data-stock="{{ item.product.stock }}" {% if not item.product.is_listed or not item.product.collection.is_listed or not item.product.collection.brand.is_listed or item.product.stock == 0 %}disabled{% endif %}>
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-image">
+                        <div class="item-details">
+                            <h3>{{ item.product.name }}</h3>
+                            <p>{{ item.product.description }}</p>
+                            <div class="item-price">Price: ${{ item.product.price }} x {{ item.quantity }} = ${{ item.total_price }}</div>
+                            {% if item.product.is_listed is False or item.product.collection.is_listed is False or item.product.collection.brand.is_listed is False %}
+                            <p style="font-size: 14px;" class="price">Currently Unavailable</p>
+                            {% elif item.product.stock <= 0 %}
+                            <p style="font-size: 14px;" class="price">Out Of Stock</p>
+                            {% elif item.product.stock <= 15 %}
+                            <p style="font-size: 14px;" class="price">Only {{ item.product.stock }} Left</p>
+                            {% else %}
+                            <p style="font-size: 14px;" class="price">You Can Buy Only Up to 8 Units</p>
+                            {% endif %}
+                        </div>
+                        <div class="item-actions">
+                            {% with max_value=item.product.stock %}
+                                {% if max_value >= 8 %}
+                                    <input type="number" 
+                                        value="{{ item.quantity }}" 
+                                        min="1" 
+                                        max="8" 
+                                        class="quantity-input" 
+                                        data-item-id="{{ item.id }}">
+                                {% else %}
+                                    <input type="number" 
+                                        value="{{ item.quantity }}" 
+                                        min="1" 
+                                        max="{{ max_value }}" 
+                                        class="quantity-input" 
+                                        data-item-id="{{ item.id }}">
+                                {% endif %}
+                            {% endwith %}
+                            <form method="POST" action="{% url 'user_move_to_wishlist' item.id %}" class="action-form">
+                                {% csrf_token %}
+                                <button type="submit" class="move-to-wishlist-button">Move to Wishlist</button>
+                            </form>
+                            <form method="POST" action="{% url 'user_cart_view' %}" class="action-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <button type="submit" class="remove-button">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>Your cart is empty.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Coupon Code Section -->
+            <div id="coupon-section" class="coupon-section">
+                <label for="coupon-code">Have a coupon?</label>
+                <input type="text" id="coupon-code" placeholder="Enter coupon code">
+                <button id="apply-coupon" class="apply-coupon-button">Apply Coupon</button>
+                <button id="remove-coupon" class="remove-coupon-button" style="display: none;">Remove Coupon</button>
+                <p id="coupon-message" class="coupon-message"></p>
+            </div>            
+
+            <div class="cart-summary">
+                <div class="summary-container">
+                    <!-- This section will take 60% width (selected images container) -->
+                    <div class="selected-images-container">
+                        <!-- The selected images will go here dynamically -->
+                    </div>
+            
+                    <!-- This section will take 40% width -->
+                    <div class="summary-details">
+                        <h3>Total: $<span id="total-price">{{ total_price }}</span></h3>
+                        <h4>Selected Total: $<span id="selected-total">0.00</span></h4>
+                        <h4>Discount: $<span id="discount">0.00</span></h4>
+                        <h4>Price After Discount: $<span id="selected-total-after-discount">0.00</span></h4>
+                        <form id="checkout-form" method="POST" action="{% url 'user_address_selection' %}" style="display: none;">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_ids" id="item_ids">
+                            <input type="hidden" name="discounted_price" id="discounted_price">
+                            <button type="submit" id="checkout-selected" class="checkout-button">Proceed To Checkout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="logout">
+                <a href="{% url 'user_logout' %}">
+                    <button class="logout-button">Logout</button>
+                </a>
+                <a href="/user_profile/user_wishlist_view/">
+                    <button class="change-password">Open Wishlist</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // State management
+        const state = {
+            couponApplied: false,
+            originalTotal: 0
+        };
+    
+        // Price Management
+        const priceManager = {
+            updateItemPrice: function(itemId, itemTotalPrice, totalPrice, quantity, productPrice) {
+                const itemTotalPriceFixed = parseFloat(itemTotalPrice).toFixed(3);
+                $(`.cart-item[data-item-id='${itemId}'] .item-price`)
+                    .text(`Price: $${productPrice} x ${quantity} = $${itemTotalPriceFixed}`);
+                $(".cart-summary h3").text("Total: $" + parseFloat(totalPrice).toFixed(3));
+            },
+    
+            updateSelectedTotal: function() {
+                let selectedTotal = 0;
+                $(".item-select:checked").each(function() {
+                    selectedTotal += parseFloat($(this).data("item-total-price"));
+                });
+                $("#selected-total").text(selectedTotal.toFixed(3));
+                $("#selected-total-after-discount").text(selectedTotal.toFixed(3));
+                // Update the discounted_price field
+                $("#discounted_price").val(selectedTotal.toFixed(3));
+                $("#selected-total").data("originalTotal", selectedTotal);
+                state.originalTotal = selectedTotal;
+                
+                // Update coupon if applied
+                if (state.couponApplied) {
+                    this.reapplyCoupon();
+                }
+            }
+        };
+    
+        // Quantity Management
+        const quantityManager = {
+            checkAndResetQuantity: function(inputField) {
+                const $cartItem = inputField.closest('.cart-item');
+                const stock = parseInt($cartItem.find('.item-select').data("stock"));
+                const maxQuantity = Math.min(stock, 8);
+                let currentQuantity = parseInt(inputField.val());
+    
+                if (currentQuantity > maxQuantity) {
+                    currentQuantity = maxQuantity;
+                    inputField.val(maxQuantity);
+                } else if (currentQuantity <= 0) {
+                    currentQuantity = 1;
+                    inputField.val(1);
+                }
+    
+                // Update checkbox state based on quantity
+                $cartItem.find('.item-select').prop('disabled', currentQuantity > stock || currentQuantity > 8);
+                
+                return currentQuantity;
+            },
+    
+            updateQuantity: function(inputField) {
+                const itemId = inputField.data("item-id");
+                const newQuantity = this.checkAndResetQuantity(inputField);
+    
+                $.ajax({
+                    url: "{% url 'update_cart_item_quantity_ajax' %}",
+                    type: "POST",
+                    data: {
+                        'item_id': itemId,
+                        'quantity': newQuantity,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            const { id, item_total_price, total_price, quantity, price } = response.cart_item;
+                            priceManager.updateItemPrice(id, item_total_price, total_price, quantity, price);
+                            
+                            // Update data attribute and recalculate if item is selected
+                            const $itemSelect = $(`.item-select[data-item-id='${id}']`);
+                            $itemSelect.data("item-total-price", item_total_price);
+                            
+                            if ($itemSelect.is(":checked")) {
+                                priceManager.updateSelectedTotal();
+                                uiManager.updateSelectedImages();
+                            }
+                        } else {
+                            alert(response.message || "Error updating quantity.");
+                        }
+                    },
+                    error: function() {
+                        alert("An error occurred while updating the quantity.");
+                    }
+                });
+            }
+        };
+    
+        // UI Management
+        const uiManager = {
+            updateSelectedImages: function() {
+                const container = $('.selected-images-container');
+                container.empty();
+    
+                $(".item-select:checked").each(function(index) {
+                    if (index > 0) {
+                        container.append(`
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 3a.5.5 0 0 1 .5.5V7h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0V8H4.5a.5.5 0 0 1 0-1h3V3.5A.5.5 0 0 1 8 3z"/>
+                                </svg>
+                            </div>
+                        `);
+                    }
+                    
+                    const imgUrl = $(this).closest('.cart-item').find('.item-image').attr('src');
+                    container.append(`<img src="${imgUrl}" alt="Selected product image" class="selected-product-image">`);
+                });
+            },
+    
+            updateSelectAllState: function() {
+                const totalItems = $(".item-select:not(:disabled)").length;
+                const selectedItems = $(".item-select:checked:not(:disabled)").length;
+                $("#select-all").prop("checked", totalItems > 0 && totalItems === selectedItems);
+            },
+    
+            toggleCouponSection: function() {
+                const isAnyItemSelected = $(".item-select:checked").length > 0;
+                $('#coupon-section').toggle(isAnyItemSelected);
+            },
+    
+            updateCheckoutForm: function() {
+                const selectedIds = $(".item-select:checked").map(function() {
+                    return $(this).data("item-id");
+                }).get();
+                
+                $("#item_ids").val(selectedIds.join(","));
+                $("#checkout-selected, #checkout-form").toggle(selectedIds.length > 0);
+            }
+        };
+    
+        // Coupon Management
+        const couponManager = {
+            // In the couponManager object, update the apply function:
+            apply: function(couponCode) {
+                if (state.couponApplied) {
+                    $('#coupon-message').text("A coupon is already applied. Please remove it first.");
+                    return;
+                }
+            
+                if (!couponCode) {
+                    $('#coupon-message').text("Please enter a coupon code.");
+                    return;
+                }
+            
+                $.ajax({
+                    url: "{% url 'validate_coupon_ajax' %}",
+                    type: "POST",
+                    data: {
+                        'coupon_code': couponCode,
+                        'selected_total': state.originalTotal,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.status === "success") {
+                            state.couponApplied = true;
+                            $('#discount').text(`${response.discount_amount.toFixed(2)}`);
+                            $('#coupon-message').text("Coupon applied successfully!");
+                            $('#selected-total').text(`${state.originalTotal.toFixed(2)}`);
+                            $('#selected-total-after-discount').text(`${response.discounted_total.toFixed(2)}`);
+                            // Update the discounted_price field
+                            $('#discounted_price').val(response.discounted_total.toFixed(2));
+                            $('#apply-coupon').hide();
+                            $('#remove-coupon').show();
+                        } else {
+                            $('#coupon-message').text(response.message);
+                        }
+                    },
+                    error: function() {
+                        $('#coupon-message').text("Error applying coupon.");
+                    }
+                });
+            },
+
+            // Update the remove function as well:
+            remove: function() {
+                state.couponApplied = false;
+                const originalTotal = state.originalTotal.toFixed(2);
+                $('#selected-total').text(originalTotal);
+                $('#selected-total-after-discount').text(originalTotal);
+                // Update the discounted_price field
+                $('#discounted_price').val(originalTotal);
+                $('#coupon-message').text("Coupon removed.");
+                $('#apply-coupon').show();
+                $('#remove-coupon').hide();
+                $('#coupon-code').val("");
+            }
+        };
+    
+        // Event Listeners
+        function initializeEventListeners() {
+            // Quantity change handler
+            $(".quantity-input").on("change", function() {
+                quantityManager.updateQuantity($(this));
+            });
+    
+            // Item selection handler
+            $(".item-select").change(function() {
+                if (!$(this).is(":checked") && state.couponApplied) {
+                    couponManager.remove();  // Remove coupon if an item is deselected
+                }
+                priceManager.updateSelectedTotal();
+                uiManager.updateSelectedImages();
+                uiManager.updateSelectAllState();
+                uiManager.toggleCouponSection();
+                uiManager.updateCheckoutForm();
+            });
+            // Select all handler
+            $("#select-all").change(function() {
+                $(".item-select:not(:disabled)").prop("checked", $(this).is(":checked")).change();
+            });
+    
+            // Coupon handlers
+            $('#apply-coupon').click(function() {
+                couponManager.apply($('#coupon-code').val());
+            });
+    
+            $('#remove-coupon').click(function() {
+                couponManager.remove();
+            });
+    
+            // Navigation handler
+            $('#mobile-nav').change(function() {
+                const baseUrl = '/user_profile';
+                window.location.href = `${baseUrl}/${$(this).val()}`;
+            });
+        }
+    
+        // Initialization
+        function initialize() {
+            $(".quantity-input").each(function() {
+                quantityManager.checkAndResetQuantity($(this));
+            });
+            uiManager.toggleCouponSection();
+            state.originalTotal = parseFloat($("#selected-total").text());
+            initializeEventListeners();
+        }
+    
+        // Start the application
+        initialize();
+    });
+</script>
+</body>
+</html>

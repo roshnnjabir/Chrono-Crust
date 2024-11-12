@@ -187,9 +187,16 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'roshanjabir7@gmail.com'
 EMAIL_HOST_PASSWORD = 'qhlx hkry cyil vbqn'  # Use an App-specific password from Google
+DEFAULT_FROM_EMAIL = 'roshanjabir7@gmail.com'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default backend
     'allauth.account.auth_backends.AuthenticationBackend',  # Allauth
 ]
+
+
+RAZOR_KEY_ID = 'rzp_test_ogXW1qOaXCrzZG'
+RAZOR_KEY_SECRET = 'xh7Hg2R6cJmhk7p02eCGhtZC'

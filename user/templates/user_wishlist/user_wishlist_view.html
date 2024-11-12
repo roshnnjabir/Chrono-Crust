@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/user_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/wishlist.css' %}">
+</head>
+<body>
+{% include 'partials/error_pop_up.html' %}
+<div class="container">
+    <div class="breadcrumbs">
+        <a href="{% url 'user_home' %}">Home</a> / <span>Wishlist</span>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div class="dropdown">
+        <select id="mobile-nav" onchange="navigateTo(this.value)">
+            <option value="overview">Overview</option>
+            <option value="personal-wallet">Personal Wallet</option>
+            <option value="address-book">Address Book</option>
+            <option value="change-password">Change Password</option>
+            <option value="my-cart">My Cart</option>
+            <option value="wishlist" selected>Wishlist</option>
+            <option value="order-history">Order History</option>
+        </select>
+    </div>
+
+    <div class="main-content">
+        {% include 'partials/sidebar.html' %}
+
+        <div class="content">
+            <h2>Wishlist</h2>
+            <div class="wishlist-items">
+                {% for item in wishlist_items %}
+                    <div class="wishlist-item">
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-image">
+                        <div class="item-details">
+                            <h3>{{ item.product.name }}</h3>
+                            <p>{{ item.product.description }}</p>
+                            <div class="item-price">Price: ${{ item.product.price }}</div>
+                        </div>
+                        <div class="item-actions">
+                            <form method="POST" action="{% url 'user_add_to_cart' %}" class="action-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                <button type="submit" class="move-to-cart-button">Move to Cart</button>
+                            </form>
+                            <form method="POST" action="{% url 'user_remove_from_wishlist' %}" class="action-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="wishlist_item_id" value="{{ item.id }}">
+                                <button type="submit" class="remove-button">Remove</button>
+                            </form>
+                        </div>                        
+                    </div>
+                {% empty %}
+                    <p>Your wishlist is empty.</p>
+                {% endfor %}
+            </div>   
+            
+            <div class="logout">
+                <a href="{% url 'user_logout' %}">
+                    <button class="logout-button">Logout</button>
+                </a>
+                <a href="/#product-list">
+                    <button class="change-password">Shop Now</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function navigateTo(value) {
+        const baseUrl = '/user_profile'; // Set this to your base user profile URL
+        const url = `${baseUrl}/${value}`;
+        window.location.href = url;
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all elements with the class 'nav-item'
+        var navItems = document.querySelectorAll('.sidebar .nav-item');
+    
+        // Remove the 'selected' class from all nav-items
+        navItems.forEach(function(item) {
+            item.classList.remove('selected');
+        });
+    
+        // Add the 'selected' class to the 'overview' nav-item
+        var overviewLink = document.querySelector('.sidebar .my-wishlist');
+        if (overviewLink) {
+            overviewLink.classList.add('selected');
+        }
+    });    
+</script>
+</body>
+</html>

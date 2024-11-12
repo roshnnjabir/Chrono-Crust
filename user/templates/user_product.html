@@ -1,324 +1,331 @@
-    {% load static %}
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ChronoCrest - Watches</title>
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="{% static 'css/header.css' %}">
-        <link rel="stylesheet" href="{% static 'css/product.css' %}">
-        <link rel="stylesheet" href="{% static 'css/product2.css' %}">
-    </head>
-    <body>
-        <!-- Header Section -->
-        <header>
-            <!-- First part of the header -->
-            <div class="header-top d-flex justify-content-between align-items-center">
-                <div class="left-text">Free Shipping Worldwide</div>
-                <nav class="nav">
-                    <a href="#" class="nav">Help & FAQs</a>
-                    <a href="#" class="nav">Contact</a>
-                    <a href="#" class="nav">Services</a>
-                    <a href="#" class="nav">About</a>
-                </nav>
-            </div>
-
-            <!-- Second part of the header -->
-            <div class="header-bottom">
-                <div class="header-background"></div> <!-- Background Image -->
-                <div class="header-content d-flex justify-content-between align-items-center .flex-column">
-                    <div class="header-upper d-flex justify-content-between pb-2 w-100">
-                        <div class="left-options d-none d-lg-flex align-items-center gap-5">
-                            <a href="#"><img src="{% static 'svg/globe.svg' %}" width="20" height="20" alt="Globe"> English - USD</a>
-                            <a href="#"><img src="{% static 'svg/phone.svg' %}" width="20" height="20" alt="Phone"> (1-866-273-3477)</a>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoCrest - {{ product.collection.brand.name }}{{ product.collection.name }}{{ product.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/product.css' %}">
+    <link rel="stylesheet" href="{% static 'css/product2.css' %}">
+</head>
+<body>
+    {% include 'partials/error_pop_up.html' %}
+    <!-- Header Section -->
+    <header>
+        <!-- First part of the header -->
+        <div class="header-top d-flex justify-content-between align-items-center">
+            <div class="left-text">Free Shipping Worldwide</div>
+            <nav class="nav">
+                <a href="#" class="nav">Help & FAQs</a>
+                <a href="#" class="nav">Contact</a>
+                <a href="#" class="nav">Services</a>
+                <a href="#" class="nav">About</a>
+            </nav>
+        </div>
+        <!-- Second part of the header -->
+        <div class="header-bottom">
+            <div class="header-background"></div> <!-- Background Image -->
+            <div class="header-content d-flex justify-content-between align-items-center .flex-column">
+                <div class="header-upper d-flex justify-content-between pb-2 w-100">
+                    <div class="left-options d-none d-lg-flex align-items-center gap-5">
+                        <a href="#"><img src="{% static 'svg/globe.svg' %}" width="20" height="20" alt="Globe"> English - USD</a>
+                        <a href="#"><img src="{% static 'svg/phone.svg' %}" width="20" height="20" alt="Phone"> (1-866-273-3477)</a>
+                    </div>
+                    <div class="icon-container gap-4">
+                        <div class="icon">
+                            <img src="{% static 'svg/cart.svg' %}" alt="Cart Icon">
                         </div>
-                        <div class="icon-container gap-4">
-                            <div class="icon">
-                                <img src="{% static 'svg/cart.svg' %}" alt="Cart Icon">
-                            </div>
-                            <div class="icon">
-                                <img src="{% static 'svg/wishlist.svg' %}" alt="Wishlist Icon">
-                            </div>
-                            <div class="icon open-modal" data-modal="login-modal">
-                                <img src="{% static 'svg/myaccount.svg' %}" alt="My Account Icon">
-                            </div>
+                        <div class="icon">
+                            <img src="{% static 'svg/wishlist.svg' %}" alt="Wishlist Icon">
+                        </div>
+                        <div class="icon open-modal" data-modal="login-modal">
+                            <img src="{% static 'svg/myaccount.svg' %}" alt="My Account Icon">
                         </div>
                     </div>
-
-                    <div class="header-nav d-none d-lg-flex justify-content-around align-items-center py-3 px-5 w-90">
-                        <nav class="left-nav d-flex gap-5">
-                            <div class="nav-item">
-                                <a href="#">For Men</a>
-                                <span class="oblong"></span>
-                            </div>
-                            <div class="nav-item">
-                                <a href="#">For Her</a>
-                                <span class="oblong"></span>
-                            </div>
-                            <!-- <div class="nav-item">
-                                <a href="#">Unisex</a>
-                                <span class="oblong"></span>
-                            </div> -->
-                        </nav>
-                        <nav class="right-nav d-flex gap-5">
-                            <div class="nav-item">
-                                <a href="#">Brands</a>
-                                <span class="oblong"></span>
-                            </div>
-                            <div class="nav-item">
-                                <a href="#">Boutiques</a>
-                                <span class="oblong"></span>
-                            </div>
-                            <!-- <div class="nav-item">
-                                <a href="#">Collections</a>
-                                <span class="oblong"></span>
-                            </div> -->
-                        </nav>
-                    </div>
-
-                    <!-- Logo in the center -->
-                    <div class="header-logo position-absolute top-50 start-50 translate-middle" id="logo">
-                        <img src="{% static 'images/logo1.png' %}" alt="ChronoCrest Logo" width="100%" height="100%">
-                    </div>
-
-                    <!-- Hamburger Menu for smaller screens -->
-                    <div class="menu-icon-container d-lg-none position-absolute end-0 top-0 p-3" id="menuIcon">
-                        <img src="{% static 'svg/menu.svg' %}" class="menu-icon" alt="Menu" width="30" height="30">
-                    </div>
-
-                    <!-- Fullscreen Dropdown Menu -->
-                    <div class="dropdown-overlay" id="dropdownMenu">
-                        <div class="dropdown-close-container text-end p-3" id="closeIcon">
-                            <img src="{% static 'svg/close.svg' %}" class="close-icon" alt="Close" width="30" height="30">
+                </div>
+                <div class="header-nav d-none d-lg-flex justify-content-around align-items-center py-3 px-5 w-90">
+                    <nav class="left-nav d-flex gap-5">
+                        <div class="nav-item">
+                            <form action="/#product-list" method="GET">
+                                <input name="gender_filter" type="hidden" value="men">
+                                <button type="submit">For Him</button>
+                            </form>
+                            <span class="oblong" {% if request.GET.gender_filter == 'men' %}id="oblong"{% endif %} ></span>
                         </div>
-                        <div class="dropdown-menu-mobile d-flex flex-column align-items-center">
-                            <a href="#">For Men</a>
-                            <a href="#">For Women</a>
+                        <div class="nav-item">
+                            <form action="/#product-list" method="GET">
+                                <input name="gender_filter" type="hidden" value="women">
+                                <button type="submit">For Her</button>
+                            </form>
+                            <span class="oblong" {% if request.GET.gender_filter == 'women' %}id="oblong"{% endif %} ></span>
+                        </div>
+                        <!-- <div class="nav-item">
                             <a href="#">Unisex</a>
+                            <span class="oblong"></span>
+                        </div> -->
+                    </nav>
+                    <nav class="right-nav d-flex gap-5">
+                        <div class="nav-item">
                             <a href="#">Brands</a>
+                            <span class="oblong"></span>
+                        </div>
+                        <div class="nav-item">
                             <a href="#">Boutiques</a>
+                            <span class="oblong"></span>
                         </div>
-                    </div>
+                        <!-- <div class="nav-item">
+                            <a href="#">Collections</a>
+                            <span class="oblong"></span>
+                        </div> -->
+                    </nav>
                 </div>
-                <div style="width: 100%; height: 100vh; position: absolute; display: flex; align-items: baseline;"><img style="height: 100%; width: 100%; object-fit: cover;" src="{{ product.image.url }}" alt="admin"></div>
-                <div class="desc-container">
-                    <div class="desc-text-container"><h2>Presenting The New {{product.collection.brand.name}} {{product.collection.name}} {{product.name}}</h2>
-                        <p>{{ product.description }}</p></div>
+                <!-- Logo in the center -->
+                <div class="header-logo position-absolute top-50 start-50 translate-middle" id="logo">
+                    <img src="{% static 'images/logo1.png' %}" alt="ChronoCrest Logo" width="100%" height="100%">
+                </div>
+                <!-- Hamburger Menu for smaller screens -->
+                <div class="menu-icon-container d-lg-none position-absolute end-0 top-0 p-3" id="menuIcon">
+                    <img src="{% static 'svg/menu.svg' %}" class="menu-icon" alt="Menu" width="30" height="30">
+                </div>
+                <!-- Fullscreen Dropdown Menu -->
+                <div class="dropdown-overlay" id="dropdownMenu">
+                    <div class="dropdown-close-container text-end p-3" id="closeIcon">
+                        <img src="{% static 'svg/close.svg' %}" class="close-icon" alt="Close" width="30" height="30">
+                    </div>
+                    <div class="dropdown-menu-mobile d-flex flex-column align-items-center">
+                        <a href="#">For Men</a>
+                        <a href="#">For Women</a>
+                        <a href="#">Unisex</a>
+                        <a href="#">Brands</a>
+                        <a href="#">Boutiques</a>
+                    </div>
                 </div>
             </div>
-            </header>
-            <div class="section-2">
-                <div class="section-2-img">
-                    <div class="section-2-img-container">
-                        <img src="{{ product.image1.url }}" alt="image">
-                    </div>
-                </div>
-                <div class="section-2-desc">
-                    <div class="desc-text-container">
-                        <h2>Precision Perfection</h2>
-                        <p>{{product.description1}}</p>
-                    </div>
-                    <p>{{product.description2}}</p>
+            <div style="width: 100%; height: 100vh; position: absolute; display: flex; align-items: baseline;"><img style="height: 100%; width: 100%; object-fit: cover;" src="{{ product.image.url }}" alt="admin"></div>
+            <div class="desc-container">
+                <div class="desc-text-container">
+                    <h2>Presenting The New {{product.collection.brand.name}} {{product.collection.name}} {{product.name}} {% if product.limited_edition %} Limited Edition {% endif %}</h2>
+                    <h6>{{ product.reference_no }}</h6>
+                    <p>{{ product.description }}</p>
                 </div>
             </div>
-            <div class="section-3">
-                <div class="section-3-button-container">
-                    <button onclick="openPopup()">Open Product View</button>
+        </div>
+        </header>
+        <div class="section-2">
+            <div class="section-2-img">
+                <div class="section-2-img-container">
+                    <img src="{{ product.image1.url }}" alt="image">
                 </div>
-                <img src="{{ product.image2.url }}" alt="{{ product.name }}">
             </div>
-
-            <!-- Product View Pop UP -->
-            <div class="overlay" id="overlay" style="display: none;"></div>
-            <div style="background-color: white; display: none; backdrop-filter: none;" class="popup" id="popup">
-                <div class="popup-header">
-                    <span class="close-btn" onclick="closePopup()">×</span>
+            <div class="section-2-desc">
+                <div class="desc-text-container">
+                    <h2>{{product.description1header}}</h2>
+                    <p>{{product.description1}}</p>
                 </div>
-                <div class="product-view">
-                    <div class="image-section">
-                        <div class="main-image-container">
-                            <button class="arrow left-arrow" onclick="changeImage('left')">&#9664;</button>
-                            <img src="{{ product.image.url }}" alt="Product Image" class="main-image">
-                            <button class="arrow right-arrow" onclick="changeImage('right')">&#9654;</button>
-                        </div>                
-                        <div class="thumbnail-section">
-                            <img src="{{ product.image.url }}" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('{{ product.image.url }}')">
-                            <img src="{{ product.image1.url }}" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('{{ product.image1.url }}')">
-                            <img src="{{ product.image2.url }}" alt="Thumbnail 3" class="thumbnail" onclick="changeImage('{{ product.image2.url }}')">
-                            <img src="{{ product.image3.url }}" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('{{ product.image3.url }}')">
-                        </div>                                 
-                    </div>
-                    <div class="details-section">
-                        <h1 class="product-name">The {{ product.collection.brand.name }} {{ product.collection.name }} {{ product.name }}</h1>
-                        <p class="price">{{ product.price }}</p>
-                        
-                        {% if product.is_listed is False or product.collection.is_listed is False or product.collection.brand.is_listed is False %}
-                        <p style="font-size: 14px;" class="price">Currently Unavailable</p>
-                        {% elif product.stock <= 0 %}
-                        <p style="font-size: 14px;" class="price">Out Of Stock</p>
+                <p>{{product.description2}}</p>
+            </div>
+        </div>
+        <div class="section-3">
+            <div class="section-3-button-container">
+                <button onclick="openPopup()">Open Product View</button>
+            </div>
+            <img src="{{ product.image2.url }}" alt="{{ product.name }}">
+        </div>
+        <!-- Product View Pop UP -->
+        <div class="overlay" id="overlay" style="display: none;"></div>
+        <div style="background-color: white; display: none; backdrop-filter: none;" class="popup" id="popup">
+            <div class="popup-header">
+                <span class="close-btn" onclick="closePopup()">×</span>
+            </div>
+            <div class="product-view">
+                <div class="image-section">
+                    <div class="main-image-container">
+                        <button class="arrow left-arrow" onclick="changeImage('left')">&#9664;</button>
+                        <img src="{{ product.image.url }}" alt="Product Image" class="main-image">
+                        <button class="arrow right-arrow" onclick="changeImage('right')">&#9654;</button>
+                    </div>                
+                    <div class="thumbnail-section">
+                        <img src="{{ product.image.url }}" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('{{ product.image.url }}')">
+                        <img src="{{ product.image1.url }}" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('{{ product.image1.url }}')">
+                        <img src="{{ product.image2.url }}" alt="Thumbnail 3" class="thumbnail" onclick="changeImage('{{ product.image2.url }}')">
+                        <img src="{{ product.image3.url }}" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('{{ product.image3.url }}')">
+                        <img src="{{ product.collection.image.url }}" alt="Thumbnail 5" class="thumbnail" onclick="changeImage('{{ product.collection.image.url }}')">
+                    </div>                                 
+                </div>
+                <div class="details-section">
+                    <h1 class="product-name">The {{ product.collection.brand.name }} {{ product.collection.name }} {{ product.name }}</h1>
+                    <p class="price">{{ product.price }}</p>
+                    
+                    {% if product.is_listed is False or product.collection.is_listed is False or product.collection.brand.is_listed is False %}
+                    <p style="font-size: 14px;" class="price">Currently Unavailable</p>
+                    {% elif product.stock <= 0 %}
+                    <p style="font-size: 14px;" class="price">Out Of Stock</p>
+                    {% elif product.stock <= 15 %}
+                    <p style="font-size: 14px;" class="price">Only {{ product.stock }} Left</p>
+                    {% endif %}
+                    
+                    <div style="width: 100%; display: flex; justify-content: center;">
+                        {% if product.stock|add:0 > 0 and product.is_listed and product.collection.is_listed and product.collection.brand.is_listed %}
+                            <form method="POST" action="{% url 'user_add_to_cart' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <button class="add-to-cart" type="submit">Add To Cart</button>
+                            </form>
+                        {% else %}
+                            <button class="add-to-cart" onclick="notifyMeWhenAvailable()" disabled>Notify Me When Available</button>
                         {% endif %}
-                        
-                        <div style="width: 100%; display: flex; justify-content: center;">
-                            {% if product.stock|add:0 > 0 and product.is_listed and product.collection.is_listed and product.collection.brand.is_listed %}
-                                <form method="POST" action="{% url 'add_to_cart' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="product_id" value="{{ product.id }}">
-                                    <button class="add-to-cart" type="submit">Add To Cart</button>
-                                </form>
-                            {% else %}
-                                <button class="add-to-cart" onclick="notifyMeWhenAvailable()" disabled>Notify Me When Available</button>
-                            {% endif %}
-                        </div>                        
-                        <div class="options">
-                            <div class="option">
-                                <svg class="icon" viewBox="0 0 24 24">
-                                    <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-9.19-.73L12 2 11.18 8.51 2 9.24l5.46 4.73L5.82 21z"/>
-                                </svg>
-                                <span>Add to Wishlist</span>
-                            </div>
-                            <div class="option">
-                                <svg class="icon" viewBox="0 0 24 24">
-                                    <path d="M4 8h16v2H4zm0 4h10v2H4z"/>
-                                </svg>
-                                <span>Find In Store</span>
-                            </div>
+                    </div>                        
+                    <div class="options">
+                        <div class="option">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-9.19-.73L12 2 11.18 8.51 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                            <span>Add to Wishlist</span>
                         </div>
-                    </div>
-                </div>
-                <div class="features">
-                    <div class="feature">
-                        <div class="feature-value">
-                            <span>{{product.diameter}}</span>
-                            <span class="unit">MM</span>
+                        <div class="option">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M4 8h16v2H4zm0 4h10v2H4z"/>
+                            </svg>
+                            <span>Find In Store</span>
                         </div>
-                        <div class="feature-name">DIAMETER</div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-value">
-                            <span>{{product.freequency}}</span>
-                            <span class="unit">VpH</span>
-                        </div>
-                        <div class="feature-name">FREQUENCY</div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-value">
-                            <span>{{product.power_reserve}}</span>
-                            <span class="unit">H</span>
-                        </div>
-                        <div class="feature-name">POWER RESERVE</div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-value">
-                            <span>{{product.water_resistance}}</span>
-                            <span class="unit">ATM</span>
-                        </div>
-                        <div class="feature-name">WATER RESISTANCE</div>
                     </div>
                 </div>
             </div>
-
-            <script>
-                const images = [
-                '{{ product.image.url }}',
-                '{{ product.image1.url }}',
-                '{{ product.image2.url }}',
-                '{{ product.image3.url }}',
-            ];
-            
-            let currentIndex = 0; // Track the currently displayed image
-            let zoomDisabled = false; // To manage zoom state
-            
-            function openPopup() {
-                document.getElementById('popup').style.display = 'flex';
-                document.getElementById('overlay').style.display = 'flex';
-            }
-            
-            function closePopup() {
-                document.getElementById('popup').style.display = 'none';
-                document.getElementById('overlay').style.display = 'none';
-            }
-            
-            function changeImage(directionOrSrc) {
-                const mainImage = document.querySelector('.main-image');
-            
-                // Reset zoom whenever the image is changed
-                resetZoom(mainImage);
-            
-                // Handle if a thumbnail is clicked (image source is passed)
-                console.log(directionOrSrc)
-                if (typeof directionOrSrc === 'string' && directionOrSrc.includes('admin')) {
-                    mainImage.src = `${directionOrSrc}?${new Date().getTime()}`; // Force reload
-                    currentIndex = images.indexOf(directionOrSrc); // Update currentIndex
-                } else if (directionOrSrc === 'left') {
-                    currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
-                    mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`; // Force reload
-                } else if (directionOrSrc === 'right') {
-                    currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
-                    mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`; // Force reload
-                }
-            }
-            
-            function addToCart() {
-                alert('Product added to cart!');
-            }
-            function notifyMeWhenAvailable() {
-                alert('You\'ll get notified when the product is available');
-            }            
-            function resetZoom(mainImage) {
-                // Reset zoom effect
-                mainImage.style.transform = 'scale(1)';
-            }
-            
-            // Zoom effect for the main image
-            const mainImageContainer = document.querySelector('.main-image-container');
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-value">
+                        <span>{{product.diameter}}</span>
+                        <span class="unit">MM</span>
+                    </div>
+                    <div class="feature-name">DIAMETER</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-value">
+                        <span>{{product.frequency}}</span>
+                        <span class="unit">VpH</span>
+                    </div>
+                    <div class="feature-name">FREQUENCY</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-value">
+                        <span>{{product.power_reserve}}</span>
+                        <span class="unit">H</span>
+                    </div>
+                    <div class="feature-name">POWER RESERVE</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-value">
+                        <span>{{product.water_resistance}}</span>
+                        <span class="unit">ATM</span>
+                    </div>
+                    <div class="feature-name">WATER RESISTANCE</div>
+                </div>
+            </div>
+        </div>
+        <script>
+            const images = [
+            '{{ product.image.url }}',
+            '{{ product.image1.url }}',
+            '{{ product.image2.url }}',
+            '{{ product.image3.url }}',
+            '{{ product.collection.image.url }}'
+        ];
+        
+        let currentIndex = 0; // Track the currently displayed image
+        let zoomDisabled = false; // To manage zoom state
+        
+        function openPopup() {
+            document.getElementById('popup').style.display = 'flex';
+            document.getElementById('overlay').style.display = 'flex';
+        }
+        
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+        
+        function changeImage(directionOrSrc) {
             const mainImage = document.querySelector('.main-image');
-            
-            mainImageContainer.addEventListener('mousemove', function (e) {
-                if (zoomDisabled) return; // Stop zooming if the zoom is disabled
-            
-                const { width, height } = this.getBoundingClientRect();
-                const x = e.clientX - this.getBoundingClientRect().left;
-                const y = e.clientY - this.getBoundingClientRect().top;
-            
-                const percentX = (x / width) * 100;
-                const percentY = (y / height) * 100;
-            
-                mainImage.style.transformOrigin = `${percentX}% ${percentY}%`;
-                mainImage.style.transform = 'scale(1.5)'; // Set zoom level
-            });
-            
-            mainImageContainer.addEventListener('mouseleave', function () {
-                mainImage.style.transform = 'scale(1)'; // Reset zoom on mouse leave
-            });
-            
-            // Disable zoom when hovering over the arrows
-            const leftArrow = document.querySelector('.left-arrow');
-            const rightArrow = document.querySelector('.right-arrow');
-            
-            leftArrow.addEventListener('mouseenter', () => {
-                zoomDisabled = true; // Disable zoom while hovering over the arrow
-                resetZoom(mainImage); // Reset zoom on hover
-            });
-            
-            rightArrow.addEventListener('mouseenter', () => {
-                zoomDisabled = true; // Disable zoom while hovering over the arrow
-                resetZoom(mainImage); // Reset zoom on hover
-            });
-            
-            // Re-enable zoom after leaving the arrows
-            leftArrow.addEventListener('mouseleave', () => {
-                zoomDisabled = false;
-            });
-            
-            rightArrow.addEventListener('mouseleave', () => {
-                zoomDisabled = false;
-            });
-            
-            
-            </script>
-        <script src="{% static 'js/body.js' %}"></script>
-    </body>
-    </html>
+        
+            // Reset zoom whenever the image is changed
+            resetZoom(mainImage);
+        
+            // Handle if a thumbnail is clicked (image source is passed)
+            console.log(directionOrSrc)
+            if (typeof directionOrSrc === 'string' && directionOrSrc.includes('media')) {
+                mainImage.src = `${directionOrSrc}?${new Date().getTime()}`; // Force reload
+                currentIndex = images.indexOf(directionOrSrc); // Update currentIndex
+            } else if (directionOrSrc === 'left') {
+                currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
+                mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`; // Force reload
+            } else if (directionOrSrc === 'right') {
+                currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
+                mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`; // Force reload
+            }
+        }
+        
+        function addToCart() {
+            alert('Product added to cart!');
+        }
+        function notifyMeWhenAvailable() {
+            alert('You\'ll get notified when the product is available');
+        }            
+        function resetZoom(mainImage) {
+            // Reset zoom effect
+            mainImage.style.transform = 'scale(1)';
+        }
+        
+        // Zoom effect for the main image
+        const mainImageContainer = document.querySelector('.main-image-container');
+        const mainImage = document.querySelector('.main-image');
+        
+        mainImageContainer.addEventListener('mousemove', function (e) {
+            if (zoomDisabled) return; // Stop zooming if the zoom is disabled
+        
+            const { width, height } = this.getBoundingClientRect();
+            const x = e.clientX - this.getBoundingClientRect().left;
+            const y = e.clientY - this.getBoundingClientRect().top;
+        
+            const percentX = (x / width) * 100;
+            const percentY = (y / height) * 100;
+        
+            mainImage.style.transformOrigin = `${percentX}% ${percentY}%`;
+            mainImage.style.transform = 'scale(1.5)'; // Set zoom level
+        });
+        
+        mainImageContainer.addEventListener('mouseleave', function () {
+            mainImage.style.transform = 'scale(1)'; // Reset zoom on mouse leave
+        });
+        
+        // Disable zoom when hovering over the arrows
+        const leftArrow = document.querySelector('.left-arrow');
+        const rightArrow = document.querySelector('.right-arrow');
+        
+        leftArrow.addEventListener('mouseenter', () => {
+            zoomDisabled = true; // Disable zoom while hovering over the arrow
+            resetZoom(mainImage); // Reset zoom on hover
+        });
+        
+        rightArrow.addEventListener('mouseenter', () => {
+            zoomDisabled = true; // Disable zoom while hovering over the arrow
+            resetZoom(mainImage); // Reset zoom on hover
+        });
+        
+        // Re-enable zoom after leaving the arrows
+        leftArrow.addEventListener('mouseleave', () => {
+            zoomDisabled = false;
+        });
+        
+        rightArrow.addEventListener('mouseleave', () => {
+            zoomDisabled = false;
+        });
+        
+        
+        </script>
+    <script src="{% static 'js/body.js' %}"></script>
+</body>
+</html>

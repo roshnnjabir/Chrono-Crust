@@ -1,0 +1,319 @@
+body {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+.cart-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.cart-items {
+    margin: 20px 0;
+}
+
+.cart-item {
+    display: flex;
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    align-items: center;
+}
+
+.item-image img {
+    width: 100px;
+    height: auto;
+    border-radius: 5px;
+    margin-right: 15px;
+}
+
+.item-details {
+    flex: 1;
+    text-align: left;
+}
+
+.item-details h2 {
+    font-size: 1.2em;
+    margin: 5px 0;
+}
+
+.item-details .price {
+    color: #555;
+    font-weight: bold;
+}
+
+.quantity-control button {
+    border: none;
+    background-color: #ddd;
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.remove-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.cart-summary {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid #e0e0e0;
+    text-align: left;
+}
+
+.checkout-button {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1.1em;
+    border: none;
+    cursor: pointer;
+}
+
+.continue-shopping {
+    display: inline-block;
+    margin-top: 15px;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+
+
+
+
+
+.cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.item-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+.item-details {
+    flex: 2;
+    color: #333;
+}
+
+.item-details h3 {
+    margin: 0;
+    color: #050505;
+}
+
+.item-price {
+    margin-top: 8px;
+    color: #666;
+    font-weight: 600;
+}
+
+.item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.quantity-input {
+    width: 60px;
+    padding: 8px;
+    margin-bottom: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.remove-button {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.remove-button:hover {
+    background-color: #ff3232;
+}
+
+.cart-summary {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    text-align: right;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.checkout-button {
+    background-color: #050505;
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+}
+
+.checkout-button:hover {
+    background-color: #333;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item-image {
+        width: 100%;
+        max-width: 80px;
+    }
+
+    .cart-summary {
+        padding: 15px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkout-button {
+        font-size: 14px;
+        padding: 8px 20px;
+    }
+}
+
+
+.item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Spacing between buttons */
+}
+.item-actions button {
+    width: 150px; /* Adjust the width as necessary */
+    height: 40px; /* Ensures buttons are the same height */
+    margin-right: 10px; /* Adds some space between the buttons */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.action-form {
+    display: inline;
+}
+.action-form button {
+    width: 150px; /* Adjust the width as necessary */
+    height: 40px; /* Ensures buttons are the same height */
+    margin-right: 10px; /* Add some space between the buttons */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.move-to-wishlist-button {
+    background-color: #ffb74d;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.move-to-wishlist-button:hover {
+    background-color: #ff9c1a;
+}
+
+.checkout-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.checkout-button:hover {
+    background-color: #0056b3;
+}
+
+
+/* Container for the summary details and selected images */
+.summary-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* This section will take 40% width */
+.summary-details {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between total, selected total, and checkout button */
+    padding-right: 15px; /* Add some space to separate from the images */
+}
+
+/* Adjusting the checkout button for consistency */
+.summary-details .checkout-button {
+    width: 100%; /* Make it take full width inside the summary box */
+    margin-top: 10px;
+}
+
+/* This section will take 60% width for selected images */
+.selected-images-container {
+    width: 60%;
+    display: flex;
+    gap: 10px; /* Space between selected images */
+    align-items: center;
+    overflow-x: auto; /* Allow scrolling if there are too many images */
+}
+
+/* Styles for selected images if needed */
+.selected-images-container img {
+    width: 80px;  /* Adjust the width of each image */
+    height: 80px; /* Keep a square aspect ratio */
+    border-radius: 5px;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    justify-content: space-around;
+}
+
+
+.error-message {
+    display: none; /* Initially hidden */
+    color: red; /* Text color */
+    background-color: #ffe6e6; /* Light red background */
+    border: 1px solid red; /* Red border */
+    padding: 10px; /* Padding */
+    border-radius: 5px; /* Rounded corners */
+    margin-top: 10px; /* Spacing above the message */
+    font-size: 16px; /* Font size */
+    font-weight: bold; /* Bold text */
+}

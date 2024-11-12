@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin_home.css">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: #050505;
+        }
+
+        .container {
+            display: flex;
+            padding: 40px;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .breadcrumbs {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #888;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-direction: row;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .sidebar div {
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .sidebar div:hover {
+            background-color: #e8e8e8;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar div.selected {
+            background-color: #050505;
+            color: #fff;
+        }
+
+        .admin-container {
+            flex: 1;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-container h1 {
+            margin-bottom: 20px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            margin-bottom: 20px; /* Space below the table */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f8f8f8;
+        }
+
+        .action-button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .show-details-button {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        .show-details-button:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .logout-button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #ff4d4d; /* Red background for logout */
+            color: white; /* White text for visibility */
+            border: none; /* No border */
+            cursor: pointer; /* Pointer cursor */
+            transition: background-color 0.3s ease;
+            margin-top: 20px; /* Spacing above the button */
+        }
+
+        .logout-button:hover {
+            background-color: #e04343; /* Darker red on hover */
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .sidebar {
+                width: 100%; /* Make sidebar full-width */
+                display: flex;
+                justify-content: space-around; /* Turn it into a horizontal bar */
+                gap: 0;
+                padding: 10px;
+                border-radius: 12px;
+                background-color: transparent; /* Make the background transparent */
+                box-shadow: none;
+            }
+
+            .admin-container {
+                padding: 15px;
+            }
+        }
+    </style>
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>Order List</span>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="nav-item">User's Overview</div>
+                <div class="nav-item">Blocked Users</div>
+                <a href="/admin/orders"><div class="nav-item selected">Order History</div></a>
+                <div class="nav-item">Settings</div>
+            </div>
+
+            <div class="admin-container">
+                <h1>Orders</h1>
+                
+                <!-- Filter Button -->
+                <button id="filterButton" class="action-button">Filters</button>
+            
+                <!-- Filter Modal -->
+                <div id="filterModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2>Filter Orders</h2>
+                        <form method="GET" action="{% url 'admin_list_orders' %}">
+                            <label for="status">Filter by Status:</label>
+                            <select id="status" name="status">
+                                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="shipped" {% if status_filter == 'shipped' %}selected{% endif %}>Shipped</option>
+                                <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Delivered</option>
+                                <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>Refunded</option>
+                            </select>
+
+                            <!-- New Payment Status Filter -->
+                            <label for="payment_status">Filter by Payment Status:</label>
+                            <select id="payment_status" name="payment_status">
+                                <option value="all" {% if payment_status_filter == 'all' %}selected{% endif %}>All</option>
+                                <option value="paid" {% if payment_status_filter == 'paid' %}selected{% endif %}>Paid</option>
+                                <option value="cod" {% if payment_status_filter == 'cod' %}selected{% endif %}>Cash On Delivery</option>
+                                <option value="refunded" {% if payment_status_filter == 'refunded' %}selected{% endif %}>Refunded</option>
+                                <option value="pending" {% if payment_status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                            </select>
+            
+                            <label for="user">Filter by User:</label>
+                            <select id="user" name="user">
+                                <option value="">Select User</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}" {% if user.id|stringformat:"s" == user_filter %}selected{% endif %}>
+                                    {{ user.first_name }} {{ user.last_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+            
+                            <label for="start_date">Start Date:</label>
+                            <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+            
+                            <label for="end_date">End Date:</label>
+                            <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+            
+                            <label for="min_price">Min Price:</label>
+                            <input type="number" id="min_price" name="min_price" value="{{ min_price }}">
+            
+                            <label for="max_price">Max Price:</label>
+                            <input type="number" id="max_price" name="max_price" value="{{ max_price }}">
+            
+                            <button type="submit">Apply Filters</button>
+                        </form>
+                    </div>
+                </div>
+            
+                <div class="table-container">
+                    <table id="customers">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Payment Status</th> <!-- New Column for Payment Status -->
+                                <th>Date</th>
+                                <th>Total Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                                <td>{{ order.status }}</td>
+                                <td>{{ order.payment_status }}</td> <!-- New Data for Payment Status -->
+                                <td>{{ order.updated_at.date }}</td>
+                                <td>{{ order.total_amount }}</td>
+                                <td>
+                                    <a href="{% url 'admin_order_details' order.id %}">
+                                        <button class="action-button show-details-button">Show Details</button>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7">No orders found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>                        
+                    </table>
+                </div>
+            
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            
+                <a href="{% url 'admin_logout' %}">
+                    <button class="logout-button">Logout</button>
+                </a>
+            </div>            
+        </div>
+    </div>
+
+    <script>
+        // Get the modal
+        var modal = document.getElementById("filterModal");
+    
+        // Get the button that opens the modal
+        var btn = document.getElementById("filterButton");
+    
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+    
+        // When the user clicks the button, open the modal 
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+    
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+    
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>    
+</body>
+
+</html>

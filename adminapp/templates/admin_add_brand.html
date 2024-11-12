@@ -1,34 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Collection</title>
     <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css"> <!-- Cropper.js CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/admin/togglebutton.css' %}">
     <style>
-        /* Styles for error messages */
-        .messages {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .messages li {
-            padding: 10px;
-            background-color: #ffefef;
-            border-left: 4px solid #ff4d4d;
-            margin-bottom: 10px;
-        }
-        
-        
+        /* Default Styles */
         body {
             font-family: 'Nunito', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f8f9fc;
-            color: #333;
+            background-color: #f8f9fc; /* Light background */
+            color: #333; /* Light text color */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -39,7 +26,7 @@
         .container {
             max-width: 700px;
             padding: 30px;
-            background-color: #ffffff;
+            background-color: #ffffff; /* Light container background */
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
@@ -53,7 +40,7 @@
 
         label {
             font-size: 14px;
-            color: #666;
+            color: #666; /* Light label color */
             display: block;
             margin-bottom: 5px;
             font-weight: 600;
@@ -69,7 +56,7 @@
             font-size: 16px;
             width: 100%;
             margin-bottom: 20px;
-            background-color: #f9f9f9;
+            background-color: #f9f9f9; /* Light input background */
             transition: border-color 0.3s;
         }
 
@@ -80,57 +67,25 @@
             outline: none;
         }
 
-        input[type="file"] {
-            margin-top: 12px;
-            font-size: 14px;
-            display: none;
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
-        .image-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .image-section img {
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            max-width: 150px;
-            max-height: 150px;
-            object-fit: cover;
-            margin: 5px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .image-section img:hover {
-            transform: scale(1.05);
-        }
-
-        .image-preview-container {
-            display: block;
-            flex-direction: column;
-            align-items: center;
-        }
-        .image-preview-container1 {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #cropped-image {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            max-width: 100%;
-            margin-top: 15px;
+        .messages li {
+            padding: 10px;
+            background-color: #ffefef;
+            border-left: 4px solid #ff4d4d;
+            margin-bottom: 10px;
         }
 
         .action-button,
         .save-button {
+            font-family: 'Nunito',sans-serif;
             padding: 12px 20px;
             border-radius: 8px;
-            background-color: #28a745;
+            background-color: #28a745; /* Light button background */
             color: white;
             border: none;
             cursor: pointer;
@@ -143,51 +98,107 @@
 
         .action-button:hover,
         .save-button:hover {
-            background-color: #218838;
+            background-color: #218838; /* Darker green on hover */
         }
 
-        #save-button {
-            width: auto;
-            padding: 10px 20px;
+        /* Dark Theme Styles */
+        .dark-theme {
+            background-color: #181818; /* Dark background */
+            color: #f0f0f0; /* Light text color for dark theme */
         }
+
+        .dark-theme .container {
+            background-color: #242424; /* Dark container background */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); /* Darker shadow */
+        }
+
+        .dark-theme label {
+            color: #b0b0b0; /* Lighter label color */
+        }
+
+        .dark-theme input[type="text"],
+        .dark-theme input[type="number"],
+        .dark-theme select {
+            background-color: #333; /* Dark input background */
+            border: 1px solid #555; /* Dark border */
+            color: #fff; /* Light text color for inputs */
+        }
+
+        .dark-theme input[type="text"]:focus,
+        .dark-theme input[type="number"]:focus,
+        .dark-theme select:focus {
+            border-color: #80bdff; /* Focus border color */
+        }
+
+        .dark-theme .messages li {
+            background-color: #4d4d4d; /* Darker background for messages */
+            border-left: 4px solid #ff4d4d; /* Keep the same warning color */
+        }
+
+        .dark-theme .action-button,
+        .dark-theme .save-button {
+            background-color: #28a745; /* Button background in dark theme */
+        }
+
+        .dark-theme .action-button:hover,
+        .dark-theme .save-button:hover {
+            background-color: #218838; /* Darker green on hover in dark theme */
+        }
+
         .breadcrumbs {
             font-size: 14px;
             margin-bottom: 20px;
-            color: #888;
+            color: #888; /* Breadcrumb text color */
         }
+        
         a {
             text-decoration: none;
-            color: #050505;
+            color: #050505; /* Link color */
+        }
+
+        .dark-theme a,.dark-theme h2 {
+            color: #f0f0f0; /* Light link color in dark theme */
         }
     </style>
 </head>
 
-<body>
+<body class="dark-theme"> <!-- Add dark-theme class for dark mode -->
     <div class="breadcrumbs">
         <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/list_brand">List Brand </a> / <span>Add Brand </span>
     </div>
     <div class="container">
+        <button id="theme-toggle" style="float: right;" aria-label="Toggle Theme">
+            <!-- Sun SVG (Light Mode) -->
+            <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+                <path d="M12 0v4M12 20v4M4.22 4.22l2.83 2.83M16.97 16.97l2.83 2.83M0 12h4M20 12h4M4.22 19.78l2.83-2.83M16.97 7.03l2.83-2.83" 
+                    stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+
+            <!-- Moon SVG (Dark Mode) -->
+            <svg id="moon-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12 2a10 10 0 1 0 10 10 7 7 0 0 1-10-10z"></path>
+            </svg>
+            
+        </button>
         <h2>Add Brand</h2>
         <form id="edit-form" action="{% url 'admin_add_brand' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-
             <label for="brand-name">Brand Name</label>
             <input type="text" id="brand-name" name="brand" required>
-
-            <button type="submit" class="save-button">Add Collection</button>
+            <button type="submit" class="save-button">Add Brand</button>
         </form>
         {% if messages %}
         <ul class="messages">
             {% for message in messages %}
             <li style="list-style: none;">
-                {% if message.tags %}
-                Warning:
-                {% endif %}{{ message }}
+                {% if message.tags %}Warning:{% endif %}{{ message }}
             </li>
             {% endfor %}
         </ul>
         {% endif %}
     </div>
+    <script src="{% static 'js/theme.js' %}"></script>
 </body>
 
 </html>

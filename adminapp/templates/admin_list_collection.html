@@ -486,6 +486,7 @@
                         <thead>
                             <tr>
                                 <th>Product ID</th>
+                                <th>Image</th>
                                 <th colspan="2">Collection Name</th>
                                 <th colspan="2">Brand Name</th>
                                 <th colspan="3">Action</th>
@@ -495,6 +496,7 @@
                             {% for collection in collections %}
                             <tr>
                                 <td>{{ collection.id }}</td>
+                                <td><img style="width: 100%; height: 100%; object-fit: cover;" src="{{ collection.image.url }}" alt="{{ collection.name }}"></td>
                                 <td>{{ collection.name }}</td>
                                 <td>
                                     {% if collection.is_listed %}

@@ -1,301 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            color: #333;
-        }
-
-        a {
-            text-decoration: none;
-            color: #050505;
-        }
-
-        .container {
-            display: flex;
-            padding: 40px;
-            flex-direction: column;
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        .breadcrumbs {
-            font-size: 14px;
-            margin-bottom: 20px;
-            color: #888;
-        }
-
-        .main-content {
-            display: flex;
-            gap: 30px;
-            flex-direction: row;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 250px;
-            background-color: #ffffff;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            position: relative;
-        }
-
-        .sidebar div {
-            padding: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 15px;
-        }
-
-        .sidebar div:hover {
-            background-color: #e8e8e8;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar div.selected {
-            background-color: #050505;
-            color: #fff;
-        }
-
-        .admin-container {
-            flex: 1;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .admin-container h1 {
-            margin-bottom: 20px;
-        }
-
-        .search {
-            display: flex;
-            margin-bottom: 20px;
-            justify-content: end;
-        }
-
-        .search input[type="search"] {
-            max-width: 200px;
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-
-        .table-container {
-            overflow-x: auto; /* Enable horizontal scrolling */
-            margin-bottom: 20px; /* Space below the table */
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        table th,
-        table td {
-            padding: 15px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        table th {
-            background-color: #f8f8f8;
-        }
-
-        .action-button {
-            padding: 10px 15px;
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .action-button:hover {
-            background-color: #e0e0e0;
-        }
-
-        .show-details-button {
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-        }
-
-        .show-details-button:hover {
-            background-color: #0056b3;
-            color: white;
-        }
-
-        .messages {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .messages li {
-            padding: 10px;
-            background-color: #ffefef;
-            border-left: 4px solid #ff4d4d;
-            margin-bottom: 10px;
-        }
-
-        .add-button {
-            background-color: #ff4d4d;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .add-button:hover {
-            background-color: #ff1a1a;
-        }
-
-        /* User Details Styles */
-        .user-details {
-            margin-top: 20px;
-        }
-
-        .user-info {
-            margin-bottom: 10px;
-        }
-
-        .back-button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-
-        .back-button:hover {
-            background-color: #0056b3;
-        }
-
-        .user-image {
-            width: 60px; /* Adjust size as needed */
-            height: 60px; /* Keep width and height equal for a circle */
-            border-radius: 50%; /* Make the image circular */
-            object-fit: cover; /* Ensure the image covers the circle */
-            margin-bottom: 15px; /* Space below the image */
-        }
-
-
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-                gap: 0;
-            }
-
-            .sidebar {
-                width: 100%; /* Make sidebar full-width */
-                display: flex;
-                justify-content: space-around; /* Turn it into a horizontal bar */
-                gap: 0;
-                padding: 10px;
-                border-radius: 12px;
-                background-color: transparent; /* Make the background transparent */
-                box-shadow: none;
-            }
-
-            .sidebar div {
-                padding: 12px 10px; /* Adjust padding for smaller screens */
-                border-radius: 10px;
-            }
-
-            .admin-container {
-                padding: 15px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                font-size: 12px;
-            }
-
-            .sidebar{
-                font-size: 10px;
-                padding: 10px 3px;
-            }
-
-            .container {
-                padding: 10px;
-            }
-
-            .admin-container h1 {
-                margin-bottom: 15px;
-            }
-
-            .breadcrumbs {
-                font-size: 10px;
-            }
-
-            .search input[type="search"] {
-                padding: 8px;
-            }
-
-            table th,
-            table td {
-                padding: 8px;
-            }
-        }
-
-        @media (max-width: 380px){
-            body{
-                font-size: 10px;
-            }
-            .sidebar{
-                justify-content: space-between;
-                font-size: 8px;
-            }
-            .sidebar div {
-                padding: 6px;
-                border-radius: 7px;
-            }
-            .breadcrumbs{
-                font-size: 8px;
-            }
-            .search{
-                margin-bottom: 10px;
-            }
-            .search input[type="search"] {
-                padding: 7px;
-                font-size: 8px;
-            }
-            #live-search{
-                max-width: 100px;
-                max-height: 25px;
-            }
-            .admin-container h1 {
-                margin-bottom: 10px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/order.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin_show_user_details.css' %}">
 </head>
 
 <body>
     <div class="container">
         <div class="breadcrumbs">
-            <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>List User </span>
+            <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/list_user">List User </a> / <span>User Details & Orders</span>
         </div>
 
         <div class="main-content">
@@ -326,8 +44,9 @@
                     {% if addresses %}
                         <ul>
                             {% for address in addresses %}
-                                <li>
-                                    <strong>{{ address.street_address }}</strong>, {{ address.city }}, {{ address.state }} - {{ address.postal_code }}
+                                <li style="margin-top: 12px;">
+                                    <strong>{{ address.building_name }}</strong>, {{ address.landmark }}, {{ address.city }}, {{ address.district }}, {{ address.state }} - {{ address.postal_code }}
+                                    <div style="margin-top: 2px;">Phone: {{ address.phone }} {% if address.is_listed == False %} Unlisted {% endif %}</div>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -335,10 +54,44 @@
                         <p>No addresses found for this user.</p>
                     {% endif %}
                 </div>
+
+                {% if show_orders %}
+                <h2>Order History</h2>
+                <div class="order-history-items">
+                    {% if orders %}
+                        {% for order in orders %}
+                            <div class="order-item">
+                                <p><strong>Order ID:</strong> {{ order.id }}</p>
+                                <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+                                <p><strong>Status:</strong> {{ order.status }}</p>
+                                <p><strong>Total:</strong> ${{ order.total }}</p>
+                                <p><strong>Items:</strong></p>
+                                <ul>
+                                    {% for item in orders.items %}
+                                        <li>{{ item.product_name }} ({{ item.quantity }})</li>
+                                    {% endfor %}
+                                </ul>
+                                <a href="{% url 'admin_order_details' order.id %}" class="show-details-button">View Order Details</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No orders found for this user.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
             
                 <a href="{% url 'admin_list_user' %}">
                     <button class="back-button">Back to List</button>
                 </a>
+                {% if show_orders %}
+                <a href="{% url 'admin_show_user_details' user.id %}">
+                    <button class="hide-button">Hide Orders Of User</button>
+                </a>
+                {% else %}
+                <a href="{% url 'show_order_of_specific_user' user.id %}">
+                    <button class="show-button">Show Orders</button>
+                </a>
+                {% endif %}
 
                 {% if messages %}
                 <ul class="messages">

@@ -154,3 +154,28 @@ button{
         font-size: 1rem; /* Maintain default font size */
     }
 }
+
+
+.image-container {
+    position: relative;
+}
+
+.product-image {
+    width: 100%;
+    transition: opacity 0.3s ease;
+}
+
+.hover-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.image-container:hover .main-image {
+    opacity: 0;
+}
+
+.image-container:hover .hover-image {
+    opacity: 1;
+}
