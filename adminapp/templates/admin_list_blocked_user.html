@@ -263,13 +263,7 @@
 
         <div class="main-content">
             <!-- Sidebar acting as Navbar on small screens -->
-            <div class="sidebar">
-                <a href="/admin/list_user"><div class="nav-item">User's Overview</div></a>
-                <div class="nav-item selected">Blocked Users</div>
-                <div class="nav-item">Order History</div>
-                <div class="nav-item">Settings</div>
-            </div>
-
+            {% include 'partials/admin_sidebar.html' %}
             <div class="admin-container">
                 <h1>Blocked Members</h1>
                 <div class="search">

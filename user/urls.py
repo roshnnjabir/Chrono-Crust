@@ -23,6 +23,12 @@ urlpatterns = [
     path('user_signup/', views.user_signup, name='user_signup'),
     path('user_profile/', views.user_profile, name='user_profile'),
     path('user_profile_update/', views.user_profile_update, name='user_profile_update'),
+    
+    path('user_list_product/', views.user_list_product, name='user_list_product'),
+    path('user_list_product_catogory/', views.user_list_product_catogory, name='user_list_product_catogory'),
+    
+    path('user_list_brand/', views.user_list_brand, name='user_list_brand'),
+    path('user_list_product_catogory/', views.user_list_product_catogory, name='user_list_product_catogory'),
 
     path('user_forgot_password/', views.user_forgot_password, name='user_forgot_password'),
     path('user_reset_password/', views.user_reset_password, name='user_reset_password'),

@@ -45,6 +45,13 @@ a {
     font-family: 'Montserrat', sans-serif;
     text-decoration: none;
 }
+.nav-item button{
+    color: #050505;
+    font-family: 'Montserrat', sans-serif;
+    text-decoration: none;
+    border: none;
+    background: none;
+}
 
 .header-bottom {
     font-family: 'Montserrat', sans-serif;
@@ -210,7 +217,10 @@ a {
     opacity: 0; /* Start invisible */
     border-radius: 10px; /* Adjust this value for more or less curvature */
 }
-
+#oblong{
+    width: 90%;
+    opacity: 1;
+}
 .nav-item:hover .oblong {
     width: 90%; /* Full width on hover */
     opacity: 1; /* Make it visible */

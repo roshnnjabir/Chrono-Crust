@@ -8,28 +8,293 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/pop_up.css' %}"><!-- So that the styles of pop up get imported -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/pop_up.css' %}">
     <link rel="stylesheet" href="{% static 'css/productslider.css' %}">
     <link rel="stylesheet" href="{% static 'css/product.css' %}">
     <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <style>/* Base Styles */
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        button {
+            margin: 0;
+        }
+        
+        /* Section Titles */
+        .section-title {
+            font-family: 'Nunito', serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background-color: #333;
+        }
+        
+        
+        /* Featured Section */
+        .featured-section {
+            padding: 5rem 0;
+            background-color: #f9f9f9;
+        }
+        
+        .featured-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .featured-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .featured-img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .featured-content {
+            padding: 2rem;
+        }
+        
+        .featured-title {
+            font-family: 'Nunito', serif;
+            margin-bottom: 1rem;
+        }
+        
+        /* Collections Section */
+        .collection-section {
+            padding: 5rem 0;
+        }
+        
+        .collection-card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .collection-img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .collection-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            padding: 2rem;
+            color: white;
+            transform: translateY(20%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .collection-card:hover .collection-img {
+            transform: scale(1.05);
+        }
+        
+        .collection-card:hover .collection-overlay {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* News Section */
+        .news-section {
+            background-color: #f9f9f9;
+            padding: 5rem 0;
+        }
+        
+        .news-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .news-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .news-date {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .news-title {
+            margin: 0.5rem 0;
+            font-family: 'Nunito', serif;
+        }
+        
+        .news-excerpt {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .read-more {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .read-more:hover {
+            color: #000;
+        }
+        
+        /* Services Section */
+        .services-section {
+            background-color: white;
+            padding: 5rem 0;
+        }
+        
+        .service-item {
+            padding: 2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .service-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .service-icon {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .service-item h4 {
+            font-family: 'Nunito', serif;
+            margin-bottom: 0.5rem;
+        }
+        
+        .service-item p {
+            color: #666;
+        }
+        
+        /* Product List (From your original CSS) */
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            max-width: 1440px;
+            margin: auto;
+        }
+        
+        /* Card Base Styles (From your original CSS) */
+        .card {
+            position: relative;
+            width: 150px;
+            max-height: 250px !important;
+            margin: 10px;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+        
+        /* Keep all your original card styles... */
+        [Your original card styles remain unchanged]
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+        
+            .product-name {
+                font-size: 1.5rem;
+            }
+        
+            .featured-img,
+            .collection-img {
+                height: 250px;
+            }
+        
+            .news-img {
+                height: 180px;
+            }
+        
+            .service-item {
+                margin-bottom: 2rem;
+            }
+        
+            .prev-button,
+            .next-button {
+                width: 40px;
+                height: 40px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .section-title {
+                font-size: 1.75rem;
+            }
+        
+            .featured-content,
+            .news-content {
+                padding: 1.5rem;
+            }
+        
+            .collection-overlay {
+                padding: 1.5rem;
+            }
+        
+            .service-icon {
+                font-size: 2rem;
+            }
+        }</style>
 </head>
 <body>
     {% include 'partials/error_pop_up.html' %}
+    
     <!-- Header Section -->
     {% include 'partials/home_header.html' %}
-
+    
     <!-- Product Slider Section -->
     <div class="featured-products">
         <div class="product-slider">
             {% for product in product_slider %}
                 <div class="product" id="product{{ forloop.counter }}">
-                    <img src="{{ product.collection.image.url }}" alt="{{ product.collection.name }}" class="product-image"> <!-- Assuming Collection has an 'image' field -->
+                    <img src="{{ product.collection.image.url }}" alt="{{ product.collection.name }}" class="product-image">
                     <h2 class="product-name">{{ product.collection.name }}</h2>
                     <p class="product-description">{{ product.description }}</p>
                     <a href="#" class="discover-button">Discover Now</a>
                 </div>
             {% endfor %}
-    
+            
             <!-- Additional product for brand discovery -->
             <div class="product" id="product5">
                 <img src="{% static 'images/image5.png' %}" alt="Product 5" class="product-image">
@@ -38,7 +303,7 @@
                 <a href="#" class="discover-button">Discover Brands</a>
             </div>
         </div>
-    
+        
         <!-- Navigation buttons -->
         <button class="prev-button">
             <img src="{% static 'svg/previous.svg' %}" alt="Previous">
@@ -46,70 +311,139 @@
         <button class="next-button">
             <img src="{% static 'svg/next.svg' %}" alt="Next">
         </button>
-    
+        
         <div class="displayed-product-info">
             <h2 class="displayed-product-name">Product Name 1</h2>
             <p class="displayed-product-description">Description of Product 1.</p>
         </div>
-    </div>    
-    
-    <!-- Filter and Search Section -->
-    <div class="header-upper d-flex justify-content-between px-4 pt-4">
-        <div>ALL Products</div>
-        <div class="right-options d-flex align-items-center justify-content-md-end gap-1 p-1">
-            <form method="GET" action="/#product-list" class="d-flex">
-                <select name="sort" class="form-select me-2">
-                    <option value="">Sort By</option>
-                    <option value="name_asc" {% if request.GET.sort == 'name_asc' %}selected{% endif %}>Name: A-Z</option>
-                    <option value="name_desc" {% if request.GET.sort == 'name_desc' %}selected{% endif %}>Name: Z-A</option>
-                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
-                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
-                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest</option>
-                    <option value="popularity" {% if request.GET.sort == 'popularity' %}selected{% endif %}>Popularity</option>
-                </select>
-                <button class="btn btn-outline-dark" type="submit">Filter</button>
-            </form>
-        </div>
     </div>
 
-
-    <!-- Products -->
-    <div class="product-list" id="product-list">
-        {% for product in products %}
-        <div class="card">
-            <div class="image-container">
-                <img src="{{ product.image1.url }}" alt="{{ product.name }}" class="product-image main-image">
-                <img src="{{ product.image3.url }}" alt="{{ product.name }} Hover Image" class="product-image hover-image">
-                <a href="view_product/{{product.id}}">
-                    <button class="btn-discover">Discover Now</button>
-                </a>
-            </div>
-            
-            <div class="details-container">
-                <div class="price-wishlist-container">
-                    <span class="price">{{ product.collection.brand.name }}</span> <!-- Assuming you have a price field in your model -->
-                    <!-- Add to Wishlist Button -->
-                    <form method="POST" action="{% url 'user_add_to_wishlist' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="product_id" value="{{ product.id }}">
-                        <button style="border: none; background-color: transparent;" type="submit" class="btn btn-sm">
-                            <svg class="wishlist-icon" enable-background="new 0 0 32 32" height="20px" width="20px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <g id="heart"> 
-                                    <path clip-rule="evenodd" d="M29.193,5.265c-3.629-3.596-9.432-3.671-13.191-0.288 C12.242,1.594,6.441,1.669,2.81,5.265c-3.741,3.704-3.741,9.709,0,13.415c1.069,1.059,11.053,10.941,11.053,10.941 c1.183,1.172,3.096,1.172,4.278,0c0,0,10.932-10.822,11.053-10.941C32.936,14.974,32.936,8.969,29.193,5.265z M27.768,17.268 L16.715,28.209c-0.393,0.391-1.034,0.391-1.425,0L4.237,17.268c-2.95-2.92-2.95-7.671,0-10.591 c2.844-2.815,7.416-2.914,10.409-0.222l1.356,1.22l1.355-1.22c2.994-2.692,7.566-2.594,10.41,0.222 C30.717,9.596,30.717,14.347,27.768,17.268z"/>
-                                </g>
-                            </svg>
-                        </button>
-                    </form>
-                </div>                
-                <div class="product-details-container">
-                    <h3 class="name">{{ product.collection.name }} {{ product.name }}</h3>
+    <!-- Featured Products -->
+    <section id="featured" class="featured-section">
+        <div class="container">
+            <h2 class="section-title">Featured Timepieces</h2>
+            <div class="row">
+                {% for product in products|slice:":3" %}
+                <div class="col-md-4">
+                    <div class="featured-card">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="featured-img">
+                        <div class="featured-content">
+                            <h3 class="featured-title">{{ product.name }}</h3>
+                            <p>{{ product.description }}</p>
+                            <a href="#" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
                 </div>
-                
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
-    </div>    
-    
+    </section>
+
+    <!-- Collections -->
+    <section id="collections" class="collection-section">
+        <div class="container">
+            <h2 class="section-title">Exclusive Collections</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="collection-card">
+                        <img src="{% static 'images/image2.png' %}" alt="Men's Collection" class="collection-img">
+                        <div class="collection-overlay">
+                            <h3>Men's Collection</h3>
+                            <form action="/user_list_product" method="GET">
+                                <input name="gender_filter" type="hidden" value="men">
+                                <button class="btn btn-primary" type="submit">Shop Now</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="collection-card">
+                        <img src="{% static 'images/image4.png' %}" alt="Women's Collection" class="collection-img">
+                        <div class="collection-overlay">
+                            <h3>Women's Collection</h3>
+                            <form action="/user_list_product" method="GET">
+                                <input name="gender_filter" type="hidden" value="women">
+                                <button class="btn btn-primary" type="submit">Shop Now</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="collection-card">
+                        <img src="{% static 'images/image3.png' %}" alt="Limited Editions" class="collection-img">
+                        <div class="collection-overlay">
+                            <h3>Limited Editions</h3>
+                            <form action="/user_list_product" method="GET">
+                                <!-- <input name="gender_filter" type="hidden" value="men"> -->
+                                <button class="btn btn-primary" type="submit">Shop Now</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest News Section -->
+    <section class="news-section py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title">Latest News</h2>
+            <div class="row">
+                {% for i in "123" %}
+                <div class="col-md-4">
+                    <div class="news-card">
+                        <img src="{% static 'images/image1.png' %}" alt="News Image" class="news-img">
+                        <div class="news-content p-4">
+                            <div class="news-date text-muted mb-2">November {% widthratio forloop.counter 1 5 %}, 2024</div>
+                            <h3 class="news-title h5">The Art of Watchmaking: Behind the Scenes</h3>
+                            <p class="news-excerpt">Discover the intricate process of creating luxury timepieces and the dedication to perfection...</p>
+                            <a href="https://weisswatchcompany.com/blogs/news/weiss-workshop-tour-part-1#:~:text=Machining%20is%20a%20bit%20like,precision%2C%20and%20the%20right%20equipment." class="read-more">Read More →</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Guarantees -->
+    <section class="services-section py-5">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <div class="service-item">
+                        <i class="service-icon fas fa-shipping-fast mb-3"></i>
+                        <h4>Free Shipping</h4>
+                        <p>Worldwide on all orders above $5000</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="service-item">
+                        <i class="service-icon fas fa-certificate mb-3"></i>
+                        <h4>Authenticity</h4>
+                        <p>Guaranteed authentic pieces</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="service-item">
+                        <i class="service-icon fas fa-history mb-3"></i>
+                        <h4>24 Month Warranty</h4>
+                        <p>International warranty coverage</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="service-item">
+                        <i class="service-icon fas fa-headset mb-3"></i>
+                        <h4>Expert Support</h4>
+                        <p>24/7 dedicated support team</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'partials/footer.html' %}
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/body.js' %}"></script>
 </body>

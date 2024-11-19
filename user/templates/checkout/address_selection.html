@@ -174,7 +174,7 @@
                         {% else %}
                             <div class="no-address-message">
                                 <p>No addresses available. Please add a new address.</p>
-                                <a href="{% url 'user_address_book' %}" class="add-address-button">Add Address</a>
+                                <a onclick="openAddAddressModal()" class="add-address-button">Add Address</a>
                             </div>
                         {% endif %}
                     </div>
@@ -186,8 +186,11 @@
             </div>
         </div>
     </div>
+    {% include 'partials/add_and_edit_address_modals.html' %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            toggleConfirmButton();
+            
             // Get all elements with the class 'nav-item'
             var navItems = document.querySelectorAll('.sidebar .nav-item');
         

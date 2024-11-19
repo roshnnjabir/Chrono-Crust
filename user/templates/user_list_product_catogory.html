@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoCrest - Watches</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/pop_up.css' %}"><!-- So that the styles of pop up get imported -->
+    <link rel="stylesheet" href="{% static 'css/productslider.css' %}">
+    <link rel="stylesheet" href="{% static 'css/product.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+</head>
+<body>
+    {% include 'partials/error_pop_up.html' %}
+    <!-- Header Section -->
+    {% include 'partials/home_header.html' %}
+    
+    <!-- Filter and Search Section -->
+    <div class="header-upper d-flex justify-content-between px-4 pt-4">
+        <div></div>
+        <div class="right-options d-flex align-items-center justify-content-md-end gap-1 p-1">
+            <form method="GET" action="/user_list_product" class="d-flex">
+                <select name="sort" class="form-select me-2">
+                    <option value="">Sort By</option>
+                    <option value="name_asc" {% if request.GET.sort == 'name_asc' %}selected{% endif %}>Name: A-Z</option>
+                    <option value="name_desc" {% if request.GET.sort == 'name_desc' %}selected{% endif %}>Name: Z-A</option>
+                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="popularity" {% if request.GET.sort == 'popularity' %}selected{% endif %}>Popularity</option>
+                </select>
+                <button class="btn btn-outline-dark" type="submit">Filter</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Products -->
+    <div class="product-list" id="product-list">
+        {% for product in products %}
+        <div class="card">
+            <div class="image-container">
+                <img src="{{ product.image1.url }}" alt="{{ product.name }}" class="product-image main-image">
+                <img src="{{ product.image3.url }}" alt="{{ product.name }} Hover Image" class="product-image hover-image">
+                <a href="/view_product/{{product.id}}">
+                    <button class="btn-discover">Discover Now</button>
+                </a>
+            </div>
+            
+            <div class="details-container">
+                <div class="price-wishlist-container">
+                    <span class="price">{{ product.collection.brand.name }}</span> <!-- Assuming you have a price field in your model -->
+                    <!-- Add to Wishlist Button -->
+                    <form method="POST" action="{% url 'user_add_to_wishlist' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <button style="border: none; background-color: transparent;" type="submit" class="btn btn-sm">
+                            <svg class="wishlist-icon" enable-background="new 0 0 32 32" height="20px" width="20px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <g id="heart">
+                                    <path clip-rule="evenodd" d="M29.193,5.265c-3.629-3.596-9.432-3.671-13.191-0.288 C12.242,1.594,6.441,1.669,2.81,5.265c-3.741,3.704-3.741,9.709,0,13.415c1.069,1.059,11.053,10.941,11.053,10.941 c1.183,1.172,3.096,1.172,4.278,0c0,0,10.932-10.822,11.053-10.941C32.936,14.974,32.936,8.969,29.193,5.265z M27.768,17.268 L16.715,28.209c-0.393,0.391-1.034,0.391-1.425,0L4.237,17.268c-2.95-2.92-2.95-7.671,0-10.591 c2.844-2.815,7.416-2.914,10.409-0.222l1.356,1.22l1.355-1.22c2.994-2.692,7.566-2.594,10.41,0.222 C30.717,9.596,30.717,14.347,27.768,17.268z"/>
+                                </g>
+                            </svg>
+                        </button>
+                    </form>
+                </div>                
+                <div class="product-details-container">
+                    <h3 class="name">{{ product.collection.name }} {{ product.name }}</h3>
+                </div>
+                
+            </div>
+        </div>
+        {% empty %}
+        <div>No Products Found For {% if request.GET.gender_filter == 'men' %}Men {% elif request.GET.gender_filter == 'women' %}Women {% elif request.GET.gender_filter == 'unisex' %}Unisex{% endif %}</div>
+        {% endfor %}
+    </div>    
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/body.js' %}"></script>
+</body>
+</html>

@@ -183,12 +183,13 @@ def admin_add_product(request):
         image1 = request.POST['image1']
         image2 = request.POST['image2']
         image3 = request.POST['image3']
+        image4 = request.POST['image4']
         description1 = request.POST['description']
         description2 = request.POST['description1']
         description3 = request.POST['description2']
 
         collection = Collection.objects.get(id=collect)
-        Product.objects.create(name=productname, price=price, collection=collection, stock=stock, reference_no=reference_no, image=image1, image1=image2, image2=image3, description=description1, description1=description2, description2=description3)
+        Product.objects.create(name=productname, price=price, collection=collection, stock=stock, reference_no=reference_no, image=image1, image1=image2, image2=image3, image3=image4, description=description1, description1=description2, description2=description3)
         return redirect('admin_list_product')
     collection = Collection.objects.all()
     return render(request, 'admin_add_product.html', {'collections': collection})
@@ -214,6 +215,7 @@ def admin_edit_product(request, id):
         productid = request.POST['product-id']
         productname = request.POST['productname']
         price = request.POST['price']
+        offerprice = request.POST['offerprice']
         collection_id = request.POST['collection']
         stock = request.POST['stock']
         diameter = request.POST['diameter']
@@ -234,6 +236,7 @@ def admin_edit_product(request, id):
         product.name = productname
         product.collection = collection
         product.price = price
+        product.offer_price = offerprice
         product.stock = stock
         product.diameter = diameter
         product.frequency = frequency
@@ -331,11 +334,13 @@ def admin_list_brand(request):
 @staff_member_required(login_url="admin_login")
 def admin_add_brand(request):
     if request.method == "POST":
-        brand_name = request.POST['brand']
+        brand_name = request.POST['brandname']
+        logo_image = request.POST.get('brandlogo')
+        banner_image = request.POST.get('brandbanner')
         if Brand.objects.filter(name=brand_name).exists():
             messages.error(request, f"The Brand '{brand_name}' already exists.")
             return redirect('admin_add_brand')
-        Brand.objects.create(name=brand_name)
+        Brand.objects.create(name=brand_name, logo_image=logo_image, banner_image=banner_image)
         return redirect('admin_list_brand')
     brands = Brand.objects.all()
     return render(request, 'admin_add_brand.html', {'brands': brands})
@@ -356,11 +361,15 @@ def admin_list_unlist_brand(request, id):
 def admin_edit_brand(request, id):
     brand = Brand.objects.get(id=id)
     if request.method == "POST":
-        brand_name = request.POST['brand']
+        brand_name = request.POST.get('brandname')
+        logo_image = request.POST.get('image1')
+        banner_image = request.POST.get('image2')
         if Brand.objects.filter(name=brand_name).exclude(id=id).exists():
             messages.error(request, "Brand name already exists.")
         else:
             brand.name = brand_name
+            brand.logo_image = logo_image
+            brand.banner_image = banner_image
             brand.save()
             return redirect('admin_list_brand')
     return render(request, 'admin_edit_brand.html', {'brand': brand})
@@ -524,6 +533,48 @@ def admin_add_coupon(request):
     return render(request, 'admin_add_coupon.html')
 
 
+def admin_edit_coupon(request, coupon_id):
+    # Fetch the coupon to edit
+    coupon = get_object_or_404(Coupen, id=coupon_id)
+    
+    if request.method == "POST":
+        # Get form data from the POST request
+        code = request.POST.get('code')
+        min_required = request.POST.get('min_required')
+        maximum_discount = request.POST.get('maximum_discount')
+        discount_percentage = request.POST.get('discount_percentage')
+        usage_limit = request.POST.get('usage_limit')
+        valid_from = request.POST.get('valid_from')
+        valid_to = request.POST.get('valid_to')
+        active = request.POST.get('active') == 'on'  # Checkbox returns 'on' when checked
+        
+        # Check if the coupon code has changed and if the new code already exists
+        if code != coupon.code and Coupen.objects.filter(code=code).exists():
+            messages.error(request, 'This Coupon Code Already Exists')
+            return redirect('admin_edit_coupon', coupon_id=coupon.id)
+
+        # Convert date strings to datetime objects
+        valid_from = timezone.datetime.fromisoformat(valid_from)
+        valid_to = timezone.datetime.fromisoformat(valid_to)
+
+        # Update the coupon object
+        coupon.code = code
+        coupon.min_required = min_required
+        coupon.maximum_discount = maximum_discount
+        coupon.discount_percentage = discount_percentage
+        coupon.usage_limit = usage_limit
+        coupon.valid_from = valid_from
+        coupon.valid_to = valid_to
+        coupon.active = active
+        coupon.save()
+
+        # Redirect to the list of coupons after editing
+        messages.success(request, 'Coupon updated successfully')
+        return redirect('admin_list_coupons')
+
+    return render(request, 'admin_edit_coupon.html', {'coupon': coupon})
+
+
 @csrf_exempt
 def validate_coupon_ajax(request):
     if request.method == "POST":
@@ -536,7 +587,7 @@ def validate_coupon_ajax(request):
             # Check if coupon's minimum purchase requirement is met
             if hasattr(coupon, 'minimum_purchase') and selected_total < coupon.min_required:
                 return JsonResponse({
-                    "status": "error", 
+                    "status": "error",
                     "message": f"Minimum purchase amount of ${coupon.min_required} required."
                 })
 
@@ -578,7 +629,7 @@ def validate_coupon_ajax(request):
 def admin_delete_coupon(request, code):
     coupen = Coupen.objects.get(code=code)
     coupen.delete()
-    return redirect('admin_list_coupen')
+    return redirect('admin_list_coupons')
 
 
 def admin_sales(request):
@@ -588,13 +639,18 @@ def admin_sales(request):
     end_date = request.GET.get('end_date')
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
-    
+    order_count = orders.count()
+    if order_count > 0:
+        average_price = round(total_amount/order_count, 2)
+    else:
+        average_price = 0
+
     if start_date and end_date:
         orders = orders.filter(updated_at__date__range=[start_date, end_date])
-    
+
     if min_price and max_price:
         orders = orders.filter(total_amount__range=[min_price, max_price])
-        
+
     for order in orders:
         total_amount += order.total_amount
         print(total_amount)
@@ -602,13 +658,32 @@ def admin_sales(request):
         'sales': orders,
         'total_revenue': total_amount,
         'total_sales': orders.count(),
-        'average_price': round(total_amount/orders.count(), 2)
+        'average_price': average_price
     }
     return render(request, 'admin_sales.html', context=context)
 
 
-def admin_offers(request):
-    return render(request, 'admin_offers.html')
+def admin_list_offers(request):
+    products = Product.objects.all()
+    return render(request, 'admin_list_offers.html', {'products': products})
+
+
+def admin_add_offers(request):
+    if request.method == 'POST':
+        id = request.POST.get('product_id')
+        offer_price = request.POST.get('offer_price')
+        print(id)
+        product = Product.objects.get(id=id)
+        product.offer_price = offer_price
+        print(product.offer_price)
+        product.save()
+        return redirect('admin_offers')
+    products = Product.objects.all()
+    return render(request, 'admin_add_offers.html', {'products': products})
+
+
+def admin_delete_offer(request):
+    pass
 
 
 @csrf_exempt

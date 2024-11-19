@@ -35,7 +35,7 @@
             <h2>Order History</h2>
             <div class="order-history-items">
                 {% for order in orders %}
-                    <div class="order-item" onclick="openOrderDetails({{ order.id }})">
+                    <div class="order-item" onclick="openOrderDetails('{{ order.id }}')">
                         <div class="order-details">
                             <h3>Order #{{ order.id }}</h3>
                             <p>Date: {{ order.updated_at.date }}</p>
@@ -127,7 +127,7 @@
                                 <div class="item-info">
                                     <span class="item-name">${item.product.name}</span> 
                                     <span class="item-quantity">Quantity: ${item.quantity}</span> 
-                                    <span class="item-price">Price: $${Number(item.product.price).toFixed(2)}</span>
+                                    <span class="item-price">Price: $${Number(item.product.offer_price).toFixed(2)}</span>
                                     <span class="item-total-price">Total Price: $${Number(item.total_price).toFixed(2)}</span>
                                 </div>
                             </div>
@@ -135,7 +135,8 @@
                     `).join('')}
                 </ul>
                 <div class="order-total-price">
-                    <strong>Total Order Price: $${Number(data.total_price).toFixed(2)}</strong>
+                    <strong>Total Order Price: $${Number(data.total_price).toFixed(2)}</strong><br>
+                    <strong>Total Price After Discount: $${Number(data.discounded_price).toFixed(2)}</strong>
                 </div>
             `;
 

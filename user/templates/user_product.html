@@ -11,6 +11,198 @@
     <link rel="stylesheet" href="{% static 'css/header.css' %}">
     <link rel="stylesheet" href="{% static 'css/product.css' %}">
     <link rel="stylesheet" href="{% static 'css/product2.css' %}">
+    <style>
+        .product-hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            background-color: #fff;
+        }
+
+        .image-gallery {
+            position: relative;
+            height: calc(100vh - 4rem);
+        }
+
+        .main-image-container {
+            height: 80%;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .thumbnail-section {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            height: 15%;
+        }
+
+        .thumbnail {
+            width: calc(20% - 0.8rem);
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .thumbnail:hover {
+            opacity: 0.8;
+        }
+
+        .product-details {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .add-to-cart {
+            background-color: #050505;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            margin: 1rem 0;
+        }
+
+        .add-to-cart:hover {
+            background-color: #202020;
+        }
+
+        .add-to-cart:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .unit {
+            font-size: 0.9rem;
+            color: #666;
+            margin-left: 0.25rem;
+        }
+
+        .feature-name {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .options {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+
+        .option:hover {
+            color: #333;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 2;
+            transition: background-color 0.3s ease;
+        }
+
+        .left-arrow {
+            left: 1rem;
+        }
+
+        .right-arrow {
+            right: 1rem;
+        }
+
+        .arrow:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        @media (max-width: 992px) {
+            .product-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .image-gallery {
+                height: auto;
+            }
+
+            .main-image-container {
+                height: 50vh;
+            }
+        }
+        .availability{
+            color: #ff4d4d;
+        }
+    </style>
 </head>
 <body>
     {% include 'partials/error_pop_up.html' %}
@@ -50,14 +242,14 @@
                 <div class="header-nav d-none d-lg-flex justify-content-around align-items-center py-3 px-5 w-90">
                     <nav class="left-nav d-flex gap-5">
                         <div class="nav-item">
-                            <form action="/#product-list" method="GET">
+                            <form action="/user_list_product_catogory" method="GET">
                                 <input name="gender_filter" type="hidden" value="men">
                                 <button type="submit">For Him</button>
                             </form>
                             <span class="oblong" {% if request.GET.gender_filter == 'men' %}id="oblong"{% endif %} ></span>
                         </div>
                         <div class="nav-item">
-                            <form action="/#product-list" method="GET">
+                            <form action="/user_list_product_catogory" method="GET">
                                 <input name="gender_filter" type="hidden" value="women">
                                 <button type="submit">For Her</button>
                             </form>
@@ -114,87 +306,75 @@
                 </div>
             </div>
         </div>
-        </header>
-        <div class="section-2">
-            <div class="section-2-img">
-                <div class="section-2-img-container">
-                    <img src="{{ product.image1.url }}" alt="image">
-                </div>
+    </header>
+    <!-- New Product Hero Section -->
+    <section class="product-hero">
+        <div class="image-gallery">
+            <div class="main-image-container">
+                <button class="arrow left-arrow" onclick="changeImage('left')">&#9664;</button>
+                <img src="{{ product.image.url }}" alt="Product Image" class="main-image">
+                <button class="arrow right-arrow" onclick="changeImage('right')">&#9654;</button>
             </div>
-            <div class="section-2-desc">
-                <div class="desc-text-container">
-                    <h2>{{product.description1header}}</h2>
-                    <p>{{product.description1}}</p>
-                </div>
-                <p>{{product.description2}}</p>
+            <div class="thumbnail-section">
+                <img src="{{ product.image.url }}" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('{{ product.image.url }}')">
+                <img src="{{ product.image1.url }}" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('{{ product.image1.url }}')">
+                <img src="{{ product.image2.url }}" alt="Thumbnail 3" class="thumbnail" onclick="changeImage('{{ product.image2.url }}')">
+                <img src="{{ product.image3.url }}" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('{{ product.image3.url }}')">
+                <img src="{{ product.collection.image.url }}" alt="Thumbnail 5" class="thumbnail" onclick="changeImage('{{ product.collection.image.url }}')">
             </div>
         </div>
-        <div class="section-3">
-            <div class="section-3-button-container">
-                <button onclick="openPopup()">Open Product View</button>
+
+        <div class="product-details">
+            <h1 class="product-name">The {{ product.collection.brand.name }} {{ product.collection.name }} {{ product.name }}</h1>
+            
+            {% if product.offer_price != 0 %}
+                <p style="font-size: 14px; color: #45a049;" class="price">Original Price: $ {{ product.price }}</p>
+                <p class="price">Offer Price: $ {{ product.offer_price }}</p>
+            {% else %}
+                <p class="price">$ {{ product.price }}</p>
+            {% endif %}
+            
+            <div class="text-center">
+                {% if product.stock|add:0 > 0 and product.is_listed and product.collection.is_listed and product.collection.brand.is_listed %}
+                    <form method="POST" action="{% url 'user_add_to_cart' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <button class="add-to-cart" type="submit">Add To Cart</button>
+                    </form>
+                {% else %}
+                    <button class="add-to-cart" onclick="notifyMeWhenAvailable()" disabled>Notify Me When Available</button>
+                {% endif %}
+                
+                {% if product.is_listed is False or product.collection.is_listed is False or product.collection.brand.is_listed is False %}
+                <p class="availability">Currently Unavailable</p>
+                {% elif product.stock <= 0 %}
+                    <p class="availability">Out Of Stock</p>
+                {% elif product.stock <= 15 %}
+                    <p class="availability">Only {{ product.stock }} Left</p>
+                {% endif %}
             </div>
-            <img src="{{ product.image2.url }}" alt="{{ product.name }}">
-        </div>
-        <!-- Product View Pop UP -->
-        <div class="overlay" id="overlay" style="display: none;"></div>
-        <div style="background-color: white; display: none; backdrop-filter: none;" class="popup" id="popup">
-            <div class="popup-header">
-                <span class="close-btn" onclick="closePopup()">×</span>
-            </div>
-            <div class="product-view">
-                <div class="image-section">
-                    <div class="main-image-container">
-                        <button class="arrow left-arrow" onclick="changeImage('left')">&#9664;</button>
-                        <img src="{{ product.image.url }}" alt="Product Image" class="main-image">
-                        <button class="arrow right-arrow" onclick="changeImage('right')">&#9654;</button>
-                    </div>                
-                    <div class="thumbnail-section">
-                        <img src="{{ product.image.url }}" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('{{ product.image.url }}')">
-                        <img src="{{ product.image1.url }}" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('{{ product.image1.url }}')">
-                        <img src="{{ product.image2.url }}" alt="Thumbnail 3" class="thumbnail" onclick="changeImage('{{ product.image2.url }}')">
-                        <img src="{{ product.image3.url }}" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('{{ product.image3.url }}')">
-                        <img src="{{ product.collection.image.url }}" alt="Thumbnail 5" class="thumbnail" onclick="changeImage('{{ product.collection.image.url }}')">
-                    </div>                                 
+
+            <div class="options">
+                <div class="option">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-9.19-.73L12 2 11.18 8.51 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
+                    <form method="POST" action="{% url 'user_add_to_wishlist' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <button style="border: none; background-color: transparent;" type="submit" class="btn btn-sm">
+                            <span class="option">Add to Wishlist</span>
+                        </button>
+                    </form>
                 </div>
-                <div class="details-section">
-                    <h1 class="product-name">The {{ product.collection.brand.name }} {{ product.collection.name }} {{ product.name }}</h1>
-                    <p class="price">{{ product.price }}</p>
-                    
-                    {% if product.is_listed is False or product.collection.is_listed is False or product.collection.brand.is_listed is False %}
-                    <p style="font-size: 14px;" class="price">Currently Unavailable</p>
-                    {% elif product.stock <= 0 %}
-                    <p style="font-size: 14px;" class="price">Out Of Stock</p>
-                    {% elif product.stock <= 15 %}
-                    <p style="font-size: 14px;" class="price">Only {{ product.stock }} Left</p>
-                    {% endif %}
-                    
-                    <div style="width: 100%; display: flex; justify-content: center;">
-                        {% if product.stock|add:0 > 0 and product.is_listed and product.collection.is_listed and product.collection.brand.is_listed %}
-                            <form method="POST" action="{% url 'user_add_to_cart' %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="product_id" value="{{ product.id }}">
-                                <button class="add-to-cart" type="submit">Add To Cart</button>
-                            </form>
-                        {% else %}
-                            <button class="add-to-cart" onclick="notifyMeWhenAvailable()" disabled>Notify Me When Available</button>
-                        {% endif %}
-                    </div>                        
-                    <div class="options">
-                        <div class="option">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-9.19-.73L12 2 11.18 8.51 2 9.24l5.46 4.73L5.82 21z"/>
-                            </svg>
-                            <span>Add to Wishlist</span>
-                        </div>
-                        <div class="option">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path d="M4 8h16v2H4zm0 4h10v2H4z"/>
-                            </svg>
-                            <span>Find In Store</span>
-                        </div>
-                    </div>
+                <div class="option">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M4 8h16v2H4zm0 4h10v2H4z"/>
+                    </svg>
+                    <span>Find In Store</span>
                 </div>
             </div>
+
             <div class="features">
                 <div class="feature">
                     <div class="feature-value">
@@ -226,8 +406,23 @@
                 </div>
             </div>
         </div>
-        <script>
-            const images = [
+    </section>
+    <div class="section-2">
+        <div class="section-2-img">
+            <div class="section-2-img-container">
+                <img src="{{ product.image1.url }}" alt="image">
+            </div>
+        </div>
+        <div class="section-2-desc">
+            <div class="desc-text-container">
+                <h2>{{product.description1header}}</h2>
+                <p>{{product.description1}}</p>
+            </div>
+            <p>{{product.description2}}</p>
+        </div>
+    </div>
+    <script>
+        const images = [
             '{{ product.image.url }}',
             '{{ product.image1.url }}',
             '{{ product.image2.url }}',
@@ -235,97 +430,67 @@
             '{{ product.collection.image.url }}'
         ];
         
-        let currentIndex = 0; // Track the currently displayed image
-        let zoomDisabled = false; // To manage zoom state
-        
-        function openPopup() {
-            document.getElementById('popup').style.display = 'flex';
-            document.getElementById('overlay').style.display = 'flex';
-        }
-        
-        function closePopup() {
-            document.getElementById('popup').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-        }
+        let currentIndex = 0;
+        let zoomDisabled = false;
         
         function changeImage(directionOrSrc) {
             const mainImage = document.querySelector('.main-image');
-        
-            // Reset zoom whenever the image is changed
             resetZoom(mainImage);
-        
-            // Handle if a thumbnail is clicked (image source is passed)
-            console.log(directionOrSrc)
+            
             if (typeof directionOrSrc === 'string' && directionOrSrc.includes('media')) {
-                mainImage.src = `${directionOrSrc}?${new Date().getTime()}`; // Force reload
-                currentIndex = images.indexOf(directionOrSrc); // Update currentIndex
+                mainImage.src = `${directionOrSrc}?${new Date().getTime()}`;
+                currentIndex = images.indexOf(directionOrSrc);
             } else if (directionOrSrc === 'left') {
                 currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
-                mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`; // Force reload
+                mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`;
             } else if (directionOrSrc === 'right') {
                 currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
-                mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`; // Force reload
+                mainImage.src = `${images[currentIndex]}?${new Date().getTime()}`;
             }
         }
         
-        function addToCart() {
-            alert('Product added to cart!');
-        }
-        function notifyMeWhenAvailable() {
-            alert('You\'ll get notified when the product is available');
-        }            
         function resetZoom(mainImage) {
-            // Reset zoom effect
             mainImage.style.transform = 'scale(1)';
         }
         
-        // Zoom effect for the main image
         const mainImageContainer = document.querySelector('.main-image-container');
         const mainImage = document.querySelector('.main-image');
         
-        mainImageContainer.addEventListener('mousemove', function (e) {
-            if (zoomDisabled) return; // Stop zooming if the zoom is disabled
-        
+        mainImageContainer.addEventListener('mousemove', function(e) {
+            if (zoomDisabled) return;
+            
             const { width, height } = this.getBoundingClientRect();
             const x = e.clientX - this.getBoundingClientRect().left;
             const y = e.clientY - this.getBoundingClientRect().top;
-        
+            
             const percentX = (x / width) * 100;
             const percentY = (y / height) * 100;
-        
+            
             mainImage.style.transformOrigin = `${percentX}% ${percentY}%`;
-            mainImage.style.transform = 'scale(1.5)'; // Set zoom level
+            mainImage.style.transform = 'scale(1.5)';
         });
         
-        mainImageContainer.addEventListener('mouseleave', function () {
-            mainImage.style.transform = 'scale(1)'; // Reset zoom on mouse leave
+        mainImageContainer.addEventListener('mouseleave', function() {
+            mainImage.style.transform = 'scale(1)';
         });
         
-        // Disable zoom when hovering over the arrows
-        const leftArrow = document.querySelector('.left-arrow');
-        const rightArrow = document.querySelector('.right-arrow');
-        
-        leftArrow.addEventListener('mouseenter', () => {
-            zoomDisabled = true; // Disable zoom while hovering over the arrow
-            resetZoom(mainImage); // Reset zoom on hover
+        const arrows = document.querySelectorAll('.arrow');
+        arrows.forEach(arrow => {
+            arrow.addEventListener('mouseenter', () => {
+                zoomDisabled = true;
+                resetZoom(mainImage);
+            });
+            
+            arrow.addEventListener('mouseleave', () => {
+                zoomDisabled = false;
+            });
         });
-        
-        rightArrow.addEventListener('mouseenter', () => {
-            zoomDisabled = true; // Disable zoom while hovering over the arrow
-            resetZoom(mainImage); // Reset zoom on hover
-        });
-        
-        // Re-enable zoom after leaving the arrows
-        leftArrow.addEventListener('mouseleave', () => {
-            zoomDisabled = false;
-        });
-        
-        rightArrow.addEventListener('mouseleave', () => {
-            zoomDisabled = false;
-        });
-        
-        
-        </script>
+
+        function notifyMeWhenAvailable() {
+            alert('You\'ll get notified when the product is available');
+        }
+    </script>
     <script src="{% static 'js/body.js' %}"></script>
 </body>
+{% include 'partials/footer.html' %}
 </html>

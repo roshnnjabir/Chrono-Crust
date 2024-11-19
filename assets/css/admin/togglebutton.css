@@ -1,0 +1,37 @@
+/* Button styles */
+#theme-toggle {
+display: flex;
+align-items: center;
+background-color: transparent; /* Remove default button background */
+border: none; /* Remove border */
+cursor: pointer; /* Show pointer cursor on hover */
+margin-bottom: 10px;
+}
+/* SVG Styling */
+svg {
+  width: 24px; /* Set width */
+  height: 24px; /* Set height */
+  fill: currentColor; /* Use current color */
+  transition: opacity 0.3s ease; /* Smooth transition */
+}
+/* Show the correct SVG based on the theme */
+.dark-theme #sun-icon {
+    display: block;
+}
+.dark-theme #moon-icon {
+    display: none;
+}
+#sun-icon {
+    display: none;
+}
+p#sun-icon{
+    color: #ffffff;
+    padding-left: 5px;
+}
+#moon-icon {
+    display: block;
+}
+p#moon-icon {
+    color: #050505;
+    padding-right: 5px;
+}

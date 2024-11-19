@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 import random, time
 import json
+import uuid
 from django.db import transaction
 from django.views.decorators.cache import never_cache
 from django.core.exceptions import ValidationError
@@ -29,18 +30,35 @@ def user_home(request):
     products = Product.objects.filter(
         Q(is_listed=True),
         Q(collection__is_listed=True),
-        Q(collection__brand__is_listed=True)
+        Q(collection__brand__is_listed=True),
+        Q(for_men=True) | Q(for_women=True)
     )
 
-    gender_filter = request.GET.get('gender_filter')
+    product_slider = Product_Slider.objects.all()
 
-    if gender_filter:
-        if gender_filter == 'men':
-            products = Product.objects.filter(Q(for_men=True))
-        elif gender_filter == 'women':
-            products = Product.objects.filter(Q(for_women=True))
-        elif gender_filter == 'unisex':
-            products = Product.objects.filter(Q(for_women=True), Q(for_men=True))
+    return render(request, 'user_home.html', {
+        'products': products,
+        'product_slider': product_slider,
+    })
+
+
+def user_list_product(request):
+    products = Product.objects.filter(
+        Q(is_listed=True),
+        Q(collection__is_listed=True),
+        Q(collection__brand__is_listed=True),
+        Q(for_men=True) | Q(for_women=True)
+    )
+    return render(request, 'user_list_product.html', {'products': products})
+
+
+def user_list_product_catogory(request):
+    products = Product.objects.filter(
+        Q(is_listed=True),
+        Q(collection__is_listed=True),
+        Q(collection__brand__is_listed=True),
+        Q(for_men=True) | Q(for_women=True)
+    )
 
     # Handle sorting
     sort_option = request.GET.get('sort')
@@ -57,14 +75,97 @@ def user_home(request):
     elif sort_option == 'popularity':
         products = products.order_by('-popularity')  # Assuming you have a popularity field
 
-    product_slider = Product_Slider.objects.all()
+    gender_filter = request.GET.get('gender_filter')
 
-    return render(request, 'user_home.html', {
-        'products': products,
-        'product_slider': product_slider,
-    })
+    if gender_filter:
+        if gender_filter == 'men':
+            products = Product.objects.filter(
+                Q(for_men=True),
+                Q(for_women=False),
+                Q(is_listed=True),
+                Q(collection__is_listed=True),
+                Q(collection__brand__is_listed=True)
+            )
+        elif gender_filter == 'women':
+            products = Product.objects.filter(
+                Q(for_women=True),
+                Q(for_men=False),
+                Q(is_listed=True),
+                Q(collection__is_listed=True),
+                Q(collection__brand__is_listed=True)
+            )
+        elif gender_filter == 'unisex':
+            products = Product.objects.filter(
+                Q(for_women=True),
+                Q(for_men=True),
+                Q(is_listed=True),
+                Q(collection__is_listed=True),
+                Q(collection__brand__is_listed=True)
+            )
+    return render(request, 'user_list_product_catogory.html', {'products': products})
 
 
+def user_list_brand(request):
+    brands = Brand.objects.filter(
+        Q(is_listed=True)
+    )
+    return render(request, 'user_list_brands.html', {'brands': brands})
+
+
+def user_list_product_catogory(request):
+    products = Product.objects.filter(
+        Q(is_listed=True),
+        Q(collection__is_listed=True),
+        Q(collection__brand__is_listed=True),
+        Q(for_men=True) | Q(for_women=True)
+    )
+
+    # Handle sorting
+    sort_option = request.GET.get('sort')
+    if sort_option == 'name_asc':
+        products = products.order_by('name')  # A-Z
+    elif sort_option == 'name_desc':
+        products = products.order_by('-name')  # Z-A
+    elif sort_option == 'price_asc':
+        products = products.order_by('price')  # Low to High
+    elif sort_option == 'price_desc':
+        products = products.order_by('-price')  # High to Low
+    elif sort_option == 'newest':
+        products = products.order_by('-created_at')  # Newest first
+    elif sort_option == 'popularity':
+        products = products.order_by('-popularity')  # Assuming you have a popularity field
+
+    gender_filter = request.GET.get('gender_filter')
+
+    if gender_filter:
+        if gender_filter == 'men':
+            products = Product.objects.filter(
+                Q(for_men=True),
+                Q(for_women=False),
+                Q(is_listed=True),
+                Q(collection__is_listed=True),
+                Q(collection__brand__is_listed=True)
+            )
+        elif gender_filter == 'women':
+            products = Product.objects.filter(
+                Q(for_women=True),
+                Q(for_men=False),
+                Q(is_listed=True),
+                Q(collection__is_listed=True),
+                Q(collection__brand__is_listed=True)
+            )
+        elif gender_filter == 'unisex':
+            products = Product.objects.filter(
+                Q(for_women=True),
+                Q(for_men=True),
+                Q(is_listed=True),
+                Q(collection__is_listed=True),
+                Q(collection__brand__is_listed=True)
+            )
+    return render(request, 'user_list_product_catogory.html', {'products': products})
+
+
+@never_cache
 def user_login(request):
     if request.user.is_authenticated:
         return redirect('user_profile')
@@ -76,19 +177,7 @@ def user_login(request):
         if CustomUser.objects.filter(email=email).exists():
             user = authenticate(request, email=email, password=password)
             if user is not None:
-                if user.is_staff:
-                    login(request, user)
-                    return redirect('user_profile')
-
-                otp = generate_otp()
-                send_otp_via_email(email, otp)
-
-                # Store the OTP and timestamp in session
-                request.session['email'] = email
-                request.session['password'] = password
-                request.session['otp'] = otp
-                request.session['otp_timestamp'] = timezone.now().isoformat()
-                messages.success(request, 'Otp Sent Successfully')
+                login(request, user)
                 return redirect('otp_page')
             else:
                 messages.error(request, "Password Wrong")
@@ -98,6 +187,7 @@ def user_login(request):
     return render(request, 'user_login.html')
 
 
+@never_cache
 def user_signup(request):
     if request.user.is_authenticated:
         return redirect('user_profile')
@@ -140,6 +230,7 @@ def user_signup(request):
     return render(request, 'user_signup.html')
 
 
+@never_cache
 def user_forgot_password(request):
     if request.method == "POST":
         email = request.POST['email']
@@ -156,10 +247,17 @@ def user_forgot_password(request):
         else:
             messages.error(request, 'Email Does Not Exist')
             return redirect('user_forgot_password')
-    return render(request, 'user_forgot_password.html')
+    try:
+        user = CustomUser.objects.get(email=request.user)
+        return render(request, 'user_forgot_password.html', {'user': user})
+    except CustomUser.DoesNotExist:
+        return render(request, 'user_forgot_password.html')
 
 
+@never_cache
 def user_reset_password(request):
+    if request.user.is_authenticated:
+        return redirect('user_profile')
     if request.method == "POST":
         email = request.POST.get('email') or request.session.get('reset_email')
         password = request.POST.get('password')
@@ -242,7 +340,6 @@ def resend_otp(request):
             send_otp_via_email(email=email, otp=otp)
             messages.success(request, 'Otp Resent Successfully')
         else:
-            print('uep')
             messages.error(request, 'Email Does Not Exist')
             return redirect('user_profile')
     else:
@@ -424,8 +521,7 @@ def add_user_address(request):
         country = request.POST.get('country')
         postal_code = request.POST.get('postal_code')
         phone = request.POST.get('phone')
-        is_default = request.POST.get('is_default') == 'on'  # Convert checkbox to boolean
-
+        is_default = request.POST.get('is_default') == 'on'  # Convert checkbox to boolean by using == 'on'
         # Validate the phone number (must be exactly 10 digits)
         if not phone.isdigit() or len(phone) != 10:
             messages.error(request, "Phone number must be exactly 10 digits.")
@@ -433,7 +529,7 @@ def add_user_address(request):
 
         # Create the Address instance
         address = Address(
-            user=request.user,  # Set the current user
+            user=request.user,  # set current logged in user
             building_name=building_name,
             landmark=landmark,
             city=city,
@@ -446,11 +542,11 @@ def add_user_address(request):
         )
 
         try:
-            address.save()  # Try to save the address
+            address.save()  # saving the address
             messages.success(request, "Address created successfully!")
             return redirect('user_address_book')
         except ValidationError as e:
-            messages.error(request, str(e))  # Handle validation errors and display messages
+            messages.error(request, str(e))  # error mesage
 
     return render(request, 'user_profile_addresses.html')
 
@@ -499,6 +595,7 @@ def user_cart_view(request):
 
 
 @csrf_exempt
+@never_cache
 @login_required(login_url='user_login')
 @require_POST
 def update_cart_item_quantity_ajax(request):
@@ -532,19 +629,16 @@ def update_cart_item_quantity_ajax(request):
             'quantity': cart_item.quantity,
             'item_total_price': f"{item_total_price:.3f}",
             'total_price': f"{cart_total_price:.3f}",
-            'price': f"{cart_item.product.price:.3f}"
+            'price': f"{cart_item.product.offer_price:.3f}"
         }
 
         return JsonResponse({"status": "success", 'cart_item': response_data})
 
     except ValueError:
-        print("Product not found.")
         return JsonResponse({"status": "error", "message": "Invalid quantity."})
     except Product.DoesNotExist:
-        print("Product not found.")
         return JsonResponse({"status": "error", "message": 'Product does not exist'})
     except CartItem.DoesNotExist:
-        print("Product not found.")
         return JsonResponse({"status": "error", "message": "Item not found in cart."})
     except Exception as e:
         # Log the exception and return a generic error
@@ -552,6 +646,7 @@ def update_cart_item_quantity_ajax(request):
         return JsonResponse({"status": "error", "message": "An error occurred. Please try again."})
 
 
+@never_cache
 def remove_from_cart(request, item_id):
     if request.method == 'POST':
         cart = Cart.objects.get(user=request.user)
@@ -578,6 +673,7 @@ def user_wishlist_view(request):
     return HttpResponse('shajh')
 
 
+@never_cache
 def user_move_to_cart(request):
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
@@ -638,8 +734,7 @@ def user_add_to_wishlist(request):
         else:
             WishlistItem.objects.create(wishlist=wishlist, product=product)
             messages.success(request, 'Product added to your wishlist.')
-
-        return redirect(request.META.get('HTTP_REFERER', '/'))  # Redirect back to the previous page
+            return redirect('user_wishlist_view')
     else:
         messages.error(request, 'You need to be logged in to add items to your wishlist.')
         return redirect('user_profile')  # Redirect to the user profile or login page
@@ -667,20 +762,22 @@ def user_move_to_wishlist(request, item_id):
     return redirect('user_cart_view')
 
 
+def generate_order_id():
+    return f"order_{uuid.uuid4().hex[:10]}"  # First 10 characters of the UUID
+
+
 @csrf_exempt  # Only use in development; make sure CSRF protection is in place for deployment
 def user_move_to_order(request):
-    print('move to order')
-    
     if request.method == 'POST':
         if request.headers.get('Content-Type') == 'application/json':
             # Handle Razorpay payment confirmation
             data = json.loads(request.body)
             payment_id = data.get('payment_id')
-            total_amount = data.get('amount')
+            discounted_amount = request.session.get('discount')
             order_id = data.get('order_id')
 
             # Debug: Check what data is coming in
-            print(f"Payment ID: {payment_id}, Total Amount: {total_amount}, Order ID: {order_id}")
+            print(f"Payment ID: {payment_id}, Discounted Total Amount: {discounted_amount}, Order ID: {order_id}")
 
             try:
                 # Try to get the order by the provided order_id
@@ -689,7 +786,7 @@ def user_move_to_order(request):
             except Order.DoesNotExist:
                 # If the order doesn't exist, create a new one
                 print("Order not found, creating a new order.")
-                
+
                 # Handle dynamic order creation if it doesn't exist
                 item_ids = request.session.get('item_ids')
                 selected_address_id = request.session.get('selected_address')
@@ -706,7 +803,8 @@ def user_move_to_order(request):
                     return JsonResponse({'status': 'error', 'message': 'No Address Selected'}, status=400)
 
                 # Create a new order for Razorpay
-                order = Order.objects.create(id=order_id ,user=request.user, address=selected_address, total_amount=total_amount, payment_status='pending')
+                order = Order.objects.create(id=order_id, user=request.user, address=selected_address, discounted_amount=discounted_amount, payment_status='pending')
+                del request.session['discount']
 
                 # Move items from cart to the order table
                 for item_id in item_ids:
@@ -718,7 +816,7 @@ def user_move_to_order(request):
                             order=order,
                             product=cart_item.product,
                             quantity=cart_item.quantity,
-                            price=cart_item.product.price
+                            price=cart_item.product.offer_price
                         )
 
                         # Decrease the stock of the product
@@ -746,11 +844,12 @@ def user_move_to_order(request):
 
             # Respond with success
             return JsonResponse({'status': 'success'})
-
         else:
             # Handle Cash on Delivery request (same logic as before)
             item_ids = request.session.get('item_ids')
             selected_address_id = request.session.get('selected_address')
+            discounted_amount = request.session.get('discount')
+            order_id = generate_order_id()
 
             if not item_ids or not selected_address_id:
                 return JsonResponse({'status': 'error', 'message': 'Incomplete order details.'}, status=400)
@@ -765,19 +864,21 @@ def user_move_to_order(request):
 
             with transaction.atomic():
                 # Create a new order for COD
-                order = Order.objects.create(user=request.user, address=selected_address, payment_status='cod')
-
+                order = Order.objects.create(id=order_id, user=request.user, address=selected_address, payment_status='cod', total_amount=discounted_amount)
+                
                 # Move items from cart to the orders table
                 for item_id in item_ids:
                     try:
                         cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
+                        
+                        product_price = cart_item.product.offer_price # taking the offer price as if, the offer is not set, then the product price will be set
 
                         # Create OrderItem and adjust stock
                         order_item = OrderItem.objects.create(
                             order=order,
                             product=cart_item.product,
                             quantity=cart_item.quantity,
-                            price=cart_item.product.price,
+                            price=product_price,
                         )
 
                         # Decrease the stock of the product
@@ -794,8 +895,7 @@ def user_move_to_order(request):
                     except CartItem.DoesNotExist:
                         continue
 
-                return JsonResponse({'status': 'success', 'message': 'Order placed successfully for Cash on Delivery'})
-
+                return redirect('user_order_history')
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 
@@ -808,6 +908,7 @@ def user_order_history(request):
 
 
 def user_order_details(request, order_id):
+    print(order_id)
     if request.method == 'GET':
         try:
             order = Order.objects.get(id=order_id, user=request.user)
@@ -816,10 +917,10 @@ def user_order_details(request, order_id):
                     'product': {
                         'name': item.product.name,
                         'image_url': item.product.image.url,  # Adjust based on your image field
-                        'price': item.product.price  # Assuming product has a 'price' field
+                        'offer_price': item.product.offer_price  # Assuming product has a 'price' field
                     },
                     'quantity': item.quantity,
-                    'total_price': item.quantity * item.product.price,
+                    'total_price': item.quantity * item.product.offer_price,
                 }
                 for item in order.items.all()
             ]
@@ -836,7 +937,8 @@ def user_order_details(request, order_id):
                     'address': f"{order.address.building_name}, {order.address.city}, {order.address.state}, {order.address.postal_code}, {order.address.country}"
                 },
                 'items': items,
-                'total_price': total_order_price
+                'total_price': total_order_price,
+                'discounded_price': order.discounted_amount
             }
 
             # Add the order status only if the payment status is 'paid'
@@ -890,16 +992,17 @@ def user_cancel_order(request, order_id):
     return redirect('user_order_history')
 
 
-@never_cache
 def address_selection(request):
     if request.method == 'POST':
         item_ids = request.POST.get('item_ids')
         discounted_price = request.POST.get('discounted_price')
 
+        request.session['discount'] = discounted_price
         request.session['item_ids'] = item_ids
 
-    user_addresses = Address.objects.filter(user=request.user, is_listed=True)
-    return render(request, 'checkout/address_selection.html', {'user_addresses': user_addresses})
+        user_addresses = Address.objects.filter(user=request.user, is_listed=True)
+        return render(request, 'checkout/address_selection.html', {'user_addresses': user_addresses})
+    return redirect('user_address_book')
 
 
 razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
@@ -909,25 +1012,15 @@ def user_payment_method_selection(request):
     if request.method == 'POST':
         selected_address_id = request.POST.get('selected_address')
         request.session['selected_address'] = selected_address_id
-        total_amount = 0
 
         item_ids = request.session.get('item_ids')
-        print(type(item_ids))
+        total_amount = request.session.get('discount')
 
         item_ids = item_ids.split(',') if item_ids else []
 
-        for item_id in item_ids:
-            try:
-                cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
-                total_amount += cart_item.quantity * cart_item.product.price
-            except CartItem.DoesNotExist:
-                continue  # Handle the case where the cart item does not exist
-        total_amount = int(total_amount)
-        request.session['total_amount'] = total_amount
-
         client = razorpay.Client(auth=("rzp_test_ogXW1qOaXCrzZG", "xh7Hg2R6cJmhk7p02eCGhtZC"))
-        amount = int(total_amount) * 100
-        print(amount)
+        amount = int(float(total_amount) * 100)
+
         data = {"amount": amount, "currency": "INR"}
         payment = client.order.create(data=data)
         order_id = payment['id']
@@ -943,13 +1036,10 @@ def user_logout(request):
 
 def view_product(request, id):
     product = Product.objects.get(id=id)
-    print(product.is_listed, product.collection.is_listed, product.collection.brand.is_listed, product.stock)
     return render(request, 'user_product.html', {'product': product})
 
 
-from django.http import HttpResponseRedirect, HttpResponse
-
-
+@never_cache
 def user_add_to_cart(request):
     if not request.user.is_authenticated:
         messages.error(request, 'Login Required')

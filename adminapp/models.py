@@ -7,6 +7,9 @@ from django.utils import timezone
 
 class Brand(models.Model):
     name = models.CharField(max_length=50)
+    logo_image = models.ImageField(upload_to='uploads/brands/logo')
+    banner_image = models.ImageField(upload_to='uploads/brands/banner')
+    discription = models.TextField(max_length=50, null=True, blank=True)
     is_listed = models.BooleanField(default=False)
 
     def __str__(self):
@@ -28,7 +31,7 @@ class Product(models.Model):
     name = models.CharField(max_length=50)
 
     price = models.DecimalField(default=0, decimal_places=3, max_digits=9)
-    offer_price = models.DecimalField(null=True, blank=True, decimal_places=3, max_digits=9)
+    offer_price = models.DecimalField(default=0, decimal_places=3, max_digits=9)
 
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, default=1)
 
@@ -59,7 +62,14 @@ class Product(models.Model):
 
     for_men = models.BooleanField(default=True)
     for_women = models.BooleanField(default=True)
-    
+
+    def save(self, *args, **kwargs):  # if no offer price then set the offer price to total price
+        if self.offer_price == 0:
+            self.offer_price = self.price  # set default, i.e offer price to price if there is no offer(i,e offer=0[default])
+
+        # Call the parent class's save method to save the instance to the database
+        super().save(*args, **kwargs)
+
     def get_discounted_price(self):
         now = timezone.now()
         product_offer = Offer.objects.filter(
@@ -127,7 +137,7 @@ class Cart(models.Model):
     @property
     def total_price(self):
         # Calculate the total price by summing product prices times quantities for all items in the cart
-        return self.items.aggregate(total=Sum(F('product__price') * F('quantity')))['total'] or 0.0
+        return self.items.aggregate(total=Sum(F('product__offer_price') * F('quantity')))['total'] or 0.0
 
 
 class CartItem(models.Model):
@@ -141,7 +151,7 @@ class CartItem(models.Model):
     @property
     def total_price(self):
         # Calculate the total price for this cart item
-        return self.product.price * Decimal(self.quantity)
+        return self.product.offer_price * Decimal(self.quantity)
 
 
 class Wishlist(models.Model):
@@ -187,6 +197,14 @@ class Order(models.Model):
     payment_status = models.CharField(max_length=8, choices=PAYMENT_STATUS_CHOICES, default='pending')
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    discounted_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def save(self, *args, **kwargs):
+        # if no discount, the discount price default should be total_amount itself
+        if self.discounted_amount == 0:
+            self.discounted_amount = self.total_amount
+        # calling the save of parent class
+        super().save(*args, **kwargs)
 
     # def calculate_total(self):
     #     total = sum(item.price for item in self.items.all())
@@ -234,9 +252,6 @@ class Coupen(models.Model):
     used_count = models.PositiveIntegerField(default=0)
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
-
-    def is_valid(self):
-        return self.active and self.valid_from <= timezone.now() <= self.valid_to
 
     def __str__(self):
         return self.code

@@ -317,3 +317,88 @@ body {
     font-size: 16px; /* Font size */
     font-weight: bold; /* Bold text */
 }
+
+
+
+
+/* Coupon Section Styles */
+.coupon-section {
+    font-family: 'Nunito', sans-serif;
+    background-color: #f9f9f9; /* Light gray background */
+    padding: 20px;
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+.coupon-section label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333; /* Dark text for readability */
+}
+
+.coupon-section input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.coupon-section input[type="text"]:focus {
+    border-color: #28a745; /* Green border on focus */
+    outline: none;
+}
+
+.apply-coupon-button,
+.remove-coupon-button {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.apply-coupon-button {
+    background-color: #28a745; /* Green background for apply */
+    color: white;
+    margin-right: 8px;
+}
+
+.apply-coupon-button:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: scale(1.05);
+}
+
+.remove-coupon-button {
+    background-color: #dc3545; /* Red background for remove */
+    color: white;
+}
+
+.remove-coupon-button:hover {
+    background-color: #c82333; /* Darker red on hover */
+    transform: scale(1.05);
+}
+
+.coupon-message {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555; /* Neutral text color */
+}
+
+.coupon-message.success {
+    color: #28a745; /* Green for success */
+}
+
+.coupon-message.error {
+    color: #dc3545; /* Red for error */
+}

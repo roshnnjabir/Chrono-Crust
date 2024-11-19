@@ -144,6 +144,22 @@
             background-color: #e04343;
         }
 
+        /* Edit Button Styles */
+        .edit-button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #007bff; /* Blue background for edit */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .main-content {
@@ -176,14 +192,7 @@
         </div>
 
         <div class="main-content">
-            <div class="sidebar">
-                <div class="nav-item">User's Overview</div>
-                <div class="nav-item">Blocked Users</div>
-                <a href="/admin/coupons">
-                    <div class="nav-item selected">Coupon List</div>
-                </a>
-                <div class="nav-item">Settings</div>
-            </div>
+            {% include 'partials/admin_sidebar.html' %}
 
             <div class="admin-container">
                 <h1>Coupons</h1>
@@ -197,6 +206,8 @@
                                 <th>Maximum Discount</th>
                                 <th>Discount Percentage</th>
                                 <th>Status</th>
+                                <th>Valid From</th>
+                                <th>Valid To</th>
                                 <th colspan="3">Action</th>
                             </tr>
                         </thead>
@@ -212,8 +223,14 @@
                                 {% else %}
                                     <td>Inactive</td>
                                 {% endif %}
-                                <!--  -->
+                                <td>{{ coupon.valid_from|date:"d-m-Y" }}</td>
+                                <td>{{ coupen.valid_to|date:"d-m-Y" }}</td>
                                 <td>
+                                    <!-- Edit Button -->
+                                    <a href="{% url 'admin_edit_coupon' coupon.id %}">
+                                        <button class="action-button edit-button">Edit</button>
+                                    </a>
+                                    <!-- Delete Button -->
                                     <a href="{% url 'admin_delete_coupon' coupon.code %}">
                                         <button class="action-button delete-button">Delete</button>
                                     </a>
@@ -224,7 +241,7 @@
                                 <td colspan="7">No coupons found</td>
                             </tr>
                             {% endfor %}
-                        </tbody>
+                        </tbody>                        
                     </table>
                 </div>
 

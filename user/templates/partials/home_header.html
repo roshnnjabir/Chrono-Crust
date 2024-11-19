@@ -40,21 +40,21 @@
         <div class="header-nav d-none d-lg-flex justify-content-between align-items-center py-3 px-5">
             <nav class="left-nav d-flex gap-5">
                 <div class="nav-item">
-                    <form action="/#product-list" method="GET">
+                    <form action="/user_list_product_catogory" method="GET">
                         <input name="gender_filter" type="hidden" value="men">
                         <button type="submit">For Men</button>
                     </form>
                     <span class="oblong" {% if request.GET.gender_filter == 'men' %}id="oblong"{% endif %} ></span>
                 </div>
                 <div class="nav-item">
-                    <form action="/#product-list" method="GET">
+                    <form action="/user_list_product_catogory" method="GET">
                         <input name="gender_filter" type="hidden" value="women">
                         <button type="submit">For Women</button>
                     </form>
                     <span class="oblong" {% if request.GET.gender_filter == 'women' %}id="oblong"{% endif %} ></span>
                 </div>
                 <div class="nav-item">
-                    <form action="/#product-list" method="GET">
+                    <form action="/user_list_product_catogory" method="GET">
                         <input name="gender_filter" type="hidden" value="unisex">
                         <button type="submit">Unisex</button>
                     </form>
@@ -63,15 +63,15 @@
             </nav>
             <nav class="right-nav d-flex gap-5">
                 <div class="nav-item">
-                    <a href="#">Brands</a>
+                    <a href="/user_list_brand">Brands</a>
                     <span class="oblong"></span>
                 </div>
                 <div class="nav-item">
-                    <a href="#">Boutiques</a>
+                    <a href="/user_list_product_catogory">Boutiques</a>
                     <span class="oblong"></span>
                 </div>
                 <div class="nav-item">
-                    <a href="#">Collections</a>
+                    <a href="/user_list_product_catogory">Collections</a>
                     <span class="oblong"></span>
                 </div>
             </nav>
@@ -79,7 +79,7 @@
 
         <!-- Logo in the center -->
         <div class="header-logo position-absolute top-50 start-50 translate-middle" id="logo">
-            <a href="/#product-list" title="All Products"><img src="{% static 'images/logo.png' %}" alt="ChronoCrest Logo" width="100%" height="100%"></a>
+            <a href="/user_list_product" title="All Products"><img src="{% static 'images/logo.png' %}" alt="ChronoCrest Logo" width="100%" height="100%"></a>
         </div>
 
         <!-- Hamburger Menu for smaller screens -->

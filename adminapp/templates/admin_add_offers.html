@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Offer</title>
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css"> <!-- Cropper.js CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/admin/togglebutton.css' %}">
+    <style>
+        /* Default Styles */
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fc; /* Light background */
+            color: #333; /* Light text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 700px;
+            padding: 30px;
+            background-color: #ffffff; /* Light container background */
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        label {
+            font-size: 14px;
+            color: #666; /* Light label color */
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 8px 0px;
+            padding-left: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #f9f9f9; /* Light input background */
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #80bdff;
+            outline: none;
+        }
+
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .messages li {
+            padding: 10px;
+            background-color: #ffefef;
+            border-left: 4px solid #ff4d4d;
+            margin-bottom: 10px;
+        }
+
+        .action-button,
+        .save-button {
+            font-family: 'Nunito',sans-serif;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background-color: #28a745; /* Light button background */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .action-button:hover,
+        .save-button:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+
+        /* Dark Theme Styles */
+        .dark-theme {
+            background-color: #181818; /* Dark background */
+            color: #f0f0f0; /* Light text color for dark theme */
+        }
+
+        .dark-theme .container {
+            background-color: #242424; /* Dark container background */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); /* Darker shadow */
+        }
+
+        .dark-theme label {
+            color: #b0b0b0; /* Lighter label color */
+        }
+
+        .dark-theme input[type="text"],
+        .dark-theme input[type="number"],
+        .dark-theme select {
+            background-color: #333; /* Dark input background */
+            border: 1px solid #555; /* Dark border */
+            color: #fff; /* Light text color for inputs */
+        }
+
+        .dark-theme input[type="text"]:focus,
+        .dark-theme input[type="number"]:focus,
+        .dark-theme select:focus {
+            border-color: #80bdff; /* Focus border color */
+        }
+
+        .dark-theme .messages li {
+            background-color: #4d4d4d; /* Darker background for messages */
+            border-left: 4px solid #ff4d4d; /* Keep the same warning color */
+        }
+
+        .dark-theme .action-button,
+        .dark-theme .save-button {
+            background-color: #28a745; /* Button background in dark theme */
+        }
+
+        .dark-theme .action-button:hover,
+        .dark-theme .save-button:hover {
+            background-color: #218838; /* Darker green on hover in dark theme */
+        }
+
+        .breadcrumbs {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #888; /* Breadcrumb text color */
+        }
+
+        a {
+            text-decoration: none;
+            color: #050505; /* Link color */
+        }
+
+        .dark-theme a,.dark-theme h2 {
+            color: #f0f0f0; /* Light link color in dark theme */
+        }
+
+        .price-info {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body class="dark-theme"> <!-- Add dark-theme class for dark mode -->
+    <div class="breadcrumbs">
+        <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/offers">List Offers </a> / <span>Add Offer </span>
+    </div>
+    <div class="container">
+        <h2>Add Or Edit An Offer</h2>
+        <form id="edit-form" action="{% url 'admin_add_offer' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Product Selection -->
+            <label for="product">Select Product</label>
+            <select id="product" name="product_id" required>
+                <option value="" disabled selected>Select a product</option>
+                {% for product in products %}
+                    <option value="{{ product.id }}" data-price="{{ product.price }}" data-offer-price="{{ product.offer_price }}">{{ product.name }}</option>
+                {% endfor %}
+            </select>
+            
+            <!-- Display Actual Price -->
+            <div id="actual-price" class="price-info">Actual Price: $0.00</div>
+            <div id="current-offer-price" class="price-info">Current Offer Price: $0.00</div>
+
+            <!-- Offer Price Input -->
+            <label for="offer-price">Offer Price</label>
+            <input type="number" id="offer-price" name="offer_price" required placeholder="Enter offer price">
+
+            <button type="submit" class="save-button">Add Offer</button>
+        </form>
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li style="list-style: none;">
+                {% if message.tags %}Warning:{% endif %}{{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+    <script>
+        // JavaScript to update the actual price and offer price when a product is selected
+        document.getElementById('product').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const actualPrice = selectedOption.getAttribute('data-price');
+            const currentOfferPrice = selectedOption.getAttribute('data-offer-price');
+            document.getElementById('actual-price').textContent = `Actual Price: $${parseFloat(actualPrice).toFixed(2)}`;
+            document.getElementById('current-offer-price').textContent = `Current Offer Price: $${parseFloat(currentOfferPrice).toFixed(2)}`;
+        });
+    
+        // Form submission validation
+        document.getElementById('edit-form').addEventListener('submit', function(event) {
+            const selectedOption = document.getElementById('product').selectedOptions[0];
+            const actualPrice = parseFloat(selectedOption.getAttribute('data-price'));
+            const offerPrice = parseFloat(document.getElementById('offer-price').value);
+            
+            if (offerPrice > actualPrice) {
+                alert("Offer price cannot be greater than the actual price.");
+                event.preventDefault();  // Prevent form submission
+            }
+        });
+    </script>    
+</body>
+
+</html>

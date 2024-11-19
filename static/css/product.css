@@ -21,7 +21,7 @@ button {
 .card {
     position: relative;
     width: 150px;
-    max-height: 250px !important;
+    max-height: 300px !important;
     margin: 10px;
     overflow: hidden;
     border-radius: 15px;
@@ -122,11 +122,21 @@ button {
     position: relative;
     z-index: 4;
 }
+h2.name{
+    margin-bottom: 1rem;
+}
 
 .name {
     font-size: 1.0rem;
-    margin: 0;
     line-height: 1.2;
+    margin: 0;
+}
+p.name{
+    margin: 5px 0px;
+}
+.price{
+    width: 100%;
+    float: left;
 }
 
 .price-wishlist-container {

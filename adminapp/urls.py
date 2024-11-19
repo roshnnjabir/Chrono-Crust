@@ -58,11 +58,14 @@ urlpatterns = [
     # path('admin/coupon_details/<str:code>', views.admin_coupon_details, name="admin_coupon_details"), # commmnted cause no use now, add later
     path('admin/delete_coupon/<str:code>', views.admin_delete_coupon, name="admin_delete_coupon"),
     path('admin/add_coupon/', views.admin_add_coupon, name='admin_add_coupon'),
+    path('admin/edit_coupon/<int:coupon_id>', views.admin_edit_coupon, name='admin_edit_coupon'),
     path('validate-coupon/', views.validate_coupon_ajax, name='validate_coupon_ajax'),
     
     path('admin/sales', views.admin_sales, name='admin_sales'),
     
-    path('admin/offers', views.admin_offers, name='admin_offers'),
+    path('admin/offers', views.admin_list_offers, name='admin_offers'),
+    path('admin/add_offer', views.admin_add_offers, name='admin_add_offer'),
+    path('admin/delet_offer', views.admin_delete_offer, name='admin_delete_offer'),
 
     path('upload_cropped_image/', views.upload_cropped_image, name='upload_cropped_image'),
 ]

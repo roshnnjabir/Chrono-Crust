@@ -502,11 +502,7 @@
         </div>
 
         <div class="main-content">
-            <div class="sidebar">
-                <div class="nav-item selected">Product Overview</div>
-                <div class="nav-item">Unlisted Products</div>
-                <div class="nav-item">Settings</div>
-            </div>
+            {% include 'partials/admin_sidebar.html' %}
 
             <div class="admin-container">
                 <h1>Products</h1>
@@ -532,6 +528,7 @@
                                 <th colspan="2">Brand Name</th>
                                 <th>Stock</th>
                                 <th>Price</th>
+                                <th>Catogory</th>
                                 <th colspan="3">Action</th>
                             </tr>
                         </thead>
@@ -566,6 +563,17 @@
                                 </td>
                                 <td>{{ product.stock }}</td>
                                 <td>${{ product.price }}</td>
+                                <td>
+                                    {% if product.for_men and not product.for_women %}
+                                    Men
+                                    {% elif product.for_women and not product.for_men %}
+                                    Women
+                                    {% elif product.for_women and product.for_men %}
+                                    Unisex
+                                    {% else %}
+                                    Not Specified
+                                    {% endif %}
+                                </td>
                                 <td>
                                     <a href="{% url 'admin_list_unlist_product' product.id %}">
                                         <button class="action-button">

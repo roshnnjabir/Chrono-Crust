@@ -212,12 +212,7 @@
         </div>
 
         <div class="main-content">
-            <div class="sidebar">
-                <div class="nav-item">User's Overview</div>
-                <div class="nav-item">Blocked Users</div>
-                <a href="/admin/orders"><div class="nav-item selected">Order History</div></a>
-                <div class="nav-item">Settings</div>
-            </div>
+            {% include 'partials/admin_sidebar.html' %}
 
             <div class="admin-container">
                 <h1>Orders</h1>
@@ -301,7 +296,7 @@
                                 <td>{{ order.updated_at.date }}</td>
                                 <td>{{ order.total_amount }}</td>
                                 <td>
-                                    <a href="{% url 'admin_order_details' order.id %}">
+                                    <a href="{% url 'admin_order_details' 1 %}">
                                         <button class="action-button show-details-button">Show Details</button>
                                     </a>
                                 </td>

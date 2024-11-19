@@ -27,7 +27,7 @@
 
             <p style="width: 100%; display: flex; justify-content: center;">OR</p>
 
-            <a href="{" class="google-login-btn">
+            <a href="{% provider_login_url 'google' %}?next=/" class="google-login-btn">
                 <img src="{% static 'images/Google_logo.png' %}" alt="Google Logo">
                 <span>Continue with Google</span>
             </a>

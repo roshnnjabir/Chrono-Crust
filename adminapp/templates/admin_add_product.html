@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Product</title>
+    <title>Admin Add Product</title>
     <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -91,6 +91,12 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
+
+        /* Highlight image preview if no image is uploaded */
+        .image-preview-container img[src="#"] {
+            border: 1px solid #ff00003c;  /* Red border if no image is uploaded */
+        }
+
 
         .image-preview-container img:hover {
             transform: scale(1.05);
@@ -278,7 +284,8 @@
             background-color: #3182ce;
         }
         textarea {
-            padding: 12px;
+            padding-top: 12px;
+            padding-left: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
@@ -299,9 +306,13 @@
         .description-help {
             font-size: 12px;
             color: #666;
-            margin-top: -15px;
-            margin-bottom: 15px;
+            margin-top: -20px;
+            margin-bottom: 30px;
             font-style: italic;
+        }
+        .required {
+            color: red;
+            font-weight: bold;
         }
 
         /* Responsive adjustments */
@@ -319,6 +330,9 @@
                 max-height: 50vh;
             }
         }
+        input:invalid, textarea:invalid {
+            border-color: #ff00003c
+        }
     </style>
 </head>
 <body>
@@ -331,11 +345,11 @@
         <form id="edit-form" action="{% url 'admin_add_product' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <label for="product-name">Product Name</label>
+            <label for="product-name">Product Name <span class="required">*</span></label>
             <input type="text" id="edit-product-name" name="productname" required>
 
-            <label for="product-price">Price of Product</label>
-            <input type="number" id="edit-product-price" name="price" min="0" required>
+            <label for="product-price">Price of Product <span class="required">*</span></label>
+            <input type="number" id="edit-product-price" name="price" min="0" maxlength="6" required>
 
             <label for="collection-name">Collection Name</label>
             <select name="collection" id="edit-product-collection" required>
@@ -346,23 +360,23 @@
                 {% endfor %}
             </select>
 
-            <label for="product-stock">Stock</label>
+            <label for="product-stock">Stock  <span class="required">*</span></label>
             <input type="number" id="add-product-stock" name="stock" min="0" required>
 
-            <label for="product-referal-num">Reference Number</label>
+            <label for="product-referal-num">Reference Number <span class="required">*</span></label>
             <input type="text" id="add-reference-number" name="reference_no" min="0" required>
 
             <!-- New Description Fields -->
-            <label for="description">Main Description</label>
-            <textarea id="description" name="description" placeholder="Enter the main product description"></textarea>
+            <label for="description">Main Description  <span class="required">*</span></label>
+            <textarea id="description" name="description" placeholder="Enter the main product description" required></textarea>
             <p class="description-help">Main overview of the product</p>
 
-            <label for="description1">Secondary Description</label>
-            <textarea id="description1" name="description1" placeholder="Enter additional product details"></textarea>
+            <label for="description1">Secondary Description  <span class="required">*</span></label>
+            <textarea id="description1" name="description1" placeholder="Enter additional product details" required></textarea>
             <p class="description-help">Additional details, features, or highlights</p>
 
-            <label for="description2">Detailed Description</label>
-            <textarea id="description2" name="description2" placeholder="Enter detailed product specifications"></textarea>
+            <label for="description2">Detailed Description  <span class="required">*</span></label>
+            <textarea id="description2" name="description2" placeholder="Enter detailed product specifications" required></textarea>
             <p class="description-help">Comprehensive product specifications and technical details</p>
 
             <div class="image-section">
@@ -371,14 +385,19 @@
                     <img id="image1" src="#" alt="Add Image 1 " onclick="chooseImage('image1')">
                     <img id="image2" src="#" alt="Add Image 2" onclick="chooseImage('image2')">
                     <img id="image3" src="#" alt="Add Image 3" onclick="chooseImage('image3')">
+                    <img id="image4" src="#" alt="Add Image 4" onclick="chooseImage('image4')">
                 </div>
             </div>
             
             <input type="hidden" name="image1" id="himage1" value="">
             <input type="hidden" name="image2" id="himage2" value="">
             <input type="hidden" name="image3" id="himage3" value="">
+            <input type="hidden" name="image4" id="himage4" value="">
+
+            <p><span class="required">*</span> Denotes Required Fields</p>
 
             <button type="submit" class="save-button">Add Product</button>
+            <p>Note: The Default Fields Can Be Changed In The Edit Product <br> (Product Will Be Unlisted By Default)</p>
         </form>
     </div>
 
@@ -446,7 +465,7 @@
 
         // Form submission handler
         document.getElementById('edit-form').onsubmit = function() {
-            ['image1', 'image2', 'image3'].forEach(imageId => {
+            ['image1', 'image2', 'image3', 'image4'].forEach(imageId => {
                 const imageSrc = document.getElementById(imageId).src;
                 if (imageSrc && imageSrc !== '#') {
                     const url = new URL(imageSrc);

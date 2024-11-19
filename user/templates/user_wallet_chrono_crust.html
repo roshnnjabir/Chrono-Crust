@@ -82,9 +82,9 @@
                 <a href="{% url 'user_logout' %}">
                     <button class="logout-button">Logout</button>
                 </a>
-                <a>
+                <!-- <a>
                     <button onclick="openModal()" class="change-password">Add Money To Wallet</button>
-                </a>
+                </a> -->
             </div>  
         </div>
     </div>
@@ -105,7 +105,7 @@
             </div>
             <div class="info-layout">
                 <div class="info-label">Amount To Be Added In Dollars:</div>
-                <input id="" type="number" min="0" max="10000" maxlength="5" name="total_amount" placeholder="In USD $" required>
+                <input id="" type="number" min="0" max="10000" maxlength="5" name="total_amount" data-total_amount="{{ total_amount }}" placeholder="In USD $" required>
             </div>
             <input type="hidden" name="Email" id="editEmail" value="{{ user.email }}" required>
             <button id="savechanges" type="submit">Confirm Amount</button>
@@ -113,7 +113,7 @@
     </div>
 </div>
 
-<p id="span" data-total_amount="{{ total_amount }}" data-order_id="{{ order_id }}" data-wallet="{{ wallet }}">{{order_id}}{{wallet}}</p>
+<p id="span" data-order_id="{{ order_id }}" data-wallet="{{ wallet }}">{{order_id}}{{wallet}}</p>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
 let input = document.getElementById('span');

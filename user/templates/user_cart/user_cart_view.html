@@ -34,22 +34,35 @@
 
         <div class="content">
             <h2>My Cart</h2>
-            <div>
+            <div class="select-all-container">
                 <input type="checkbox" id="select-all"> Select All
             </div>
             <div class="cart-items">
                 {% for item in cart_items %}
                     <div class="cart-item" data-item-id="{{ item.id }}">
-                        <input type="checkbox" class="item-select" data-item-id="{{ item.id }}" data-item-total-price="{{ item.total_price }}" data-stock="{{ item.product.stock }}" {% if not item.product.is_listed or not item.product.collection.is_listed or not item.product.collection.brand.is_listed or item.product.stock == 0 %}disabled{% endif %}>
+                        <input type="checkbox" class="item-select"
+                        data-item-id="{{ item.id }}" 
+                        data-item-total-price="{{ item.total_price }}" 
+                        data-stock="{{ item.product.stock }}" 
+                        {% if not item.product.is_listed or not item.product.collection.is_listed or not item.product.collection.brand.is_listed or item.product.stock == 0 %} 
+                            disabled 
+                        {% endif %} 
+                        {% if item.product.stock == 0 %} 
+                            onclick="return false;" 
+                        {% endif %}>                    
                         <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-image">
                         <div class="item-details">
                             <h3>{{ item.product.name }}</h3>
                             <p>{{ item.product.description }}</p>
-                            <div class="item-price">Price: ${{ item.product.price }} x {{ item.quantity }} = ${{ item.total_price }}</div>
+                            <div class="item-price">
+                                {% if item.product.stock > 0 and item.product.is_listed and item.product.collection.is_listed and item.product.collection.brand.is_listed %}
+                                    Price: ${{ item.product.offer_price }} x {{ item.quantity }} = ${{ item.total_price }}
+                                {% endif %}
+                            </div>                            
                             {% if item.product.is_listed is False or item.product.collection.is_listed is False or item.product.collection.brand.is_listed is False %}
-                            <p style="font-size: 14px;" class="price">Currently Unavailable</p>
+                            <p style="font-size: 14px; color: #ff4d4d;" class="price">Currently Unavailable</p>
                             {% elif item.product.stock <= 0 %}
-                            <p style="font-size: 14px;" class="price">Out Of Stock</p>
+                            <p style="font-size: 14px; color: #ff4d4d;" class="price">Out Of Stock</p>
                             {% elif item.product.stock <= 15 %}
                             <p style="font-size: 14px;" class="price">Only {{ item.product.stock }} Left</p>
                             {% else %}
@@ -57,23 +70,25 @@
                             {% endif %}
                         </div>
                         <div class="item-actions">
-                            {% with max_value=item.product.stock %}
-                                {% if max_value >= 8 %}
-                                    <input type="number" 
-                                        value="{{ item.quantity }}" 
-                                        min="1" 
-                                        max="8" 
-                                        class="quantity-input" 
-                                        data-item-id="{{ item.id }}">
-                                {% else %}
-                                    <input type="number" 
-                                        value="{{ item.quantity }}" 
-                                        min="1" 
-                                        max="{{ max_value }}" 
-                                        class="quantity-input" 
-                                        data-item-id="{{ item.id }}">
-                                {% endif %}
-                            {% endwith %}
+                            {% if item.product.stock > 0 and item.product.is_listed and item.product.collection.is_listed and item.product.collection.brand.is_listed %}
+                                {% with max_value=item.product.stock %}
+                                    {% if max_value >= 8 %}
+                                        <input type="number" 
+                                            value="{{ item.quantity }}" 
+                                            min="0" 
+                                            max="8" 
+                                            class="quantity-input"
+                                            data-item-id="{{ item.id }}">
+                                    {% else %}
+                                        <input type="number" 
+                                            value="{{ item.quantity }}" 
+                                            min="0"
+                                            max="{{ max_value }}" 
+                                            class="quantity-input" 
+                                            data-item-id="{{ item.id }}">
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
                             <form method="POST" action="{% url 'user_move_to_wishlist' item.id %}" class="action-form">
                                 {% csrf_token %}
                                 <button type="submit" class="move-to-wishlist-button">Move to Wishlist</button>
@@ -107,7 +122,7 @@
                     </div>
             
                     <!-- This section will take 40% width -->
-                    <div class="summary-details">
+                    <div class="summary-details" id="summary-details">
                         <h3>Total: $<span id="total-price">{{ total_price }}</span></h3>
                         <h4>Selected Total: $<span id="selected-total">0.00</span></h4>
                         <h4>Discount: $<span id="discount">0.00</span></h4>
@@ -137,6 +152,18 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
+        // check if the quantity is out of stock
+        $('.cart-item').each(function(){
+            var quantity = parseInt($(this).data('item-quantity'));
+
+            var $checkbox = $(this).find('.item-select');
+
+            if(quantity <=  0){
+                $checkbox.prop('disabled', true);
+                $checkbox.prop('checked', false)
+            }
+        });
+
         // State management
         const state = {
             couponApplied: false,
@@ -210,7 +237,7 @@
                             const { id, item_total_price, total_price, quantity, price } = response.cart_item;
                             priceManager.updateItemPrice(id, item_total_price, total_price, quantity, price);
                             
-                            // Update data attribute and recalculate if item is selected
+                            // recalculate if item is selected
                             const $itemSelect = $(`.item-select[data-item-id='${id}']`);
                             $itemSelect.data("item-total-price", item_total_price);
                             
@@ -226,6 +253,12 @@
                         alert("An error occurred while updating the quantity.");
                     }
                 });
+
+                // If a coupon is applied, remove it when the quantity is changed
+                if (state.couponApplied) {
+                    couponManager.remove();
+                    alert("Please Note That On Quantity Update Coupon Will Be Removed,However You Can Reapply Coupon")
+                }
             }
         };
     
@@ -269,6 +302,16 @@
                 
                 $("#item_ids").val(selectedIds.join(","));
                 $("#checkout-selected, #checkout-form").toggle(selectedIds.length > 0);
+            },
+    
+            hideSelectAllIfNoItems: function() {
+                // Check if there are any items in the cart
+                if ($(".cart-item").length === 0) {
+                    $(".cart-summary .summary-details h4").hide(); // Hide the prices if cart is empty except the total price
+                    $(".select-all-container").hide(); // Hide select-all container
+                } else {
+                    $(".select-all-container").show(); // Show it if there are items
+                }
             }
         };
     
@@ -277,6 +320,7 @@
             // In the couponManager object, update the apply function:
             apply: function(couponCode) {
                 if (state.couponApplied) {
+                    alert("A coupon is already applied. Please remove it first")
                     $('#coupon-message').text("A coupon is already applied. Please remove it first.");
                     return;
                 }
@@ -321,6 +365,7 @@
                 const originalTotal = state.originalTotal.toFixed(2);
                 $('#selected-total').text(originalTotal);
                 $('#selected-total-after-discount').text(originalTotal);
+                $('#discount').text('0.0');
                 // Update the discounted_price field
                 $('#discounted_price').val(originalTotal);
                 $('#coupon-message').text("Coupon removed.");
@@ -352,6 +397,11 @@
             $("#select-all").change(function() {
                 $(".item-select:not(:disabled)").prop("checked", $(this).is(":checked")).change();
             });
+
+            $('#coupon-code').on('input', function() {
+                // Replace any spaces with an empty string
+                this.value = this.value.replace(/\s+/g, '');
+            });
     
             // Coupon handlers
             $('#apply-coupon').click(function() {
@@ -377,11 +427,32 @@
             uiManager.toggleCouponSection();
             state.originalTotal = parseFloat($("#selected-total").text());
             initializeEventListeners();
+
+             // Check if the cart is empty and hide the select all if so
+            uiManager.hideSelectAllIfNoItems();
         }
     
         // Start the application
         initialize();
     });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all elements with the class 'nav-item'
+        var navItems = document.querySelectorAll('.sidebar .nav-item');
+    
+        // Remove the 'selected' class from all nav-items
+        navItems.forEach(function(item) {
+            item.classList.remove('selected');
+        });
+    
+        // Add the 'selected' class to the 'overview' nav-item
+        var overviewLink = document.querySelector('.sidebar .my-cart');
+        if (overviewLink) {
+            overviewLink.classList.add('selected');
+        }
+    });    
 </script>
 </body>
 </html>
