@@ -279,11 +279,13 @@ def admin_add_collection(request):
     if request.method == "POST":
         collection_name = request.POST['collection']
         brand_id = request.POST['brand']
+        logo_image = request.POST.get('image1')
+        banner_image = request.POST.get('image2')
         if Collection.objects.filter(name=collection_name).exists():
             messages.error(request, f"The collection '{collection_name}' already exists.")
             return redirect('admin_add_collection')
         brand = Brand.objects.get(id=brand_id)
-        Collection.objects.create(name=collection_name, brand=brand)
+        Collection.objects.create(name=collection_name, brand=brand, logo_image=logo_image, banner_image=banner_image)
         return redirect('admin_list_collection')
     brands = Brand.objects.all()
     return render(request, 'admin_add_collection.html', {'brands': brands})
@@ -306,12 +308,16 @@ def admin_edit_collection(request, id):
     if request.method == "POST":
         brand_id = request.POST['brand']
         collect_name = request.POST['collection']
+        logo_image = request.POST.get('image1')
+        banner_image = request.POST.get('image2')
         if Collection.objects.filter(name=collect_name, brand_id=brand_id).exclude(id=id).exists():
             messages.error(request, "Collection name already exists.")
         else:
             collection.name = collect_name
             brand = Brand.objects.get(id=brand_id)
             collection.brand = brand
+            collection.logo_image = logo_image
+            collection.banner_image = banner_image
             collection.save()
             return redirect('admin_list_collection')
     brands = Brand.objects.all()
@@ -335,8 +341,8 @@ def admin_list_brand(request):
 def admin_add_brand(request):
     if request.method == "POST":
         brand_name = request.POST['brandname']
-        logo_image = request.POST.get('brandlogo')
-        banner_image = request.POST.get('brandbanner')
+        logo_image = request.POST.get('image1')
+        banner_image = request.POST.get('image2')
         if Brand.objects.filter(name=brand_name).exists():
             messages.error(request, f"The Brand '{brand_name}' already exists.")
             return redirect('admin_add_brand')
@@ -385,7 +391,7 @@ def admin_delete_brand(request, id):
 @never_cache
 @staff_member_required(login_url="admin_login")
 def admin_list_orders(request):
-    orders = Order.objects.all()
+    orders = Order.objects.all().order_by('-updated_at')
     # Filter by order status
     status_filter = request.GET.get('status', 'all')
     payment_status = request.GET.get('payment_status', 'all')
@@ -418,7 +424,7 @@ def admin_list_orders(request):
     if min_price and max_price:
         orders = orders.filter(total_amount__range=[min_price, max_price])
 
-    users = CustomUser.objects.all()  # Get all users for the user filter
+    users = CustomUser.objects.all()
     return render(request, 'admin_list_orders.html', {
         'orders': orders,
         'status_filter': status_filter,
@@ -433,7 +439,7 @@ def admin_list_orders(request):
 @staff_member_required(login_url="admin_login")
 def admin_order_details(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    status_choices = Order.STATUS_CHOICES  # Get the status choices from the model
+    status_choices = Order.STATUS_CHOICES
     payment_status_choices = Order.PAYMENT_STATUS_CHOICES
     return render(request, 'admin_order_details.html', {
         'order': order,
@@ -442,36 +448,40 @@ def admin_order_details(request, order_id):
     })
 
 
-@staff_member_required(login_url="admin_login")
-@csrf_exempt
 def update_order_status(request, order_id):
     if request.method == 'POST':
+        print('admin_order_details')
         try:
-            order = Order.objects.get(id=order_id)
-            new_status = request.POST.get('status')
+            # Parse the JSON data
+            data = json.loads(request.body)
+            new_status = data.get('status')
 
             # Validate the new status against the model's status choices
             if new_status in dict(Order.STATUS_CHOICES):
+                order = Order.objects.get(id=order_id)
                 order.status = new_status
                 order.save()
+                print(order.status)
                 return JsonResponse({'message': 'Order status updated successfully'})
             else:
                 return JsonResponse({'error': 'Invalid status'}, status=400)
         except Order.DoesNotExist:
             return JsonResponse({'error': 'Order not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
-@staff_member_required(login_url="admin_login")
-@csrf_exempt
 def update_payment_status(request, order_id):
     if request.method == 'POST':
+        print('admin_order_details')
         try:
-            order = Order.objects.get(user=request.user)
-            print(order)
-            new_payment_status = request.POST.get('payment_status')
+            data = json.loads(request.body)
+            new_payment_status = data.get('payment_status')
 
-            # Validate the new payment status against the model's choices
             if new_payment_status in dict(Order.PAYMENT_STATUS_CHOICES):
+                order = Order.objects.get(id=order_id)
                 order.payment_status = new_payment_status
                 order.save()
                 return JsonResponse({'message': 'Payment status updated successfully'})
@@ -479,6 +489,10 @@ def update_payment_status(request, order_id):
                 return JsonResponse({'error': 'Invalid payment status'}, status=400)
         except Order.DoesNotExist:
             return JsonResponse({'error': 'Order not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 @staff_member_required(login_url="admin_login")
@@ -506,11 +520,11 @@ def admin_add_coupon(request):
         valid_to = request.POST.get('valid_to')
         active = request.POST.get('active') == 'on'  # Checkbox returns 'on' when checked
         print(active)
-        
+
         if Coupen.objects.filter(code=code).exists():
             messages.error(request, ' This Coupen Code Already Exist')
             return redirect('admin_add_coupon')
-        
+
         # Convert date strings to datetime objects
         valid_from = timezone.datetime.fromisoformat(valid_from)
         valid_to = timezone.datetime.fromisoformat(valid_to)
@@ -521,33 +535,33 @@ def admin_add_coupon(request):
             min_required=min_required,
             maximum_discount=maximum_discount,
             discount_percentage=discount_percentage,
-            usage_limit=usage_limit,
+            # usage_limit=usage_limit,
             valid_from=valid_from,
             valid_to=valid_to,
             active=active
         )
-        
+
         # Redirect to the list of coupons after creation
         return redirect('admin_list_coupons')
-    
+
     return render(request, 'admin_add_coupon.html')
 
 
 def admin_edit_coupon(request, coupon_id):
     # Fetch the coupon to edit
     coupon = get_object_or_404(Coupen, id=coupon_id)
-    
+
     if request.method == "POST":
         # Get form data from the POST request
         code = request.POST.get('code')
         min_required = request.POST.get('min_required')
         maximum_discount = request.POST.get('maximum_discount')
         discount_percentage = request.POST.get('discount_percentage')
-        usage_limit = request.POST.get('usage_limit')
+        # usage_limit = request.POST.get('usage_limit')
         valid_from = request.POST.get('valid_from')
         valid_to = request.POST.get('valid_to')
         active = request.POST.get('active') == 'on'  # Checkbox returns 'on' when checked
-        
+
         # Check if the coupon code has changed and if the new code already exists
         if code != coupon.code and Coupen.objects.filter(code=code).exists():
             messages.error(request, 'This Coupon Code Already Exists')
@@ -562,7 +576,7 @@ def admin_edit_coupon(request, coupon_id):
         coupon.min_required = min_required
         coupon.maximum_discount = maximum_discount
         coupon.discount_percentage = discount_percentage
-        coupon.usage_limit = usage_limit
+        # coupon.usage_limit = usage_limit
         coupon.valid_from = valid_from
         coupon.valid_to = valid_to
         coupon.active = active
@@ -575,57 +589,6 @@ def admin_edit_coupon(request, coupon_id):
     return render(request, 'admin_edit_coupon.html', {'coupon': coupon})
 
 
-@csrf_exempt
-def validate_coupon_ajax(request):
-    if request.method == "POST":
-        coupon_code = request.POST.get("coupon_code")
-        selected_total = float(request.POST.get("selected_total"))
-
-        try:
-            coupon = Coupen.objects.get(code=coupon_code, active=True)
-            
-            # Check if coupon's minimum purchase requirement is met
-            if hasattr(coupon, 'minimum_purchase') and selected_total < coupon.min_required:
-                return JsonResponse({
-                    "status": "error",
-                    "message": f"Minimum purchase amount of ${coupon.min_required} required."
-                })
-
-            # Calculate discount
-            discount_amount = selected_total * (int(coupon.discount_percentage) / 100)
-            
-            # If coupon has maximum discount limit
-            if hasattr(coupon, 'maximum_discount') and discount_amount > coupon.maximum_discount:
-                discount_amount = coupon.maximum_discount
-            
-            discounted_total = selected_total - discount_amount
-
-            return JsonResponse({
-                "status": "success",
-                "original_total": selected_total,
-                "discount_percentage": coupon.discount_percentage,
-                "discount_amount": round(discount_amount, 2),
-                "discounted_total": round(discounted_total, 2),
-                "message": f"Coupon applied! {coupon.discount_percentage}% discount"
-            })
-
-        except Coupen.DoesNotExist:
-            return JsonResponse({
-                "status": "error", 
-                "message": "Invalid or expired coupon code."
-            })
-        except Exception as e:
-            return JsonResponse({
-                "status": "error",
-                "message": "An error occurred while processing the coupon."
-            })
-
-    return JsonResponse({
-        "status": "error", 
-        "message": "Invalid request method."
-    })
-
-
 def admin_delete_coupon(request, code):
     coupen = Coupen.objects.get(code=code)
     coupen.delete()
@@ -633,19 +596,21 @@ def admin_delete_coupon(request, code):
 
 
 def admin_sales(request):
-    orders = Order.objects.all()
+    orders = Order.objects.filter(payment_status='paid')
     total_amount = 0
+    total_sale_discount = 0
+    
+    last_7_days = request.GET.get('last_7_days')
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     order_count = orders.count()
-    if order_count > 0:
-        average_price = round(total_amount/order_count, 2)
-    else:
-        average_price = 0
 
-    if start_date and end_date:
+    if last_7_days:
+        seven_days_ago = timezone.now() - timedelta(days=7)
+        orders = orders.filter(updated_at__date__gte=seven_days_ago.date())
+    elif start_date and end_date:
         orders = orders.filter(updated_at__date__range=[start_date, end_date])
 
     if min_price and max_price:
@@ -653,12 +618,19 @@ def admin_sales(request):
 
     for order in orders:
         total_amount += order.total_amount
-        print(total_amount)
+        total_sale_discount += order.total_discount
+
+    if order_count > 0:
+        average_price = round(total_amount/order_count, 2)
+    else:
+        average_price = 0
+
     context = {
         'sales': orders,
         'total_revenue': total_amount,
         'total_sales': orders.count(),
-        'average_price': average_price
+        'average_price': average_price,
+        'total_sale_discount': total_sale_discount,
     }
     return render(request, 'admin_sales.html', context=context)
 

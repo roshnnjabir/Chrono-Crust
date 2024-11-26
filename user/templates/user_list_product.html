@@ -89,7 +89,7 @@
                         <span class="oblong"></span>
                     </div>
                     <div class="nav-item">
-                        <a href="/user_list_product">Collections</a>
+                        <a href="/user_list_collection">Collections</a>
                         <span class="oblong"></span>
                     </div>
                 </nav>
@@ -174,10 +174,10 @@
                     <h3 class="name">{{ product.collection.name }} {{ product.name }}</h3>
                     
                     {% if product.price >= product.offer_price %}
-                        <p class="price name" style="font-size: 12px; text-decoration: line-through;">Price: $ {{ product.price }}</p>
-                        <p class="price" style="color: green;font-size: 15px; font-weight: 600;">Offer Price: $ {{ product.offer_price }}</p>
+                        <p class="price name" style="font-size: 12px; text-decoration: line-through;">Price: ₹{{ product.price }}</p>
+                        <p class="price" style="color: green;font-size: 15px; font-weight: 600;">Offer Price: ₹{{ product.offer_price }}</p>
                     {% else %}
-                        <h2 class="name">Price: $ {{ product.price }}</h2>
+                        <h2 class="name">Price: ₹{{ product.price }}</h2>
                     {% endif %}
                     {% if product.is_listed == false or product.collection.is_listed == false or product.collection.brand.is_listed == false %}
                     <p style="color: red; margin-bottom: 0; float: right;">Not Available</p>

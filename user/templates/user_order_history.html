@@ -16,17 +16,8 @@
         <a href="{% url 'user_home' %}">Home</a> / <span>Order History</span>
     </div>
 
-    <!-- Mobile Dropdown Navigation -->
-    <div class="dropdown">
-        <select id="mobile-nav" onchange="navigateTo(this.value)">
-            <option value="overview">Overview</option>
-            <option value="personal-wallet">Personal Wallet</option>
-            <option value="address-book">Address Book</option>
-            <option value="change-password">Change Password</option>
-            <option value="my-cart">My Cart</option>
-            <option value="order-history" selected>Order History</option>
-        </select>
-    </div>
+    <!-- Dropdown for Sidebar on Mobile-->
+    {% include 'partials/dropdown.html' %}
 
     <div class="main-content">
         {% include 'partials/sidebar.html' %}
@@ -37,16 +28,16 @@
                 {% for order in orders %}
                     <div class="order-item" onclick="openOrderDetails('{{ order.id }}')">
                         <div class="order-details">
-                            <h3>Order #{{ order.id }}</h3>
+                            <h3>Order ID: {{ order.id }}</h3>
                             <p>Date: {{ order.updated_at.date }}</p>
-                            <p>Products:</p>
-                            <ul>
-                                {% for item in order.items.all %}
-                                    <li>{{ item.product.name }}</li> <!-- Displaying the product name -->
-                                {% empty %}
-                                    <li>No products in this order.</li>
-                                {% endfor %}
-                            </ul>
+                            <strong>Products:</strong>
+                                <ul class="order-history-products">
+                                    {% for item in order.items.all %}
+                                        <li>{{ item.product.name }}</li> <!-- Displaying the product name -->
+                                    {% empty %}
+                                        <li>No products in this order.</li>
+                                    {% endfor %}
+                                </ul>
                         </div>
                         <div class="order-actions">
                             <button type="button" class="view-details-button" onclick="openOrderDetails({{ order.id }})">View Details</button>
@@ -58,6 +49,7 @@
                                     <button type="submit" class="cancel-order-button" onclick="event.stopPropagation();">Cancel Order</button>
                                 </form>
                             {% endif %}
+                            <a href="{% url 'user_generate_invoice' order.id %}"><button onclick="event.stopPropagation();" class="view-details-button">Invoice</button></a>
                         </div>
                     </div>
                 {% empty %}
@@ -113,7 +105,7 @@
             // Populate the modal with order details and add specific classes for styling
             const orderDetailsHtml = `
                 <div class="order-header">
-                    <h3 class="order-id">Order #${data.order.id}</h3>
+                    <h3 class="order-id">${data.order.id}</h3>
                     <p class="order-date">Date: ${data.order.date}</p>
                     <p class="order-address">Address: ${data.order.address}</p>
                     ${orderStatusHtml}  <!-- Only show status if it's defined -->
@@ -127,16 +119,16 @@
                                 <div class="item-info">
                                     <span class="item-name">${item.product.name}</span> 
                                     <span class="item-quantity">Quantity: ${item.quantity}</span> 
-                                    <span class="item-price">Price: $${Number(item.product.offer_price).toFixed(2)}</span>
-                                    <span class="item-total-price">Total Price: $${Number(item.total_price).toFixed(2)}</span>
+                                    <span class="item-price">Price: ₹${Number(item.product.offer_price).toFixed(2)}</span>
+                                    <span class="item-total-price">Total Price: ₹${Number(item.total_price).toFixed(2)}</span>
                                 </div>
                             </div>
                         </li>
                     `).join('')}
                 </ul>
                 <div class="order-total-price">
-                    <strong>Total Order Price: $${Number(data.total_price).toFixed(2)}</strong><br>
-                    <strong>Total Price After Discount: $${Number(data.discounded_price).toFixed(2)}</strong>
+                    <strong>Total Order Price: ₹${Number(data.total_price).toFixed(2)}</strong><br>
+                    <strong>Total Price After Discount: ₹${Number(data.discounded_price).toFixed(2)}</strong>
                 </div>
             `;
 

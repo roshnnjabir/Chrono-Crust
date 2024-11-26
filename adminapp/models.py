@@ -19,7 +19,8 @@ class Brand(models.Model):
 class Collection(models.Model):
     name = models.CharField(max_length=50)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, default=1)
-    image = models.ImageField(upload_to='uploads/collection')
+    logo_image = models.ImageField(upload_to='uploads/collection')
+    banner_image = models.ImageField(upload_to='uploads/collection')
     is_listed = models.BooleanField(default=False)
 
     def __str__(self):
@@ -115,7 +116,6 @@ class Product(models.Model):
             return round(discount_percentage, 2)  # Round to two decimal places
         return 0  # No discount
 
-
     def __str__(self):
         return self.name
 
@@ -123,6 +123,14 @@ class Product(models.Model):
 class Product_Slider(models.Model):
     collection = models.OneToOneField(Collection, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=500)
+    image = models.FileField(upload_to='uploads/product_slider')
+
+    def save(self, *args, **kwargs):
+        # if no discount, the discount price default should be total_amount itself
+        if self.image is None:
+            self.image = self.collection.banner_image
+        # calling the save of parent class
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.collection.name
@@ -176,7 +184,7 @@ class Order(models.Model):
     id = models.CharField(primary_key=True, auto_created=True, max_length=20)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="orders")
     payment_id = models.CharField(max_length=20)
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
+    address = models.ForeignKey(Address, on_delete=models.PROTECT, null=True, related_name="order_address")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -190,6 +198,7 @@ class Order(models.Model):
     PAYMENT_STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('cod', 'Cod'),
+        ('pwallet', 'Personal Wallet'),
         ('paid', 'Paid'),
         ('refunded', 'Refunded'),
     ]
@@ -199,10 +208,14 @@ class Order(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discounted_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
+    total_discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     def save(self, *args, **kwargs):
         # if no discount, the discount price default should be total_amount itself
         if self.discounted_amount == 0:
             self.discounted_amount = self.total_amount
+        if self.total_amount != self.discounted_amount:
+            self.total_discount = float(self.total_amount) - float(self.discounted_amount)
         # calling the save of parent class
         super().save(*args, **kwargs)
 
@@ -217,16 +230,20 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)  # Assuming you have a Product model
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    price = models.DecimalField(max_digits=10, decimal_places=2)  # Store price to prevent changes in the product's price affecting past orders
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    @property
+    def total_price(self):
+        return self.quantity * self.price
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in Order #{self.order.id}"
 
 
 class PersonalWallet(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.PROTECT)
+    user = models.OneToOneField(CustomUser, on_delete=models.PROTECT, related_name='personal_wallet')
     balance = models.IntegerField(default=0)
 
 
@@ -244,7 +261,7 @@ class PersonalWalletTransactions(models.Model):
 
 class Coupen(models.Model):
     code = models.CharField(max_length=10, unique=True)
-    min_required = models.IntegerField(default=10000)
+    min_required = models.IntegerField(default=1000)
     maximum_discount = models.IntegerField(default=1000)
     discount_percentage = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     active = models.BooleanField(default=False)

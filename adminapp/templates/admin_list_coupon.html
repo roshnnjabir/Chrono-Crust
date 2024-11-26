@@ -70,6 +70,7 @@
         }
 
         .admin-container {
+            max-width: 800px;
             flex: 1;
             background-color: #ffffff;
             padding: 30px;
@@ -127,6 +128,9 @@
         .show-details-button:hover {
             background-color: #0056b3;
             color: white;
+        }
+        .customers {
+            overflow-x: scroll;
         }
 
         .logout-button, .delete-button {
@@ -203,6 +207,7 @@
                             <tr>
                                 <th>Coupon ID</th>
                                 <th>Code</th>
+                                <th>Minimum Amount Required</th>
                                 <th>Maximum Discount</th>
                                 <th>Discount Percentage</th>
                                 <th>Status</th>
@@ -216,6 +221,7 @@
                             <tr>
                                 <td>{{ coupon.id }}</td>
                                 <td>{{ coupon.code }}</td>
+                                <td>{{ coupon.min_required }}</td>
                                 <td>{{ coupon.maximum_discount }}</td>
                                 <td>{{ coupon.discount_percentage }}</td>
                                 {% if coupon.active %}
@@ -224,12 +230,14 @@
                                     <td>Inactive</td>
                                 {% endif %}
                                 <td>{{ coupon.valid_from|date:"d-m-Y" }}</td>
-                                <td>{{ coupen.valid_to|date:"d-m-Y" }}</td>
+                                <td>{{ coupon.valid_to|date:"d-m-Y" }}</td>
                                 <td>
                                     <!-- Edit Button -->
                                     <a href="{% url 'admin_edit_coupon' coupon.id %}">
                                         <button class="action-button edit-button">Edit</button>
                                     </a>
+                                </td>
+                                <td>
                                     <!-- Delete Button -->
                                     <a href="{% url 'admin_delete_coupon' coupon.code %}">
                                         <button class="action-button delete-button">Delete</button>

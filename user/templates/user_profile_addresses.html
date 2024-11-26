@@ -15,6 +15,9 @@
             <a href="{% url 'user_home' %}">Home</a> / <span>Address Book</span>
         </div>
 
+        <!-- Dropdown for Sidebar on Mobile-->
+        {% include 'partials/dropdown.html' %}
+
         <div class="main-content">
             {% include 'partials/sidebar.html' %}
 
@@ -23,11 +26,23 @@
                 <button class="add-address-button" onclick="openAddAddressModal()">Add Address</button>
                 <div class="box">
                     {% for address in addresses %}
-                    <div class="info-layout">
-                        <div class="info-label">{{ address.building_name }}, {{ address.city }}, {{ address.district }}, {{ address.state }}, {{ address.postal_code }}, Phone: {{ address.phone }}</div>
-                        <button id="editbutton" onclick="openEditModal({{ address.id }}, '{{ address.building_name }}', '{{ address.landmark }}', '{{ address.city }}', '{{ address.district }}', '{{ address.state }}', '{{ address.postal_code }}', '{{ address.country }}', '{{ address.phone }}')">EDIT</button>
-                        <button class="deletebutton" onclick="confirmDelete({{ address.id }})">DELETE</button>
-                    </div>                    
+                        {% if address.order_address.count > 0 %}
+                            <div class="info-layout">
+                                <div class="info-label">{{ address.building_name }}, {{ address.city }}, {{ address.district }}, {{ address.state }}, {{ address.postal_code }}, Phone: {{ address.phone }}</div>
+                                <div class="button-label">
+                                    <button style="opacity: 0.5;" title="Cannot Edit as It Is Being Used In Order" id="editbutton" disabled>EDIT</button>
+                                    <button style="opacity: 0.5;" class="deletebutton" title="Cannot Delete as It Is Being Used In Order"  disabled>DELETE</button>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="info-layout">
+                                <div class="info-label">{{ address.building_name }}, {{ address.city }}, {{ address.district }}, {{ address.state }}, {{ address.postal_code }}, Phone: {{ address.phone }}</div>
+                                <div>
+                                    <button id="editbutton" onclick="openEditModal({{ address.id }}, '{{ address.building_name }}', '{{ address.landmark }}', '{{ address.city }}', '{{ address.district }}', '{{ address.state }}', '{{ address.postal_code }}', '{{ address.country }}', '{{ address.phone }}')">EDIT</button>
+                                    <button class="deletebutton" onclick="confirmDelete({{ address.id }})">DELETE</button>
+                                </div>
+                            </div>                    
+                        {% endif %}
                     {% empty %}
                         <p>No addresses found.</p>
                     {% endfor %}
@@ -58,7 +73,14 @@
             if (overviewLink) {
                 overviewLink.classList.add('selected');
             }
-        });        
+        });
+    </script>
+    <script>
+        function navigateTo(value) {
+            const baseUrl = '/user_profile'; // Change this to the base URL for your user profile
+            const url = `${baseUrl}/${value}`; // Append the selected value to the base URL
+            window.location.href = url; // Redirect to the new URL
+        }
     </script>
 </body>
 </html>

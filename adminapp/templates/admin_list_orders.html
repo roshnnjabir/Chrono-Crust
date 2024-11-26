@@ -296,7 +296,7 @@
                                 <td>{{ order.updated_at.date }}</td>
                                 <td>{{ order.total_amount }}</td>
                                 <td>
-                                    <a href="{% url 'admin_order_details' 1 %}">
+                                    <a href="{% url 'admin_order_details' order.id %}">
                                         <button class="action-button show-details-button">Show Details</button>
                                     </a>
                                 </td>

@@ -50,16 +50,15 @@ urlpatterns = [
 
 
     path('admin/orders', views.admin_list_orders, name='admin_list_orders'),
-    path('admin/orders/<str:order_id>/', views.admin_order_details, name='admin_order_details'),
-    path('admin/update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
-    path('admin/update-payment-status/<int:order_id>/', views.update_payment_status, name='update_payment_status'),
+    path('admin/order/<str:order_id>/', views.admin_order_details, name='admin_order_details'),
+    path('admin/update_order_status/<str:order_id>/', views.update_order_status, name='update_order_status'),
+    path('admin/update_payment_status/<str:order_id>/', views.update_payment_status, name='update_payment_status'),
     
     path('admin/list_coupons', views.admin_coupons, name='admin_list_coupons'),
     # path('admin/coupon_details/<str:code>', views.admin_coupon_details, name="admin_coupon_details"), # commmnted cause no use now, add later
     path('admin/delete_coupon/<str:code>', views.admin_delete_coupon, name="admin_delete_coupon"),
     path('admin/add_coupon/', views.admin_add_coupon, name='admin_add_coupon'),
     path('admin/edit_coupon/<int:coupon_id>', views.admin_edit_coupon, name='admin_edit_coupon'),
-    path('validate-coupon/', views.validate_coupon_ajax, name='validate_coupon_ajax'),
     
     path('admin/sales', views.admin_sales, name='admin_sales'),
     

@@ -16,18 +16,8 @@
         <a href="{% url 'user_home' %}">Home</a> / <span>My Cart</span>
     </div>
 
-    <!-- Mobile Dropdown Navigation -->
-    <div class="dropdown">
-        <select id="mobile-nav" onchange="navigateTo(this.value)">
-            <option value="overview">Overview</option>
-            <option value="personal-wallet">Personal Wallet</option>
-            <option value="address-book">Address Book</option>
-            <option value="change-password">Change Password</option>
-            <option value="order-history" selected>My Cart</option>
-            <option value="wishlist">Wishlist</option>
-            <option value="order-history">Order History</option>
-        </select>
-    </div>
+    <!-- Dropdown for Sidebar on Mobile-->
+    {% include 'partials/dropdown.html' %}
 
     <div class="main-content">
         {% include 'partials/sidebar.html' %}
@@ -131,6 +121,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="item_ids" id="item_ids">
                             <input type="hidden" name="discounted_price" id="discounted_price">
+                            <input type="hidden" name="total_price" id="total_price" value="">
                             <button type="submit" id="checkout-selected" class="checkout-button">Proceed To Checkout</button>
                         </form>
                     </div>
@@ -188,6 +179,7 @@
                 $("#selected-total-after-discount").text(selectedTotal.toFixed(3));
                 // Update the discounted_price field
                 $("#discounted_price").val(selectedTotal.toFixed(3));
+                $("#total_price").val(selectedTotal.toFixed(3));
                 $("#selected-total").data("originalTotal", selectedTotal);
                 state.originalTotal = selectedTotal;
                 
@@ -319,6 +311,8 @@
         const couponManager = {
             // In the couponManager object, update the apply function:
             apply: function(couponCode) {
+                const originalTotal = state.originalTotal.toFixed(2);
+                
                 if (state.couponApplied) {
                     alert("A coupon is already applied. Please remove it first")
                     $('#coupon-message').text("A coupon is already applied. Please remove it first.");
@@ -346,6 +340,7 @@
                             $('#selected-total').text(`${state.originalTotal.toFixed(2)}`);
                             $('#selected-total-after-discount').text(`${response.discounted_total.toFixed(2)}`);
                             // Update the discounted_price field
+                            $('#total_price').val(`${state.originalTotal.toFixed(2)}`);
                             $('#discounted_price').val(response.discounted_total.toFixed(2));
                             $('#apply-coupon').hide();
                             $('#remove-coupon').show();

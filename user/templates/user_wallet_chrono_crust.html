@@ -28,18 +28,8 @@
         <a href="{% url 'user_home' %}">Home</a> / <span>My Profile</span>
     </div>
 
-    <!-- Dropdown for Sidebar on Mobile -->
-    <div class="dropdown">
-        <select id="mobile-nav" onchange="navigateTo(this.value)">
-            <option value="/" selected>Overview</option>
-            <option value="personal-wallet">Personal Wallet</option>
-            <option value="address-book">Address Book</option>
-            <option value="user_forgot_password">Change Password</option>
-            <option value="user_cart_view">My Cart</option>
-            <option value="order-history">Wishlist</option>
-            <option value="user_order_history">Order History</option>
-        </select>
-    </div>
+    <!-- Dropdown for Sidebar on Mobile // mobile aavumbo ith edku matte sidebar hide aaku-->
+    {% include 'partials/dropdown.html' %}
 
     <div class="main-content">
         {% include 'partials/sidebar.html' %}        
@@ -47,12 +37,12 @@
         <div class="content" >
             <h2>My Wallet</h2>
 
-            <p style="padding: 10px 25px;margin: 0;">Welcome to your personal wallet. Here you can view your balance and manage your transactions.</p>
+            <p>Welcome to your personal wallet. Here you can view your balance and manage your transactions.</p>
 
             <div class="box">
                 <div class="box-header">
                     <h3>Wallet Overview</h3>
-                    <button  class="edit_button" id="transaction_history_button" onclick="toggleTransactionHistory()">Show Transaction History</button>
+                    <button  class="edit_button" id="transaction_history_button" onclick="toggleTransactionHistory()">Transaction History</button>
                 </div>
                 <div class="info-layout">
                     <div class="info-label">Owner:</div>

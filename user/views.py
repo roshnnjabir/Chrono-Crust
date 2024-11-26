@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import CustomUser, Address
-from adminapp.models import Product, Product_Slider, Collection, Brand, Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem, PersonalWallet, PersonalWalletTransactions
+from adminapp.models import Product, Product_Slider, Collection, Brand, Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem, PersonalWallet, Coupen, PersonalWalletTransactions
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -11,7 +11,7 @@ import uuid
 from django.db import transaction
 from django.views.decorators.cache import never_cache
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 from django.contrib.auth import get_backends
 from django.core.cache import cache
 from django.utils import timezone
@@ -24,6 +24,8 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 import razorpay
 from django.conf import settings
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 
 def user_home(request):
@@ -32,7 +34,7 @@ def user_home(request):
         Q(collection__is_listed=True),
         Q(collection__brand__is_listed=True),
         Q(for_men=True) | Q(for_women=True)
-    )
+    ).order_by('-popularity')[:3]
 
     product_slider = Product_Slider.objects.all()
 
@@ -112,57 +114,12 @@ def user_list_brand(request):
     return render(request, 'user_list_brands.html', {'brands': brands})
 
 
-def user_list_product_catogory(request):
-    products = Product.objects.filter(
+def user_list_collection(request):
+    collection = Collection.objects.filter(
         Q(is_listed=True),
-        Q(collection__is_listed=True),
-        Q(collection__brand__is_listed=True),
-        Q(for_men=True) | Q(for_women=True)
+        Q(brand__is_listed=True)
     )
-
-    # Handle sorting
-    sort_option = request.GET.get('sort')
-    if sort_option == 'name_asc':
-        products = products.order_by('name')  # A-Z
-    elif sort_option == 'name_desc':
-        products = products.order_by('-name')  # Z-A
-    elif sort_option == 'price_asc':
-        products = products.order_by('price')  # Low to High
-    elif sort_option == 'price_desc':
-        products = products.order_by('-price')  # High to Low
-    elif sort_option == 'newest':
-        products = products.order_by('-created_at')  # Newest first
-    elif sort_option == 'popularity':
-        products = products.order_by('-popularity')  # Assuming you have a popularity field
-
-    gender_filter = request.GET.get('gender_filter')
-
-    if gender_filter:
-        if gender_filter == 'men':
-            products = Product.objects.filter(
-                Q(for_men=True),
-                Q(for_women=False),
-                Q(is_listed=True),
-                Q(collection__is_listed=True),
-                Q(collection__brand__is_listed=True)
-            )
-        elif gender_filter == 'women':
-            products = Product.objects.filter(
-                Q(for_women=True),
-                Q(for_men=False),
-                Q(is_listed=True),
-                Q(collection__is_listed=True),
-                Q(collection__brand__is_listed=True)
-            )
-        elif gender_filter == 'unisex':
-            products = Product.objects.filter(
-                Q(for_women=True),
-                Q(for_men=True),
-                Q(is_listed=True),
-                Q(collection__is_listed=True),
-                Q(collection__brand__is_listed=True)
-            )
-    return render(request, 'user_list_product_catogory.html', {'products': products})
+    return render(request, 'user_list_collection.html', {'collections': collection})
 
 
 @never_cache
@@ -178,7 +135,7 @@ def user_login(request):
             user = authenticate(request, email=email, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('otp_page')
+                return redirect('user_profile')
             else:
                 messages.error(request, "Password Wrong")
         else:
@@ -445,7 +402,7 @@ def personal_wallet(request):
 @login_required(login_url='user_login')
 def address_book(request):
     user = CustomUser.objects.get(email=request.user.email)
-    addresses = user.addresses.filter(is_listed=True)
+    addresses = Address.objects.filter(user=user, is_listed=True)
 
     # Handle the form submission to update addresses
     if request.method == 'POST':
@@ -506,6 +463,53 @@ def edit_user_address(request):
 
 @login_required(login_url='user_login')
 def add_user_address(request):
+    if request.method == 'POST':
+        # Check if the user already has 3 addresses
+        if request.user.addresses.filter(is_listed=True).count() >= 3:
+            messages.error(request, "You can only have a maximum of 3 addresses.")
+            return redirect('user_address_book')
+
+        # Extract data from request.POST
+        building_name = request.POST.get('building_name')
+        landmark = request.POST.get('landmark')
+        city = request.POST.get('city')
+        district = request.POST.get('district')
+        state = request.POST.get('state')
+        country = request.POST.get('country')
+        postal_code = request.POST.get('postal_code')
+        phone = request.POST.get('phone')
+        is_default = request.POST.get('is_default') == 'on'  # Convert checkbox to boolean by using == 'on'
+        # Validate the phone number (must be exactly 10 digits)
+        if not phone.isdigit() or len(phone) != 10:
+            messages.error(request, "Phone number must be exactly 10 digits.")
+            return redirect('user_address_book')
+
+        # Create the Address instance
+        address = Address(
+            user=request.user,  # set current logged in user
+            building_name=building_name,
+            landmark=landmark,
+            city=city,
+            district=district,
+            state=state,
+            country=country,
+            postal_code=postal_code,
+            phone=phone,
+            is_default=is_default,
+        )
+
+        try:
+            address.save()  # saving the address
+            messages.success(request, "Address created successfully!")
+            return redirect('user_address_book')
+        except ValidationError as e:
+            messages.error(request, str(e))  # error mesage
+
+    return render(request, 'user_profile_addresses.html')
+
+
+@login_required(login_url='user_login')
+def add_user_address_on_order(request):
     if request.method == 'POST':
         # Check if the user already has 3 addresses
         if request.user.addresses.filter(is_listed=True).count() >= 3:
@@ -773,6 +777,7 @@ def user_move_to_order(request):
             # Handle Razorpay payment confirmation
             data = json.loads(request.body)
             payment_id = data.get('payment_id')
+            total_amount = request.session.get('total_price')
             discounted_amount = request.session.get('discount')
             order_id = data.get('order_id')
 
@@ -803,8 +808,9 @@ def user_move_to_order(request):
                     return JsonResponse({'status': 'error', 'message': 'No Address Selected'}, status=400)
 
                 # Create a new order for Razorpay
-                order = Order.objects.create(id=order_id, user=request.user, address=selected_address, discounted_amount=discounted_amount, payment_status='pending')
+                order = Order.objects.create(id=order_id, user=request.user, address=selected_address,total_amount=total_amount, discounted_amount=discounted_amount, payment_status='pending')
                 del request.session['discount']
+                del request.session['total_price']
 
                 # Move items from cart to the order table
                 for item_id in item_ids:
@@ -845,55 +851,60 @@ def user_move_to_order(request):
             # Respond with success
             return JsonResponse({'status': 'success'})
         else:
-            # Handle Cash on Delivery request (same logic as before)
-            item_ids = request.session.get('item_ids')
-            selected_address_id = request.session.get('selected_address')
-            discounted_amount = request.session.get('discount')
-            order_id = generate_order_id()
+            # handling cod or payment through wallet
+            if request.method == 'POST':
+                payment_method = request.POST.get('payment_method')
+                item_ids = request.session.get('item_ids')
+                selected_address_id = request.session.get('selected_address')
+                discounted_amount = request.session.get('discount')
+                total_price = request.session.get('total_price')
+                order_id = generate_order_id()
 
-            if not item_ids or not selected_address_id:
-                return JsonResponse({'status': 'error', 'message': 'Incomplete order details.'}, status=400)
+                if not item_ids or not selected_address_id:
+                    return JsonResponse({'status': 'error', 'message': 'Incomplete order details.'}, status=400)
 
-            item_ids = item_ids.split(',') if item_ids else []
+                item_ids = item_ids.split(',') if item_ids else []
 
-            # Get the selected address
-            try:
-                selected_address = Address.objects.get(id=selected_address_id, user=request.user)
-            except Address.DoesNotExist:
-                return JsonResponse({'status': 'error', 'message': 'No Address Selected'}, status=400)
+                # Get the selected address
+                try:
+                    selected_address = Address.objects.get(id=selected_address_id, user=request.user)
+                except Address.DoesNotExist:
+                    return JsonResponse({'status': 'error', 'message': 'No Address Selected'}, status=400)
 
-            with transaction.atomic():
-                # Create a new order for COD
-                order = Order.objects.create(id=order_id, user=request.user, address=selected_address, payment_status='cod', total_amount=discounted_amount)
-                
-                # Move items from cart to the orders table
-                for item_id in item_ids:
-                    try:
-                        cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
-                        
-                        product_price = cart_item.product.offer_price # taking the offer price as if, the offer is not set, then the product price will be set
+                with transaction.atomic():
+                    # Create a new order for COD
+                    order = Order.objects.create(id=order_id, user=request.user, address=selected_address, payment_status=payment_method, total_amount=total_price, discounted_amount=discounted_amount)
+                    del request.session['discount']
+                    del request.session['total_price']
 
-                        # Create OrderItem and adjust stock
-                        order_item = OrderItem.objects.create(
-                            order=order,
-                            product=cart_item.product,
-                            quantity=cart_item.quantity,
-                            price=product_price,
-                        )
+                    # Move items from cart to the orders table
+                    for item_id in item_ids:
+                        try:
+                            cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
 
-                        # Decrease the stock of the product
-                        product = cart_item.product
-                        if product.stock >= cart_item.quantity:
-                            product.stock -= cart_item.quantity
-                            product.save()
-                        else:
-                            return JsonResponse({'status': 'error', 'message': f'Insufficient stock for {product.name}'}, status=400)
+                            product_price = cart_item.product.offer_price # taking the offer price as if, the offer is not set, then the product price will be set
 
-                        # Remove the item from the cart
-                        cart_item.delete()
+                            # Create OrderItem and adjust stock
+                            order_item = OrderItem.objects.create(
+                                order=order,
+                                product=cart_item.product,
+                                quantity=cart_item.quantity,
+                                price=product_price,
+                            )
 
-                    except CartItem.DoesNotExist:
-                        continue
+                            # Decrease the stock of the product
+                            product = cart_item.product
+                            if product.stock >= cart_item.quantity:
+                                product.stock -= cart_item.quantity
+                                product.save()
+                            else:
+                                return JsonResponse({'status': 'error', 'message': f'Insufficient stock for {product.name}'}, status=400)
+
+                            # Remove the item from the cart
+                            cart_item.delete()
+
+                        except CartItem.DoesNotExist:
+                            continue
 
                 return redirect('user_order_history')
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
@@ -901,7 +912,7 @@ def user_move_to_order(request):
 
 @login_required(login_url='user_login')
 def user_order_history(request):
-    orders = Order.objects.filter(user=request.user)
+    orders = Order.objects.filter(user=request.user).order_by('-updated_at')
     for order in orders:
         print(f"Order ID: {order.id},{order.status} Items: {[item.product.name for item in order.items.all()]}")
     return render(request, 'user_order_history.html', {'orders': orders})
@@ -973,6 +984,7 @@ def user_cancel_order(request, order_id):
 
                 # Update the order status to 'Cancelled'
                 order.status = 'cancelled'  # Use the correct choice value
+                order.payment_status = 'refunded'
                 order.save()  # Save the updated order
                 payment.balance += order.total_amount
                 payment.save()
@@ -996,8 +1008,10 @@ def address_selection(request):
     if request.method == 'POST':
         item_ids = request.POST.get('item_ids')
         discounted_price = request.POST.get('discounted_price')
+        total_price = request.POST.get('total_price')
 
         request.session['discount'] = discounted_price
+        request.session['total_price'] = total_price
         request.session['item_ids'] = item_ids
 
         user_addresses = Address.objects.filter(user=request.user, is_listed=True)
@@ -1020,11 +1034,13 @@ def user_payment_method_selection(request):
 
         client = razorpay.Client(auth=("rzp_test_ogXW1qOaXCrzZG", "xh7Hg2R6cJmhk7p02eCGhtZC"))
         amount = int(float(total_amount) * 100)
+        personal_wallet = PersonalWallet.objects.get(user=request.user)
 
         data = {"amount": amount, "currency": "INR"}
+        amount = amount/100
         payment = client.order.create(data=data)
         order_id = payment['id']
-        return render(request, 'checkout/payment_method.html', {'order_id': order_id, 'total_amount': amount})
+        return render(request, 'checkout/payment_method.html', {'order_id': order_id, 'total_amount': amount, 'personal_wallet_balance': personal_wallet})
     return redirect('user_profile')
 
 
@@ -1074,5 +1090,70 @@ def user_add_to_cart(request):
     return redirect(request.META.get('HTTP_REFERER', '/'))  # Redirect back if not a POST request
 
 
+@csrf_exempt
+def validate_coupon_ajax(request):
+    if request.method == "POST":
+        coupon_code = request.POST.get("coupon_code")
+        selected_total = float(request.POST.get("selected_total"))
+
+        try:
+            coupon = Coupen.objects.get(code=coupon_code, active=True)
+
+            # Check if coupon's minimum purchase requirement is met
+            if hasattr(coupon, 'min_required') and selected_total < coupon.min_required:
+                return JsonResponse({
+                    "status": "error",
+                    "message": f"Minimum purchase amount of ${coupon.min_required} required."
+                })
+
+            # Calculate discount
+            discount_amount = selected_total * (int(coupon.discount_percentage) / 100)
+            
+            # If coupon has maximum discount limit
+            if hasattr(coupon, 'maximum_discount') and discount_amount > coupon.maximum_discount:
+                discount_amount = coupon.maximum_discount
+            
+            discounted_total = selected_total - discount_amount
+
+            return JsonResponse({
+                "status": "success",
+                "original_total": selected_total,
+                "discount_percentage": coupon.discount_percentage,
+                "discount_amount": round(discount_amount, 2),
+                "discounted_total": round(discounted_total, 2),
+                "message": f"Coupon applied! {coupon.discount_percentage}% discount"
+            })
+
+        except Coupen.DoesNotExist:
+            return JsonResponse({
+                "status": "error", 
+                "message": "Invalid or expired coupon code."
+            })
+        except Exception as e:
+            return JsonResponse({
+                "status": "error",
+                "message": "An error occurred while processing the coupon."
+            })
+
+    return JsonResponse({
+        "status": "error", 
+        "message": "Invalid request method."
+    })
+
+
 def add_money_to_wallet(request):
     pass
+
+
+def user_generate_invoice(request, order_id):
+    order = Order.objects.get(user=request.user, id=order_id)
+    context = {
+        'user': request.user,
+        'order': order
+    }
+    html_string = render_to_string('invoice.html', context)
+    html = HTML(string=html_string)
+    pdf = html.write_pdf()
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="invoice_{order_id}.pdf"'
+    return response

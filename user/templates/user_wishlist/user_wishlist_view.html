@@ -16,18 +16,8 @@
         <a href="{% url 'user_home' %}">Home</a> / <span>Wishlist</span>
     </div>
 
-    <!-- Mobile Dropdown Navigation -->
-    <div class="dropdown">
-        <select id="mobile-nav" onchange="navigateTo(this.value)">
-            <option value="overview">Overview</option>
-            <option value="personal-wallet">Personal Wallet</option>
-            <option value="address-book">Address Book</option>
-            <option value="change-password">Change Password</option>
-            <option value="my-cart">My Cart</option>
-            <option value="wishlist" selected>Wishlist</option>
-            <option value="order-history">Order History</option>
-        </select>
-    </div>
+    <!-- Dropdown for Sidebar on Mobile-->
+    {% include 'partials/dropdown.html' %}
 
     <div class="main-content">
         {% include 'partials/sidebar.html' %}
@@ -41,7 +31,7 @@
                         <div class="item-details">
                             <h3>{{ item.product.name }}</h3>
                             <p>{{ item.product.description }}</p>
-                            <div class="item-price">Price: ${{ item.product.price }}</div>
+                            <div class="item-price">Price: ₹{{ item.product.price }}</div>
                         </div>
                         <div class="item-actions">
                             <form method="POST" action="{% url 'user_add_to_cart' %}" class="action-form">

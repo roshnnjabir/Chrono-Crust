@@ -528,6 +528,7 @@
                                 <th colspan="2">Brand Name</th>
                                 <th>Stock</th>
                                 <th>Price</th>
+                                <th>Offer Price</th>
                                 <th>Catogory</th>
                                 <th colspan="3">Action</th>
                             </tr>
@@ -563,6 +564,11 @@
                                 </td>
                                 <td>{{ product.stock }}</td>
                                 <td>${{ product.price }}</td>
+                                {% if product.price != product.offer_price %}
+                                    <td>${{ product.offer_price }}</td>
+                                {% else %}
+                                    <td>NIL</td>
+                                {% endif %}
                                 <td>
                                     {% if product.for_men and not product.for_women %}
                                     Men

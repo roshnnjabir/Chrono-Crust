@@ -284,11 +284,11 @@
     {% include 'partials/home_header.html' %}
     
     <!-- Product Slider Section -->
-    <div class="featured-products">
+    <div class="featured-products" id="rz">
         <div class="product-slider">
             {% for product in product_slider %}
                 <div class="product" id="product{{ forloop.counter }}">
-                    <img src="{{ product.collection.image.url }}" alt="{{ product.collection.name }}" class="product-image">
+                    <img src="{{ product.image.url }}" alt="{{ product.collection.name }}" class="product-image">
                     <h2 class="product-name">{{ product.collection.name }}</h2>
                     <p class="product-description">{{ product.description }}</p>
                     <a href="#" class="discover-button">Discover Now</a>
@@ -330,7 +330,7 @@
                         <div class="featured-content">
                             <h3 class="featured-title">{{ product.name }}</h3>
                             <p>{{ product.description }}</p>
-                            <a href="#" class="btn btn-primary">View Details</a>
+                            <a href="view_product/{{ product.id }}" class="btn btn-primary">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -414,7 +414,7 @@
                     <div class="service-item">
                         <i class="service-icon fas fa-shipping-fast mb-3"></i>
                         <h4>Free Shipping</h4>
-                        <p>Worldwide on all orders above $5000</p>
+                        <p>Worldwide on all orders above ₹5000</p>
                     </div>
                 </div>
                 <div class="col-md-3">

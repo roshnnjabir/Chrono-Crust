@@ -151,18 +151,32 @@
             background-color: #f8f8f8;
         }
 
-        .action-button {
-            padding: 10px 15px;
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+        /* Action Button Styles */
+.action-button {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #28a745; /* Green background */
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
 
-        .action-button:hover {
-            background-color: #e0e0e0;
-        }
+.action-button:hover {
+    background-color: #218838; /* Darker green */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+.action-button:active {
+    transform: translateY(0); /* Reset lift on click */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
         .logout-button {
             background-color: #ff4d4d;
             border: none;
@@ -182,9 +196,46 @@
             font-weight: bold;
         }
 
+        .sales-stats {
+            display: flex;
+            justify-content: space-around;
+        }
+
         .show-details-button:hover {
             background-color: #0056b3;
         }
+
+        /* Container for the filter form */
+        .filter-form {
+            display: inline-block; /* Ensure it aligns inline if part of a toolbar */
+            margin: 10px; /* Add spacing around the form */
+        }
+
+        /* Button styling */
+        .filter-button {
+            background-color: #28a745; /* Green background */
+            color: #fff; /* White text */
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners */
+            padding: 10px 15px; /* Padding for a comfortable size */
+            font-size: 16px; /* Slightly larger font for readability */
+            font-family: 'Nunito', sans-serif; /* Match project font */
+            cursor: pointer; /* Pointer cursor on hover */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effect */
+        }
+
+        /* Hover and active states */
+        .filter-button:hover {
+            background-color: #218838; /* Darker green on hover */
+            transform: scale(1.05); /* Slight zoom on hover */
+        }
+
+        .filter-button:active {
+            background-color: #1e7e34; /* Even darker green on click */
+            transform: scale(0.98); /* Slight shrink effect on click */
+        }
+
 
         /* Responsive Styles */
         @media (max-width: 768px) {
@@ -228,9 +279,14 @@
 
             <div class="admin-container">
                 <h1>Sales Report</h1>
+                
+                <form method="GET" action="{% url 'admin_sales' %}" class="filter-form">
+                    <input type="hidden" id="last_7_days" name="last_7_days" value="7">
+                    <button type="submit" class="filter-button">Last 7 Days</button>
+                </form>    
 
                 <!-- Filter Button -->
-                <button id="filterButton" class="action-button">Filters</button>
+                <button id="filterButton" class="action-button">Custom Filters</button>            
             
                 <!-- Filter Modal -->
                 <div id="filterModal" class="modal">
@@ -260,6 +316,7 @@
                     <p><strong>Total Sales:</strong> {{ total_sales }}</p>
                     <p><strong>Average Price:</strong> {{ average_price }}</p>
                     <p><strong>Total Revenue:</strong> {{ total_revenue }}</p>
+                    <p><strong>Total Discount:</strong> {{ total_sale_discount }}</p>
                 </div>
 
                 <!-- Recent Sales Table -->
@@ -272,6 +329,8 @@
                                 <th>Product</th>
                                 <th>Date</th>
                                 <th>Total Amount</th>
+                                <th>Discounted Total Amount</th>
+                                <th>Discount</th>
                             </tr>
                         </thead>
                         <tbody id="table-body">
@@ -286,6 +345,8 @@
                                 </td>
                                 <td>{{ sale.created_at.date }}</td>
                                 <td>{{ sale.total_amount }}</td>
+                                <td>{{ sale.discounted_amount }}</td>
+                                <td>{{ sale.total_discount }}</td>
                             </tr>
                             {% empty %}
                             <tr>
@@ -341,3 +402,4 @@
 </body>
 
 </html>
+total_amount

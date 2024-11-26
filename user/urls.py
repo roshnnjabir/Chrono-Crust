@@ -28,6 +28,7 @@ urlpatterns = [
     path('user_list_product_catogory/', views.user_list_product_catogory, name='user_list_product_catogory'),
     
     path('user_list_brand/', views.user_list_brand, name='user_list_brand'),
+    path('user_list_collection/', views.user_list_collection, name='user_list_collection'),
     path('user_list_product_catogory/', views.user_list_product_catogory, name='user_list_product_catogory'),
 
     path('user_forgot_password/', views.user_forgot_password, name='user_forgot_password'),
@@ -65,6 +66,11 @@ urlpatterns = [
 
     path('view_product/<int:id>', views.view_product, name='view_product'),
     path('user_add_to_cart/', views.user_add_to_cart, name='user_add_to_cart'),
+    
+    path('validate-coupon/', views.validate_coupon_ajax, name='validate_coupon_ajax'),
 
     path('user_profile/add_money_to_wallet/', views.add_money_to_wallet, name='add_money_to_wallet'),
+    
+    
+    path('user_generate_invoice/<str:order_id>', views.user_generate_invoice, name='user_generate_invoice')
 ]

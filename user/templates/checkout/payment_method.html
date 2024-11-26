@@ -189,8 +189,8 @@
         <h2>Select a Payment Method</h2>
 
         <div class="order-summary">
-            <p>Order ID: <span id="display-order-id"></span></p>
-            <p class="total-amount">Total Amount: $<span id="display-amount"></span></p>
+            <p>Order ID: <span id="display-order-id">{{ order.id }}</span></p>
+            <p class="total-amount">Total Amount: $<span id="display-amount">{{ total_amount }}</span></p>
         </div>
 
         <form id="payment-form">
@@ -203,10 +203,26 @@
                     <input type="radio" id="stripe" name="payment_method" value="stripe">
                     <label for="stripe">Pay with Stripe</label>
                 </div> -->
+                {% if total_amount >= 1000 %}
                 <div class="payment-option">
                     <input type="radio" id="cod" name="payment_method" value="cod">
                     <label for="cod">Cash On Delivery</label>
                 </div>
+                {% else %}
+                <div class="payment-option">
+                    <label>Cash On Delivery is not available for orders above $1000</label>
+                </div>
+                {% endif %}
+                {% if personal_wallet_balance.balance >= total_amount %}
+                <div class="payment-option">
+                    <input type="radio" id="pwallet" name="payment_method" value="pwallet">
+                    <label for="pwallet">Pay Using Personal Wallet</label>
+                </div>
+                {% else %}
+                <div class="payment-option">
+                    <label>Cash On Delivery is not available for orders above $1000</label>
+                </div>
+                {% endif %}
             </div>
 
             <div class="button-container">
@@ -219,6 +235,10 @@
         <form id="cod-form" action="{% url 'user_move_to_order' %}" method="post" style="display: none;">
             {% csrf_token %}
             <input type="hidden" name="payment_method" value="cod">
+        </form>
+        <form id="pwallet-form" action="{% url 'user_move_to_order' %}" method="post" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="payment_method" value="pwallet">
         </form>
     </div>
 
@@ -234,7 +254,7 @@
 
         // Display order details
         document.getElementById('display-order-id').textContent = orderData.orderId;
-        document.getElementById('display-amount').textContent = (orderData.amount)/100;
+        document.getElementById('display-amount').textContent = (orderData.amount);
 
         // Razorpay configuration
         const options = {
@@ -299,6 +319,9 @@
                     break;
                 case 'cod':
                     document.getElementById('cod-form').submit();
+                    break;
+                case 'pwallet':
+                    document.getElementById('pwallet-form').submit();
                     break;
                 default:
                     alert("Please select a valid payment method.");

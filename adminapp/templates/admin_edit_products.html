@@ -343,7 +343,7 @@
             <input type="number" id="edit-product-price" name="price" min="0" value="{{ product.price }}" required>
 
             <label for="edit-product-offer-price">Offer Price of Product</label>
-            <input type="number" id="edit-product-offer-price" name="offerprice" min="0" value="{{ product.offer_price }}">
+            <input type="number" placeholder="If No Offer, Give The Price Same As The Original Price" id="edit-product-offer-price" name="offerprice" min="0" value="{{ product.offer_price }}" required>
             
             <label for="edit-product-collection">Collection Name</label>
             <select name="collection" id="edit-product-collection" required>

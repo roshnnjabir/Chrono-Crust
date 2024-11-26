@@ -20,13 +20,15 @@ button {
 /* Card Base Styles */
 .card {
     position: relative;
-    width: 150px;
-    max-height: 300px !important;
+    width: 100%;
+    max-width: 300px;  /* Set a max-width for better control */  
+    height: auto;
     margin: 10px;
     overflow: hidden;
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s, box-shadow 0.3s;
+    
 }
 
 .card:hover {
@@ -38,7 +40,7 @@ button {
     position: relative;
     overflow: hidden;
     width: 100%;
-    height: 100%;
+    height: 250px; /* Fixed height to maintain consistency */
     background-color: #fff;
 }
 
@@ -122,29 +124,28 @@ button {
     position: relative;
     z-index: 4;
 }
-h2.name{
-    margin-bottom: 1rem;
-}
 
 .name {
-    font-size: 1.0rem;
+    font-size: 1rem;
     line-height: 1.2;
     margin: 0;
 }
-p.name{
-    margin: 5px 0px;
-}
-.price{
-    width: 100%;
-    float: left;
+.sub-name {
+    font-size: .8rem;
+    line-height: 1;
+    margin: 0;
 }
 
 .price-wishlist-container {
-    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 5px;
+}
+
+.price {
+    font-size: 0.9rem;
+    color: #666;
 }
 
 .product-details-container {
@@ -164,15 +165,10 @@ p.name{
     transform: scale(1.1);
 }
 
-.price {
-    font-size: 0.9rem;
-    color: #666;
-}
-
 /* Responsive Styles */
 @media (max-width: 600px) {
     .card {
-        width: calc(50% - 20px);
+        width: calc(100% - 20px);  /* Full width on small screens */
     }
     
     .btn-discover {
@@ -181,32 +177,80 @@ p.name{
     }
     
     .name {
+        font-size: 0.9rem;
+    }
+    .sub-name {
+        font-size: 0.7rem;
+    }
+    
+    .price {
         font-size: 0.8rem;
     }
 }
 
 @media (min-width: 601px) and (max-width: 900px) {
     .card {
-        width: calc(33.33% - 20px);
+        width: calc(50% - 20px);  /* Two cards per row on medium screens */
     }
     
     .btn-discover {
-        padding: 12px 24px;
+        padding: 10px 20px;
         font-size: 0.95rem;
     }
     
     .name {
+        font-size: 1rem;
+    }
+    .sub-name {
+        font-size: 0.8rem;
+    }
+    
+    .price {
+        font-size: 0.85rem;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1200px) {
+    .card {
+        width: calc(33.33% - 20px);  /* Three cards per row on large screens */
+    }
+    
+    .btn-discover {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+    
+    .name {
+        font-size: 1.1rem;
+    }
+    .sub-name {
+        font-size: 0.9rem;
+    }
+    
+    .price {
         font-size: 0.9rem;
     }
 }
 
-@media (min-width: 901px) {
+@media (min-width: 1201px) {
     .card {
-        width: calc(25% - 20px);
+        width: calc(25% - 20px);  /* Four cards per row on extra-large screens */
     }
     
     .btn-discover {
         padding: 15px 30px;
+        font-size: 1.1rem;
+    }
+    
+    .name {
+        font-size: 1.2rem;
+    }
+    
+    .sub-name {
+        font-size: 0.9rem;
+    }
+    
+    .price {
         font-size: 1rem;
     }
 }

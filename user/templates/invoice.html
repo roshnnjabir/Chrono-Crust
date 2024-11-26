@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+        <h1>Invoice</h1>
+        <p>Order ID: {{ order.id }}</p>
+        <p>Date Of Order: {{ order.created_at }}</p>
+        <p>Last Updated: {{ order.updated_at }}</p>
+        <p>Invoice Date: {{ order.created_at }}</p>
+    </div>
+    <div class="invoice-header">
+        <h1>Shipping Address</h1>
+        <p>Building Name: {{ order.address.building_name }}</p>
+        <p>City: {{ order.address.city }}</p>
+        <p>District: {{ order.address.district }}</p>
+        <p>State: {{ order.address.state }}</p>
+        <p>Postal Code: {{ order.address.postal_code }}</p>
+        <p>Phone: {{ order.address.phone }}</p>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.collection.brand.name}} {{ item.product.collection.name }} {{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h3>Total Amount: ₹{{ order.total_amount }}</h3>
+
+    <h3>Total Discount: -₹{{ order.total_discount }}</h3>
+
+    <h3>Total Amount After Discount: ₹{{ order.discounted_amount }}</h3>
+</body>
+<script>
+    document.querySelectorAll('.total-price').forEach(function(el) {
+        var quantity = parseFloat(el.getAttribute('data-quantity'));
+        var price = parseFloat(el.getAttribute('data-price'));
+        
+        if (!isNaN(quantity) && !isNaN(price)) {
+            var total = quantity * price;
+            el.innerHTML = total.toFixed(2);
+        } else {
+            el.innerHTML = 0;
+        }
+    });
+</script>
+</html>

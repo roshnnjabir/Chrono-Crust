@@ -15,18 +15,8 @@
         <a href="{% url 'user_home' %}">Home</a> / <span>My Profile</span>
     </div>
 
-    <!-- Dropdown for Sidebar on Mobile -->
-    <div class="dropdown">
-        <select id="mobile-nav" onchange="navigateTo(this.value)">
-            <option value="/" selected>Overview</option>
-            <option value="personal-wallet">Personal Wallet</option>
-            <option value="address-book">Address Book</option>
-            <option value="user_forgot_password">Change Password</option>
-            <option value="user_cart_view">My Cart</option>
-            <option value="order-history">Wishlist</option>
-            <option value="user_order_history">Order History</option>
-        </select>
-    </div>
+    <!-- Dropdown for Sidebar on Mobile-->
+    {% include 'partials/dropdown.html' %}
 
     <div class="main-content">
         {% include 'partials/sidebar.html' %}        
@@ -36,7 +26,7 @@
             <div class="box">
                 <div class="box-header">
                     <h3>Account Overview</h3>
-                    <button  class="edit_button" id="edit_button" onclick="openModal()">EDIT</button>
+                    <button  class="edit_button" id="edit_button" onclick="openModal()">Edit</button>
                 </div>
                 <div class="info-layout">
                     <div class="info-label">First Name:</div>

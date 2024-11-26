@@ -10,11 +10,15 @@
 <body>
     {% load socialaccount %}
     {% include 'partials/error_pop_up.html' %}
+    <div class="breadcrumbs">
+        <a href="/">Home </a> / <span> Signup </span>
+    </div>
+
     <div class="container">
         <img src="{% static 'images/image2.png' %}" alt="Sign Up Image">
         <div class="form-container">
             <h2>Sign Up</h2>
-            <form action="{% url 'user_signup' %}" method="post">
+            <form id="signup-form" action="{% url 'user_signup' %}" method="post">
                 {% csrf_token %}
                 <input type="text" name="FirstName" placeholder="First Name" value="{{ user.FirstName }}" required>
                 <input type="text" name="LastName" placeholder="Last Name" value="{{ user.LastName }}" required>
@@ -35,6 +39,10 @@
                 <img src="{% static 'images/Google_logo.png' %}" alt="Google Logo">
                 <span>Sign up with Google</span>
             </a>
+
+            <div style="margin: 0; margin-top: 10px;" class="redirect-link">
+                <p>Forgot your password? <a href="{% url 'user_forgot_password' %}" class="link">Reset Password</a></p>
+            </div>
         </div>
     </div>
 

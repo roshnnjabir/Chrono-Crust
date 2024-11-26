@@ -1,39 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
-
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Add Collection</title>
+    <title>Add collection</title>
     <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css"> <!-- Cropper.js CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/admin/togglebutton.css' %}">
     <style>
-        /* Styles for error messages */
+        /* Default Styles */
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fc; /* Light background */
+            color: #333; /* Light text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 700px;
+            padding: 30px;
+            background-color: #ffffff; /* Light container background */
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        label {
+            font-size: 14px;
+            color: #666; /* Light label color */
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 8px 0px;
+            padding-left: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #f9f9f9; /* Light input background */
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #80bdff;
+            outline: none;
+        }
+
         .messages {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-        
+
         .messages li {
             padding: 10px;
             background-color: #ffefef;
             border-left: 4px solid #ff4d4d;
             margin-bottom: 10px;
         }
+
+        .action-button,
+        .save-button {
+            font-family: 'Nunito',sans-serif;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background-color: #28a745; /* Light button background */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .action-button:hover,
+        .save-button:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+
+        /* Dark Theme Styles */
+        .dark-theme {
+            background-color: #181818; /* Dark background */
+            color: #f0f0f0; /* Light text color for dark theme */
+        }
+
+        .dark-theme .container {
+            background-color: #242424; /* Dark container background */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); /* Darker shadow */
+        }
+
+        .dark-theme label {
+            color: #b0b0b0; /* Lighter label color */
+        }
+
+        .dark-theme input[type="text"],
+        .dark-theme input[type="number"],
+        .dark-theme select {
+            background-color: #333; /* Dark input background */
+            border: 1px solid #555; /* Dark border */
+            color: #fff; /* Light text color for inputs */
+        }
+
+        .dark-theme input[type="text"]:focus,
+        .dark-theme input[type="number"]:focus,
+        .dark-theme select:focus {
+            border-color: #80bdff; /* Focus border color */
+        }
+
+        .dark-theme .messages li {
+            background-color: #4d4d4d; /* Darker background for messages */
+            border-left: 4px solid #ff4d4d; /* Keep the same warning color */
+        }
+
+        .dark-theme .action-button,
+        .dark-theme .save-button {
+            background-color: #28a745; /* Button background in dark theme */
+        }
+
+        .dark-theme .action-button:hover,
+        .dark-theme .save-button:hover {
+            background-color: #218838; /* Darker green on hover in dark theme */
+        }
+
+        .breadcrumbs {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #888; /* Breadcrumb text color */
+        }
         
-        
+        a {
+            text-decoration: none;
+            color: #050505; /* Link color */
+        }
+
+        .dark-theme a,.dark-theme h2 {
+            color: #f0f0f0; /* Light link color in dark theme */
+        }
         body {
             font-family: 'Nunito', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f8f9fc;
             color: #333;
-            height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
         }
 
         .container {
@@ -59,9 +194,7 @@
             font-weight: 600;
         }
 
-        input[type="text"],
-        input[type="number"],
-        select {
+        input[type="text"] {
             padding: 8px 0px;
             padding-left: 5px;
             border: 1px solid #ddd;
@@ -73,16 +206,12 @@
             transition: border-color 0.3s;
         }
 
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus {
+        input[type="text"]:focus {
             border-color: #80bdff;
             outline: none;
         }
 
         input[type="file"] {
-            margin-top: 12px;
-            font-size: 14px;
             display: none;
         }
 
@@ -93,40 +222,32 @@
             margin-bottom: 20px;
         }
 
-        .image-section img {
+        .image-preview-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .image-preview-container img {
             border-radius: 8px;
             border: 1px solid #ddd;
-            max-width: 150px;
-            max-height: 150px;
+            width: 150px;
+            height: 150px;
             object-fit: cover;
-            margin: 5px;
             cursor: pointer;
             transition: transform 0.2s;
         }
 
-        .image-section img:hover {
+        .image-preview-container img[src="#"] {
+            border: 1px solid #ff00003c;
+        }
+
+        .image-preview-container img:hover {
             transform: scale(1.05);
         }
 
-        .image-preview-container {
-            display: block;
-            flex-direction: column;
-            align-items: center;
-        }
-        .image-preview-container1 {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #cropped-image {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            max-width: 100%;
-            margin-top: 15px;
-        }
-
-        .action-button,
         .save-button {
             padding: 12px 20px;
             border-radius: 8px;
@@ -138,43 +259,184 @@
             text-align: center;
             width: 100%;
             font-size: 16px;
-            margin-bottom: 20px;
+            margin-top: 20px;
         }
 
-        .action-button:hover,
         .save-button:hover {
             background-color: #218838;
         }
 
-        #save-button {
-            width: auto;
-            padding: 10px 20px;
-        }
         .breadcrumbs {
             font-size: 14px;
-            margin-bottom: 20px;
+            margin: 20px 0px;
             color: #888;
         }
-        a {
+
+        .breadcrumbs a {
             text-decoration: none;
             color: #050505;
+        }
+
+        .required {
+            color: red;
+            font-weight: bold;
+        }
+
+        input:invalid {
+            border-color: #ff00003c;
+        }
+
+        /* Cropper Modal Styles */
+        #cropperModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .cropper-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .cropper-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .cropper-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: #4a5568;
+        }
+
+        .cropper-content {
+            width: 100%;
+            position: relative;
+            background: #f7fafc;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #cropperImage {
+            max-width: 100%;
+            max-height: 60vh;
+            display: block;
+        }
+
+        .cropper-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            width: 100%;
+            padding: 20px 0 0;
+            border-top: 1px solid #edf2f7;
+        }
+
+        .cropper-button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .button-primary {
+            background: #3182ce;
+            color: white;
+        }
+
+        .button-secondary {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+
+        .button-warning {
+            background: #f56565;
+            color: white;
+        }
+
+        .upload-progress {
+            width: 100%;
+            height: 4px;
+            background: #edf2f7;
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #3182ce;
+            width: 0%;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
 
-<body>
+<body class="dark-theme"> <!-- Add dark-theme class for dark mode -->
     <div class="breadcrumbs">
-        <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/list_collection">List Collection </a> / <span>Add Collection </span>
+        <a href="/">Home </a> / <a href="/admin">Admin </a> / <a href="/admin/list_collection">List collection </a> / <span>Add collection </span>
     </div>
     <div class="container">
+        <button id="theme-toggle" style="float: right;" aria-label="Toggle Theme">
+            <!-- Sun SVG (Light Mode) -->
+            <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+                <path d="M12 0v4M12 20v4M4.22 4.22l2.83 2.83M16.97 16.97l2.83 2.83M0 12h4M20 12h4M4.22 19.78l2.83-2.83M16.97 7.03l2.83-2.83" 
+                    stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+
+            <!-- Moon SVG (Dark Mode) -->
+            <svg id="moon-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12 2a10 10 0 1 0 10 10 7 7 0 0 1-10-10z"></path>
+            </svg>
+            
+        </button>
         <h2>Add Collection</h2>
         <form id="edit-form" action="{% url 'admin_add_collection' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <label for="collection-name">Collection Name</label>
+            <label for="collection-name">Collection Name <span class="required">*</span></label>
             <input type="text" id="collection-name" name="collection" required>
 
-            <label for="brand-name">Brand Name</label>
+            <label for="brand-name">Brand Name  <span class="required">*</span></label>
             <select name="brand" id="collection-brand" required>
                 {% for brand in brands %}
                 <option value="{{ brand.id }}">
@@ -182,20 +444,292 @@
                 </option>
                 {% endfor %}
             </select>
+
+            <div class="image-section">
+                <label for="collection-image">Collection Images <span class="required">*</span></label>
+                <div class="image-preview-container">
+                    <img id="image1" name="collectionlogo" src="#" alt="Add Logo" onclick="chooseImage('image1')">
+                    <img id="image2" name="collectionbanner" src="#" alt="Add Banner" onclick="chooseImage('image2')">
+                </div>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                    First image will be used as logo, second as banner
+                </p>
+            </div>
+            
+            <input type="hidden" name="image1" id="himage1" value="">
+            <input type="hidden" name="image2" id="himage2" value="">
+
+            <p><span class="required">*</span> Denotes Required Fields</p>
+
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li style="list-style: none;">
+                        {% if message.tags %}
+                        Warning:
+                        {% endif %}{{ message }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             <button type="submit" class="save-button">Add Collection</button>
         </form>
-        {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-            <li style="list-style: none;">
-                {% if message.tags %}
-                Warning:
-                {% endif %}{{ message }}
-            </li>
-            {% endfor %}
-        </ul>
-        {% endif %}
     </div>
+
+    <!-- Cropper Modal -->
+    <div id="cropperModal">
+        <div class="cropper-container">
+            <div class="cropper-header">
+                <h3 class="cropper-title">Add Image</h3>
+                <button class="close-button" onclick="closeCropper()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="cropper-content">
+                <img id="cropperImage" src="" alt="Image to crop">
+            </div>
+
+            <div class="cropper-controls">
+                <button class="cropper-button button-secondary" onclick="rotateCropper(-90)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    </svg>
+                    Rotate Left
+                </button>
+                <button class="cropper-button button-secondary" onclick="rotateCropper(90)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                    </svg>
+                    Rotate Right
+                </button>
+                <button class="cropper-button button-secondary" onclick="resetCropper()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                        <path d="M3 8h6v-6"></path>
+                    </svg>
+                    Reset
+                </button>
+                <button class="cropper-button button-primary" onclick="saveCroppedImage()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    Save Changes
+                </button>
+                <button class="cropper-button button-warning" onclick="closeCropper()">Cancel</button>
+            </div>
+
+            <div class="upload-progress">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
+    <script>
+        let cropper;
+        let selectedImageId;
+        const modal = document.getElementById('cropperModal');
+        const cropperImage = document.getElementById('cropperImage');
+        const progressBar = document.querySelector('.progress-bar');
+        const progressContainer = document.querySelector('.upload-progress');
+            
+        // Form submission handler with validation
+        document.getElementById('edit-form').onsubmit = function(e) {
+            // Get both images
+            const image1 = document.getElementById('image1');
+            const image2 = document.getElementById('image2');
+            
+            // Check if either image is not set (src is # or empty)
+            if (image1.src.endsWith('#') || image2.src.endsWith('#') || 
+                !image1.src || !image2.src || 
+                image1.src === window.location.href || 
+                image2.src === window.location.href) {
+                
+                // Create or get the messages container
+                let messagesContainer = document.querySelector('.messages');
+                if (!messagesContainer) {
+                    messagesContainer = document.createElement('ul');
+                    messagesContainer.className = 'messages';
+                    const form = document.getElementById('edit-form');
+                    form.insertBefore(messagesContainer, form.querySelector('.save-button'));
+                }
+                
+                // Clear previous messages
+                messagesContainer.innerHTML = '';
+                
+                // Add error message
+                const errorMessage = document.createElement('li');
+                errorMessage.style.listStyle = 'none';
+                errorMessage.innerHTML = 'Warning: Please select both a logo and banner image before submitting.';
+                messagesContainer.appendChild(errorMessage);
+                
+                // Highlight unselected images with red border
+                if (image1.src.endsWith('#') || !image1.src || image1.src === window.location.href) {
+                    image1.style.border = '2px solid #ff4d4d';
+                }
+                if (image2.src.endsWith('#') || !image2.src || image2.src === window.location.href) {
+                    image2.style.border = '2px solid #ff4d4d';
+                }
+                
+                // Prevent form submission
+                e.preventDefault();
+                return false;
+            }
+            
+            // If validation passes, update hidden inputs and submit
+            ['image1', 'image2'].forEach(imageId => {
+                const imageSrc = document.getElementById(imageId).src;
+                if (imageSrc && imageSrc !== '#') {
+                    const url = new URL(imageSrc);
+                    document.getElementById('h' + imageId).value = url.pathname.replace('/media/', '');
+                }
+            });
+            
+            return true;
+        };
+        
+        // Image selection handler
+        function chooseImage(imageId) {
+            selectedImageId = imageId;
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (e) => {
+                // Reset border color when new image is selected
+                document.getElementById(imageId).style.border = '1px solid #ddd';
+                handleImageUpload(e.target.files[0]);
+            };
+            input.click();
+        }
+        
+        // Image upload handler
+        function handleImageUpload(file) {
+            if (!file) return;
+        
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload a valid image file (JPEG, PNG, or WebP)');
+                return;
+            }
+        
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                cropperImage.src = e.target.result;
+                modal.style.display = 'flex';
+                
+                if (cropper) {
+                    cropper.destroy();
+                }
+            
+                cropper = new Cropper(cropperImage, {
+                    viewMode: 2,
+                    background: true,
+                    rotatable: true,
+                    scalable: true,
+                    zoomable: true,
+                    cropBoxResizable: true,
+                    cropBoxMovable: true,
+                    guides: true,
+                    center: true,
+                    autoCropArea: 0.8,
+                    aspectRatio: NaN
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Rotation handler
+        function rotateCropper(degrees) {
+            if (cropper) {
+                cropper.rotate(degrees);
+            }
+        }
+        
+        // Reset cropper
+        function resetCropper() {
+            if (cropper) {
+                cropper.reset();
+            }
+        }
+        
+        // Close modal handler
+        function closeCropper() {
+            modal.style.display = 'none';
+            if (cropper) {
+                cropper.destroy();
+            }
+        }
+        
+        // Save cropped image handler
+        function saveCroppedImage() {
+            if (!cropper) return;
+        
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+        
+            const canvas = cropper.getCroppedCanvas({
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
+        
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                const filename = `cropped_${Date.now()}.png`;
+                formData.append('image', blob, filename);
+            
+                try {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/upload_cropped_image/', true);
+                    
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const percentComplete = (e.loaded / e.total) * 100;
+                            progressBar.style.width = percentComplete + '%';
+                        }
+                    };
+                
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.status === 'success') {
+                                const selectedImage = document.getElementById(selectedImageId);
+                                selectedImage.src = response.file_url;
+                                closeCropper();
+                                progressContainer.style.display = 'none';
+                            } else {
+                                alert('Error uploading image');
+                            }
+                        }
+                    };
+                
+                    xhr.onerror = function() {
+                        alert('Error uploading image');
+                        progressContainer.style.display = 'none';
+                    };
+                
+                    xhr.send(formData);
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error uploading image');
+                    progressContainer.style.display = 'none';
+                }
+            }, 'image/png', 0.9);
+        }
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeCropper();
+            }
+        });
+    </script>
+    <script src="{% static 'js/theme.js' %}"></script>
 </body>
 
 </html>
