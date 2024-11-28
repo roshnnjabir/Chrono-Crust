@@ -2,81 +2,174 @@
 <html>
 <head>
     <style>
-        body {
-            font-family: 'Nunito', sans-serif;
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0,123,255,0.5) rgba(0,123,255,0.1);
         }
+        
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        *::-webkit-scrollbar-track {
+            background: rgba(0,123,255,0.1);
+            border-radius: 4px;
+        }
+        
+        *::-webkit-scrollbar-thumb {
+            background-color: rgba(0,123,255,0.5);
+            border-radius: 4px;
+        }
+        
+        *::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(0,123,255,0.7);
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+            overflow-y: auto;
+        }
+        
+        .invoice-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
         .invoice-header {
             text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
             margin-bottom: 20px;
         }
+        
+        .invoice-header h1 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .invoice-details .left,
+        .invoice-details .right {
+            width: 45%;
+        }
+        
+        .invoice-details p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
         }
+        
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
             text-align: left;
         }
+        
         th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        
+        tr:nth-child(even) {
             background-color: #f2f2f2;
+        }
+        
+        .totals {
+            text-align: right;
+            margin-top: 20px;
+        }
+        
+        .totals h3 {
+            margin: 10px 0;
+            color: #333;
+        }
+        
+        .total-amount {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .discount {
+            color: #dc3545;
         }
     </style>
 </head>
 <body>
-    <div class="invoice-header">
-        <h1>Invoice</h1>
-        <p>Order ID: {{ order.id }}</p>
-        <p>Date Of Order: {{ order.created_at }}</p>
-        <p>Last Updated: {{ order.updated_at }}</p>
-        <p>Invoice Date: {{ order.created_at }}</p>
-    </div>
-    <div class="invoice-header">
-        <h1>Shipping Address</h1>
-        <p>Building Name: {{ order.address.building_name }}</p>
-        <p>City: {{ order.address.city }}</p>
-        <p>District: {{ order.address.district }}</p>
-        <p>State: {{ order.address.state }}</p>
-        <p>Postal Code: {{ order.address.postal_code }}</p>
-        <p>Phone: {{ order.address.phone }}</p>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Item</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in order.items.all %}
-            <tr>
-                <td>{{ item.product.collection.brand.name}} {{ item.product.collection.name }} {{ item.product.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.price }}</td>
-                <td>{{ item.total_price }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <h3>Total Amount: ₹{{ order.total_amount }}</h3>
-
-    <h3>Total Discount: -₹{{ order.total_discount }}</h3>
-
-    <h3>Total Amount After Discount: ₹{{ order.discounted_amount }}</h3>
-</body>
-<script>
-    document.querySelectorAll('.total-price').forEach(function(el) {
-        var quantity = parseFloat(el.getAttribute('data-quantity'));
-        var price = parseFloat(el.getAttribute('data-price'));
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>Invoice</h1>
+        </div>
         
-        if (!isNaN(quantity) && !isNaN(price)) {
-            var total = quantity * price;
-            el.innerHTML = total.toFixed(2);
-        } else {
-            el.innerHTML = 0;
-        }
-    });
-</script>
+        <div class="invoice-details">
+            <div class="left">
+                <h3>Order Details</h3>
+                <p><strong>Order ID:</strong> {{ order.id }}</p>
+                <p><strong>Date of Order:</strong> {{ order.created_at }}</p>
+                <p><strong>Last Updated:</strong> {{ order.updated_at }}</p>
+            </div>
+            
+            <div class="right">
+                <h3>Shipping Address</h3>
+                <p>{{ order.address.building_name }}</p>
+                <p>{{ order.address.city }}, {{ order.address.district }}</p>
+                <p>{{ order.address.state }} - {{ order.address.postal_code }}</p>
+                <p><strong>Phone:</strong> {{ order.address.phone }}</p>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.collection.brand.name }} {{ item.product.collection.name }} {{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.price }}</td>
+                    <td>₹{{ item.total_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="totals">
+            <h3>Total Amount: <span class="total-amount">₹{{ order.total_amount }}</span></h3>
+            <h3>Total Discount: <span class="discount">₹{{ order.total_discount }}</span></h3>
+            <h3>Total Amount After Discount: <span class="total-amount">₹{{ order.discounted_amount }}</span></h3>
+        </div>
+    </div>
+</body>
 </html>

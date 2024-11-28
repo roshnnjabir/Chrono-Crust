@@ -562,7 +562,13 @@
                                     Unlisted
                                     {% endif %}
                                 </td>
-                                <td>{{ product.stock }}</td>
+                                {% if product.stock <= 0 %}
+                                    <td><div style="color: rgba(255, 0, 0, 0.463);">0</div></td>
+                                {% elif product.stock <= 15 %}
+                                    <td><div style="color: #ff0000;">{{ product.stock }}</div></td>
+                                {% else %}
+                                    <td>{{ product.stock }}</td>
+                                {% endif %}
                                 <td>${{ product.price }}</td>
                                 {% if product.price != product.offer_price %}
                                     <td>${{ product.offer_price }}</td>

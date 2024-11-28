@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 ]
 
-SITE_ID = 2
+SITE_ID = 3
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -173,6 +173,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
@@ -185,10 +186,9 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'roshanjabir7@gmail.com'
-EMAIL_HOST_PASSWORD = 'qhlx hkry cyil vbqn'  # Use an App-specific password from Google
+EMAIL_HOST_PASSWORD = 'pupf ufpm oqgz wxms'  # Use an App-specific password from Google
 DEFAULT_FROM_EMAIL = 'roshanjabir7@gmail.com'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
 
 
 AUTHENTICATION_BACKENDS = [
@@ -199,3 +199,10 @@ AUTHENTICATION_BACKENDS = [
 
 RAZOR_KEY_ID = 'rzp_test_ogXW1qOaXCrzZG'
 RAZOR_KEY_SECRET = 'xh7Hg2R6cJmhk7p02eCGhtZC'
+
+
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Automatically create user on social login
+SOCIALACCOUNT_EMAIL_VERIFICATION = False  # Optional
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

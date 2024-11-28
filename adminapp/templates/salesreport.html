@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+    
+</head>
+<body>
+    <h1>Monthly Sales Report</h1>
+
+    <!-- Debugging output for labels and salesData -->
+<p>Labels: {{ labels }}</p>
+<p>Sales Data: {{ sales }}</p>
+
+    <canvas id="salesChart" width="600" height="400"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN -->
+    <script>
+        // Ensure the data passed from Django is parsed correctly
+        const labels = JSON.parse('{{ labels|escapejs }}');  // Safely escaping labels
+        const salesData = JSON.parse('{{ sales|escapejs }}');  // Safely escaping sales data
+        
+        // Check if the data is passed correctly (optional)
+        console.log(labels);
+        console.log(salesData);
+        
+        // Create the chart after ensuring the canvas is ready
+        window.onload = function () {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            const salesChart = new Chart(ctx, {
+                type: 'bar',  // Bar chart type
+                data: {
+                    labels: labels,  // X-axis labels
+                    datasets: [{
+                        label: 'Total Sales ($)',  // Dataset label
+                        data: salesData,  // Y-axis data (total sales)
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',  // Bar color
+                        borderColor: 'rgba(75, 192, 192, 1)',  // Bar border color
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>    
+</body>
+</html>

@@ -31,18 +31,26 @@
                             <h3>Order ID: {{ order.id }}</h3>
                             <p>Date: {{ order.updated_at.date }}</p>
                             <strong>Products:</strong>
-                                <ul class="order-history-products">
-                                    {% for item in order.items.all %}
-                                        <li>{{ item.product.name }}</li> <!-- Displaying the product name -->
-                                    {% empty %}
-                                        <li>No products in this order.</li>
-                                    {% endfor %}
-                                </ul>
+                            <ul class="order-history-products">
+                                {% for item in order.items.all %}
+                                    <li style="list-style: none;">
+                                        <div class="order-product-item">
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="order-product-image">
+                                            <span>
+                                                <span>{{ item.product.collection.brand.name }}</span><br>
+                                                <span>  {{ item.product.collection.name }} {{ item.product.name }}</span>
+                                            </span>
+                                        </div>
+                                    </li>
+                                {% empty %}
+                                    <li>No products in this order.</li>
+                                {% endfor %}
+                            </ul>
                         </div>
                         <div class="order-actions">
                             <button type="button" class="view-details-button" onclick="openOrderDetails({{ order.id }})">View Details</button>
                             {% if order.status == 'cancelled' %}
-                                <button class="cancel-order-button-disabled"onclick="event.stopPropagation();" disabled>Order Cancelled</button>
+                                <button class="cancel-order-button-disabled" onclick="event.stopPropagation();" disabled>Order Cancelled</button>
                             {% else %}
                                 <form method="POST" action="{% url 'user_order_cancel' order.id %}" onclick="event.stopPropagation();">
                                     {% csrf_token %}

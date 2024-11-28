@@ -42,6 +42,12 @@
         </div>
     </div>    
     <script>
+        // Prevent spaces in input fields
+        document.querySelectorAll('#login-form input').forEach(input => {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/\s/g, ''); // Remove spaces
+            });
+        });
         document.getElementById('login-form').addEventListener('submit', function(event) {
             const loginBtn = document.getElementById('login-btn');
             loginBtn.disabled = true;

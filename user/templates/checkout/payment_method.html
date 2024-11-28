@@ -282,7 +282,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === "success") {
-                        window.location = '/user_profile/user_order_history';
+                        window.location.assign('/user_profile/user_order_history');
+                        window.location.reload();
                     } else {
                         alert("Error saving order. Please contact support.");
                     }
@@ -327,6 +328,11 @@
                     alert("Please select a valid payment method.");
             }
         };
+
+        document.getElementById('cod-form').onsubmit = function() {
+            window.location.assign('/user_profile/user_order_history');
+            window.location.reload();
+        };   
     </script>
 </body>
 </html>

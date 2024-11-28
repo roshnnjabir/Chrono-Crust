@@ -93,9 +93,11 @@
     function openAddAddressModal() {
         document.getElementById("addAddressModal").style.display = "flex";
     }
+
     function closeAddAddressModal() {
         document.getElementById("addAddressModal").style.display = "none";
     }
+
     function openEditModal(id, building_name, landmark, city, district, state, postal_code, country, phone) {
         document.getElementById("address_id").value = id;
         document.getElementById("editBuildingName").value = building_name;
@@ -107,14 +109,53 @@
         document.getElementById("editCountry").value = country;
         document.getElementById("editPhone").value = phone;
         document.getElementById("editModal").style.display = "flex";
-    }        
+    }
+
     function closeEditModal() {
         document.getElementById("editModal").style.display = "none";
     }
+
     function confirmDelete(addressId) {
         const confirmDelete = confirm("Are you sure you want to delete this address?");
         if (confirmDelete) {
             window.location.href = `/user_profile/delete_address/${addressId}`;
         }
     }
+
+    // General validation and sanitization for all text inputs
+    function validateAndSanitizeForm(formId) {
+        const form = document.getElementById(formId);
+        const textInputs = form.querySelectorAll("input[type='text']");
+        let isValid = true;
+
+        textInputs.forEach(input => {
+            const sanitizedValue = input.value.trim();
+
+            if (!sanitizedValue) {
+                alert(`${input.previousElementSibling.textContent} cannot be empty or just spaces.`);
+                input.focus();
+                isValid = false;
+                return; // Exit loop
+            }
+
+            // Update the input value to remove extra spaces
+            input.value = sanitizedValue;
+        });
+
+        return isValid;
+    }
+
+    // Add event listener to Add Address form
+    document.getElementById("addAddressForm").addEventListener("submit", function (event) {
+        if (!validateAndSanitizeForm("addAddressForm")) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
+
+    // Add event listener to Edit Address form
+    document.getElementById("editAddressForm").addEventListener("submit", function (event) {
+        if (!validateAndSanitizeForm("editAddressForm")) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
 </script>

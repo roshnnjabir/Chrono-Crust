@@ -212,7 +212,7 @@
         }
 
         /* Button styling */
-        .filter-button {
+        .filter-button, .filter-form select {
             background-color: #28a745; /* Green background */
             color: #fff; /* White text */
             border: none; /* Remove default border */
@@ -234,6 +234,22 @@
         .filter-button:active {
             background-color: #1e7e34; /* Even darker green on click */
             transform: scale(0.98); /* Slight shrink effect on click */
+        }
+
+        .graphs-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .product-popularity-graph,
+        .collection-popularity-graph {
+            width: 48%;
+        }
+        
+        .graphs-container img {
+            max-width: 100%;
+            height: auto;
         }
 
 
@@ -281,9 +297,14 @@
                 <h1>Sales Report</h1>
                 
                 <form method="GET" action="{% url 'admin_sales' %}" class="filter-form">
-                    <input type="hidden" id="last_7_days" name="last_7_days" value="7">
-                    <button type="submit" class="filter-button">Last 7 Days</button>
-                </form>    
+                    <select id="date-filter" name="time_frame" class="filter-select">
+                        <option value="all" disabled selected>Select a time frame</option>
+                        <option value="1">Last 24 Hours</option>
+                        <option value="7">Last 7 Days</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                </form>                
 
                 <!-- Filter Button -->
                 <button id="filterButton" class="action-button">Custom Filters</button>            
@@ -319,43 +340,62 @@
                     <p><strong>Total Discount:</strong> {{ total_sale_discount }}</p>
                 </div>
 
-                <!-- Recent Sales Table -->
-                <div class="table-container">
-                    <table id="sales-report">
-                        <thead>
-                            <tr>
-                                <th>Sale ID</th>
-                                <th>User</th>
-                                <th>Product</th>
-                                <th>Date</th>
-                                <th>Total Amount</th>
-                                <th>Discounted Total Amount</th>
-                                <th>Discount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-body">
-                            {% for sale in sales %}
-                            <tr>
-                                <td>{{ sale.id|capfirst }}</td>
-                                <td>{{ sale.user.first_name }} {{ sale.user.last_name }}</td>
-                                <td>
-                                    {% for item in sale.items.all %}
-                                        {{item.quantity}} X {{item.product.collection.brand.name}} {{item.product.collection.name}} {{item.product.name}} <br><br>
-                                    {% endfor %}
-                                </td>
-                                <td>{{ sale.created_at.date }}</td>
-                                <td>{{ sale.total_amount }}</td>
-                                <td>{{ sale.discounted_amount }}</td>
-                                <td>{{ sale.total_discount }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6">No sales found</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>                        
-                    </table>
+                <div class="graphs-container">
+                    <div class="product-popularity-graph">
+                        <h2>Top 5 Most Popular Products - Sales Trend</h2>
+                        <img src="data:image/png;base64,{{ product_line_graph }}" alt="Product Sales Line Graph">
+                        
+                        <h2>Product Sales Percentage</h2>
+                        <img src="data:image/png;base64,{{ product_pie_graph }}" alt="Product Sales Percentage Pie Chart">
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Total Sales</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in product_popularity %}
+                                <tr>
+                                    <td>{{ product.name }}</td>
+                                    <td>{{ product.total_sales }}</td>
+                                    <td>{{ product.sales_percentage|floatformat:2 }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                
+                    <div class="collection-popularity-graph">
+                        <h2>Top 5 Most Popular Collections - Sales Trend</h2>
+                        <img src="data:image/png;base64,{{ collection_line_graph }}" alt="Collection Sales Line Graph">
+                        
+                        <h2>Collection Sales Percentage</h2>
+                        <img src="data:image/png;base64,{{ collection_pie_graph }}" alt="Collection Sales Percentage Pie Chart">
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Collection</th>
+                                    <th>Total Sales</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for collection in collection_popularity %}
+                                <tr>
+                                    <td>{{ collection.name }}</td>
+                                    <td>{{ collection.total_sales }}</td>
+                                    <td>{{ collection.sales_percentage|floatformat:2 }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+                <a href="?download_pdf=1">Download Sales Report (PDF)</a>
             
                 {% if messages %}
                 <ul class="messages">
@@ -373,6 +413,9 @@
     </div>
 
     <script>
+        document.getElementById('date-filter').addEventListener('change', function() {
+            this.form.submit(); // Submit the form when the selection changes
+        });
         // Get the modal
         var modal = document.getElementById("filterModal");
     

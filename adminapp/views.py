@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from user.models import CustomUser
 from .models import Product, Brand, Collection, Order, OrderItem, Coupen
 from django.contrib.auth import logout, login, authenticate
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum, F, FloatField
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.cache import never_cache
@@ -14,6 +14,14 @@ import json
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import Sum, DecimalField
+import matplotlib
+matplotlib.use('Agg')  # Set the backend before importing pyplot
+import matplotlib.pyplot as plt
+import io
+import base64
+from django.db.models.functions import Cast
+from django.db.models.functions import Coalesce
 
 
 # Create your views here.
@@ -596,66 +604,195 @@ def admin_delete_coupon(request, code):
 
 
 def admin_sales(request):
-    orders = Order.objects.filter(payment_status='paid')
-    total_amount = 0
-    total_sale_discount = 0
+    # Explicitly close any existing plots
+    plt.close('all')
     
-    last_7_days = request.GET.get('last_7_days')
+    # Base queryset of paid orders
+    orders = Order.objects.filter(payment_status='paid')
+    
+    # Extract filter parameters
+    time_frame = request.GET.get('time_frame')
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
-    order_count = orders.count()
-
-    if last_7_days:
-        seven_days_ago = timezone.now() - timedelta(days=7)
-        orders = orders.filter(updated_at__date__gte=seven_days_ago.date())
-    elif start_date and end_date:
+    
+    # Dynamic Time Filtering
+    if time_frame:
+        if time_frame == '1':
+            start_date = timezone.now() - timedelta(days=1)
+        elif time_frame == '7':
+            start_date = timezone.now() - timedelta(days=7)
+        elif time_frame == '30':
+            start_date = timezone.now() - timedelta(days=30)
+        
+        if start_date:
+            orders = orders.filter(updated_at__date__gte=start_date.date())
+    
+    # Optional Date Range Filtering
+    if start_date and end_date:
         orders = orders.filter(updated_at__date__range=[start_date, end_date])
-
+    
+    # Price Range Filtering
     if min_price and max_price:
-        orders = orders.filter(total_amount__range=[min_price, max_price])
-
-    for order in orders:
-        total_amount += order.total_amount
-        total_sale_discount += order.total_discount
-
-    if order_count > 0:
-        average_price = round(total_amount/order_count, 2)
-    else:
-        average_price = 0
-
+        orders = orders.filter(total_amount__range=[float(min_price), float(max_price)])
+    
+    # Sales Calculations
+    total_amount = orders.aggregate(
+        total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField())
+    )['total']
+    
+    total_sale_discount = orders.aggregate(
+        discount=Coalesce(Sum('total_discount'), 0, output_field=DecimalField())
+    )['discount']
+    
+    order_count = orders.count()
+    
+    # Average Price Calculation
+    average_price = round(total_amount / order_count, 2) if order_count > 0 else 0
+    
+    # Top 5 Popular Products Calculation
+    total_product_sales = OrderItem.objects.filter(order__in=orders).aggregate(
+        total_sales=Coalesce(Sum('quantity'), 0, output_field=DecimalField())  # Ensure no None values
+    )['total_sales']
+    
+    product_popularity = Product.objects.filter(orderitem__order__in=orders).annotate(
+        total_sales=Coalesce(Sum('orderitem__quantity'), 0, output_field=DecimalField()),
+        sales_percentage=Cast(
+            Coalesce(Sum('orderitem__quantity'), 0) * 100.0 / (total_product_sales if total_product_sales > 0 else 1), 
+            FloatField()
+        )
+    ).order_by('-total_sales')[:5]
+    
+    # Top 5 Popular Collections Calculation
+    total_collection_sales = OrderItem.objects.filter(order__in=orders).aggregate(
+        total_sales=Coalesce(Sum('quantity'), 0, output_field=DecimalField())  # Ensure no None values
+    )['total_sales']
+    
+    collection_popularity = Collection.objects.filter(product__orderitem__order__in=orders).annotate(
+        total_sales=Coalesce(Sum('product__orderitem__quantity'), 0, output_field=DecimalField()),
+        sales_percentage=Cast(
+            Coalesce(Sum('product__orderitem__quantity'), 0) * 100.0 / (total_collection_sales if total_collection_sales > 0 else 1),
+            FloatField()
+        )
+    ).order_by('-total_sales')[:5]
+    
+    # Visualization Functions
+    def generate_line_graph(data, title, x_label, y_label):
+        try:
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.plot([item.name for item in data], 
+                    [item.total_sales for item in data], 
+                    marker='o')
+            ax.set_title(title)
+            ax.set_xlabel(x_label)
+            ax.set_ylabel(y_label)
+            plt.xticks(rotation=45, ha='right')
+            plt.tight_layout()
+            
+            buffer = io.BytesIO()
+            fig.savefig(buffer, format='png')
+            buffer.seek(0)
+            graph = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            plt.close(fig)  # Close the specific figure
+            return graph
+        except Exception as e:
+            print(f"Error generating line graph: {e}")
+            return None
+    
+    def generate_pie_chart(data, title):
+        try:
+            fig, ax = plt.subplots(figsize=(8, 8))
+            ax.pie([item.sales_percentage for item in data], 
+                   labels=[item.name for item in data], 
+                   autopct='%1.1f%%')
+            ax.set_title(title)
+            ax.axis('equal')
+            
+            buffer = io.BytesIO()
+            fig.savefig(buffer, format='png')
+            buffer.seek(0)
+            chart = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            plt.close(fig)  # Close the specific figure
+            return chart
+        except Exception as e:
+            print(f"Error generating pie chart: {e}")
+            return None
+    
+    # Generate Graphs (with data checks)
+    product_line_graph = None
+    product_pie_graph = None
+    collection_line_graph = None
+    collection_pie_graph = None
+    
+    if product_popularity:
+        product_line_graph = generate_line_graph(
+            product_popularity, 
+            'Product Sales Trend', 
+            'Product Name', 
+            'Total Sales'
+        )
+        product_pie_graph = generate_pie_chart(
+            product_popularity, 
+            'Product Sales Percentage'
+        )
+    
+    if collection_popularity:
+        collection_line_graph = generate_line_graph(
+            collection_popularity, 
+            'Collection Sales Trend', 
+            'Collection Name', 
+            'Total Sales'
+        )
+        collection_pie_graph = generate_pie_chart(
+            collection_popularity, 
+            'Collection Sales Percentage'
+        )
+    
+    # Final cleanup
+    plt.close('all')
+    
+    # Prepare Context
     context = {
         'sales': orders,
         'total_revenue': total_amount,
-        'total_sales': orders.count(),
+        'total_sales': order_count,
         'average_price': average_price,
         'total_sale_discount': total_sale_discount,
+        'product_line_graph': product_line_graph,
+        'product_pie_graph': product_pie_graph,
+        'collection_line_graph': collection_line_graph,
+        'collection_pie_graph': collection_pie_graph,
+        'product_popularity': product_popularity,
+        'collection_popularity': collection_popularity
     }
+    
     return render(request, 'admin_sales.html', context=context)
 
 
 def admin_list_offers(request):
     products = Product.objects.all()
-    return render(request, 'admin_list_offers.html', {'products': products})
+    return render(request, 'offers/admin_list_offers.html', {'products': products})
 
 
 def admin_add_offers(request):
     if request.method == 'POST':
         id = request.POST.get('product_id')
         offer_price = request.POST.get('offer_price')
-        print(id)
         product = Product.objects.get(id=id)
         product.offer_price = offer_price
-        print(product.offer_price)
         product.save()
         return redirect('admin_offers')
     products = Product.objects.all()
-    return render(request, 'admin_add_offers.html', {'products': products})
+    return render(request, 'offers/admin_add_offers.html', {'products': products})
 
 
-def admin_delete_offer(request):
-    pass
+@staff_member_required
+def admin_delete_offer(request, id):
+    product = Product.objects.get(id=id)
+    product.offer_price = product.price
+    product.save()
+    return redirect('admin_offers')
 
 
 @csrf_exempt

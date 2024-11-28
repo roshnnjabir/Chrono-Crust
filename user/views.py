@@ -29,6 +29,9 @@ from weasyprint import HTML
 
 
 def user_home(request):
+    
+    print(settings.EMAIL_BACKEND)  # Should output: 'django.core.mail.backends.smtp.EmailBackend'
+
     products = Product.objects.filter(
         Q(is_listed=True),
         Q(collection__is_listed=True),
@@ -358,6 +361,20 @@ def verify_otp(request):
             messages.error(request, 'No OTP found. Please request a new one.')
     return redirect('otp_page')
 
+
+def google_login_redirect(request):
+    client_id = settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['client_id']
+    redirect_uri = request.build_absolute_uri('/accounts/google/login/callback/')
+
+    google_login_url = (
+        f"https://accounts.google.com/o/oauth2/v2/auth"
+        f"?client_id={client_id}"
+        f"&redirect_uri={redirect_uri}"
+        "&response_type=code"
+        "&scope=openid%20email%20profile"
+    )
+
+    return redirect(google_login_url)
 
 @login_required(login_url='user_login')
 def user_profile(request):
@@ -771,6 +788,7 @@ def generate_order_id():
 
 
 @csrf_exempt  # Only use in development; make sure CSRF protection is in place for deployment
+@never_cache
 def user_move_to_order(request):
     if request.method == 'POST':
         if request.headers.get('Content-Type') == 'application/json':
@@ -838,15 +856,13 @@ def user_move_to_order(request):
 
                     except CartItem.DoesNotExist:
                         continue
-                
                 print(f"New order created with ID: {order.id}")
 
             # Now that we have the order (whether existing or new), update it with payment details
             order.payment_id = payment_id
             order.payment_status = 'paid'  # Update status to 'paid' as payment was successful
             order.save()
-
-            # Additional logic for processing order items, e.g., marking as sold, etc.
+            messages.success(request, 'Order Placed Successfully.')
 
             # Respond with success
             return JsonResponse({'status': 'success'})
@@ -902,6 +918,8 @@ def user_move_to_order(request):
 
                             # Remove the item from the cart
                             cart_item.delete()
+                            messages.success(request, 'Order Placed Successfully On Cash On Delivery.')
+
 
                         except CartItem.DoesNotExist:
                             continue
@@ -911,6 +929,7 @@ def user_move_to_order(request):
 
 
 @login_required(login_url='user_login')
+@never_cache
 def user_order_history(request):
     orders = Order.objects.filter(user=request.user).order_by('-updated_at')
     for order in orders:
@@ -1022,6 +1041,7 @@ def address_selection(request):
 razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
 
 
+@never_cache
 def user_payment_method_selection(request):
     if request.method == 'POST':
         selected_address_id = request.POST.get('selected_address')
@@ -1033,14 +1053,15 @@ def user_payment_method_selection(request):
         item_ids = item_ids.split(',') if item_ids else []
 
         client = razorpay.Client(auth=("rzp_test_ogXW1qOaXCrzZG", "xh7Hg2R6cJmhk7p02eCGhtZC"))
-        amount = int(float(total_amount) * 100)
-        personal_wallet = PersonalWallet.objects.get(user=request.user)
-
-        data = {"amount": amount, "currency": "INR"}
-        amount = amount/100
-        payment = client.order.create(data=data)
-        order_id = payment['id']
-        return render(request, 'checkout/payment_method.html', {'order_id': order_id, 'total_amount': amount, 'personal_wallet_balance': personal_wallet})
+        if total_amount:
+            amount = int(float(total_amount) * 100)
+            personal_wallet = PersonalWallet.objects.get(user=request.user)
+    
+            data = {"amount": amount, "currency": "INR"}
+            amount = amount/100
+            payment = client.order.create(data=data)
+            order_id = payment['id']
+            return render(request, 'checkout/payment_method.html', {'order_id': order_id, 'total_amount': amount, 'personal_wallet_balance': personal_wallet})
     return redirect('user_profile')
 
 

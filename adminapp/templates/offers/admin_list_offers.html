@@ -104,6 +104,21 @@
             color: #888;
         }
 
+        .logout-button {
+            background-color: #ff4d4d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+    
+        .logout-button:hover {
+            background-color: #ff1a1a;
+        }
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             table th, table td {
@@ -139,15 +154,17 @@
                         <th>Product Name</th>
                         <th>Original Price</th>
                         <th>Offer Price</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for product in products %}
-                    {% if product.offer_price != 0 %}
+                    {% if product.offer_price != product.price %}
                     <tr>
                         <td>{{ product.name }}</td>
                         <td>{{ product.price }}</td>
                         <td>{{ product.offer_price }}</td>
+                        <td><a href="{% url 'admin_delete_offer' product.id %}"><button class="logout-button">Delete</button></a></td>
                     </tr>
                     {% endif %}
                     {% endfor %}

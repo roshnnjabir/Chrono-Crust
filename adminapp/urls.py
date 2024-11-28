@@ -64,7 +64,8 @@ urlpatterns = [
     
     path('admin/offers', views.admin_list_offers, name='admin_offers'),
     path('admin/add_offer', views.admin_add_offers, name='admin_add_offer'),
-    path('admin/delet_offer', views.admin_delete_offer, name='admin_delete_offer'),
+    path('admin/delete_offer/<int:id>', views.admin_delete_offer, name='admin_delete_offer'),
+
 
     path('upload_cropped_image/', views.upload_cropped_image, name='upload_cropped_image'),
 ]
