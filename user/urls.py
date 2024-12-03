@@ -48,6 +48,8 @@ urlpatterns = [
     path('user_profile/user_wishlist_view/', views.user_wishlist_view, name='user_wishlist_view'),
     path('user_remove_from_wishlist', views.user_remove_from_wishlist, name='user_remove_from_wishlist'),
     path('user_move_to_cart/', views.user_move_to_cart, name='user_move_to_cart'),
+    path('user_profile/prepare_razorpay_payment/<str:order_id>', views.prepare_razorpay_payment, name='prepare_razorpay_payment'),
+    path('user_profile/verify_razorpay_payment/', views.verify_razorpay_payment, name='verify_razorpay_payment'),
     path('user_add_to_wishlist', views.user_add_to_wishlist, name='user_add_to_wishlist'),
     path('user_move_to_wishlist/<int:item_id>', views.user_move_to_wishlist, name='user_move_to_wishlist'),
     path('user_move_to_order', views.user_move_to_order, name='user_move_to_order'),
@@ -56,8 +58,6 @@ urlpatterns = [
     path('user_order_cancel/<str:order_id>/', views.user_cancel_order, name='user_order_cancel'),
     path('address/selection/', views.address_selection, name='user_address_selection'),
     path('user_payment_method_selection/', views.user_payment_method_selection, name='user_payment_method_selection'),  # after payment is made...redirect to move to order...
-    # path('paymenthandler/', views.razor_payment_handler , name='paymenthandler'),
-
     path('user_logout/', views.user_logout, name='user_logout'),
 
     path('otp_page', views.otp_page, name='otp_page'),
@@ -65,6 +65,8 @@ urlpatterns = [
     path('resend_otp', views.resend_otp, name='resend_otp'),
 
     path('view_product/<int:id>', views.view_product, name='view_product'),
+    path('view_brand/<int:id>', views.view_brand, name='view_brand'),
+    path('view_collection/<int:id>', views.view_collection, name='view_collection'),
     path('user_add_to_cart/', views.user_add_to_cart, name='user_add_to_cart'),
     
     path('validate-coupon/', views.validate_coupon_ajax, name='validate_coupon_ajax'),

@@ -158,17 +158,17 @@
                 <tr>
                     <td>{{ item.product.collection.brand.name }} {{ item.product.collection.name }} {{ item.product.name }}</td>
                     <td>{{ item.quantity }}</td>
-                    <td>₹{{ item.price }}</td>
-                    <td>₹{{ item.total_price }}</td>
+                    <td>${{ item.price }}</td>
+                    <td>${{ item.total_price }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         
         <div class="totals">
-            <h3>Total Amount: <span class="total-amount">₹{{ order.total_amount }}</span></h3>
-            <h3>Total Discount: <span class="discount">₹{{ order.total_discount }}</span></h3>
-            <h3>Total Amount After Discount: <span class="total-amount">₹{{ order.discounted_amount }}</span></h3>
+            <h3>Total Amount: <span class="total-amount">${{ order.total_amount }}</span></h3>
+            <h3>Total Discount: <span class="discount">${{ order.total_discount }}</span></h3>
+            <h3>Total Amount After Discount: <span class="total-amount">${{ order.discounted_amount }}</span></h3>
         </div>
     </div>
 </body>

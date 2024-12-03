@@ -264,13 +264,13 @@
             description: "Test Transaction",
             order_id: orderData.orderId,
             handler: function (response) {
+                // Payment successful handler (existing code)
                 const data = {
                     order_id: orderData.orderId,
                     payment_id: response.razorpay_payment_id,
                     amount: orderData.amount
                 };
-
-                // Send payment data to server
+        
                 fetch('/user_move_to_order', {
                     method: 'POST',
                     headers: {
@@ -285,14 +285,48 @@
                         window.location.assign('/user_profile/user_order_history');
                         window.location.reload();
                     } else {
-                        alert("Error saving order. Please contact support.");
+                        alert("Order Placed With Incomplete Payment.");
+                        window.location.assign('/user_profile/user_order_history');
+                        window.location.reload();
                     }
                 })
                 .catch(error => {
                     console.error("Error:", error);
-                    alert("An error occurred. Please try again.");
-                    location.reload();
+                    alert("An error occurred. Please check your order history.");
+                    window.location.assign('/user_profile/user_order_history');
+                    window.location.reload();
                 });
+            },
+            modal: {
+                ondismiss: function() {
+                    // Handle modal dismissal
+                    fetch('/user_move_to_order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            order_id: orderData.orderId,
+                            payment_status: 'cancelled'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            alert("Payment was cancelled. Your order has been saved.");
+                            window.location.assign('/user_profile/user_order_history');
+                        } else {
+                            alert("Error processing cancelled payment. Please contact support.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("An error occurreds. Please check your order history.");
+                        window.location.assign('/user_profile/user_order_history');
+                        window.location.reload();
+                    });
+                }
             },
             prefill: {
                 name: "Gaurav Kumar",

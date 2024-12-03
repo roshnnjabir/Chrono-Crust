@@ -31,7 +31,7 @@
                         <div class="item-details">
                             <h3>{{ item.product.name }}</h3>
                             <p>{{ item.product.description }}</p>
-                            <div class="item-price">Price: ₹{{ item.product.price }}</div>
+                            <div class="item-price">Price: ${{ item.product.price }}</div>
                         </div>
                         <div class="item-actions">
                             <form method="POST" action="{% url 'user_add_to_cart' %}" class="action-form">

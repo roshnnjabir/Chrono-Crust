@@ -8,6 +8,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/user_profile.css' %}">
     <link rel="stylesheet" href="{% static 'css/order.css' %}">
+    <style>.retry-payment-button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .retry-payment-button:hover {
+        background-color: #45a049;
+    }</style>
 </head>
 <body>
 {% include 'partials/error_pop_up.html' %}
@@ -49,15 +67,21 @@
                         </div>
                         <div class="order-actions">
                             <button type="button" class="view-details-button" onclick="openOrderDetails({{ order.id }})">View Details</button>
+
                             {% if order.status == 'cancelled' %}
                                 <button class="cancel-order-button-disabled" onclick="event.stopPropagation();" disabled>Order Cancelled</button>
+                            {% elif order.payment_status == 'failed' %}
+                                <button class="retry-payment-button" onclick="retryPayment('{{ order.id }}', event)">Retry Payment</button>
                             {% else %}
                                 <form method="POST" action="{% url 'user_order_cancel' order.id %}" onclick="event.stopPropagation();">
                                     {% csrf_token %}
                                     <button type="submit" class="cancel-order-button" onclick="event.stopPropagation();">Cancel Order</button>
                                 </form>
                             {% endif %}
-                            <a href="{% url 'user_generate_invoice' order.id %}"><button onclick="event.stopPropagation();" class="view-details-button">Invoice</button></a>
+                            
+                            <a href="{% url 'user_generate_invoice' order.id %}">
+                                <button onclick="event.stopPropagation();" class="view-details-button">Invoice</button>
+                            </a>
                         </div>
                     </div>
                 {% empty %}
@@ -127,16 +151,17 @@
                                 <div class="item-info">
                                     <span class="item-name">${item.product.name}</span> 
                                     <span class="item-quantity">Quantity: ${item.quantity}</span> 
-                                    <span class="item-price">Price: ₹${Number(item.product.offer_price).toFixed(2)}</span>
-                                    <span class="item-total-price">Total Price: ₹${Number(item.total_price).toFixed(2)}</span>
+                                    <span class="item-price">Price: $${Number(item.product.offer_price).toFixed(2)}</span>
+                                    <span class="item-total-price">Total Price: $${Number(item.total_price).toFixed(2)}</span>
                                 </div>
                             </div>
                         </li>
                     `).join('')}
                 </ul>
                 <div class="order-total-price">
-                    <strong>Total Order Price: ₹${Number(data.total_price).toFixed(2)}</strong><br>
-                    <strong>Total Price After Discount: ₹${Number(data.discounded_price).toFixed(2)}</strong>
+                    <strong>Total Order Price: $${Number(data.total_price).toFixed(2)}</strong><br>
+                    <strong>Total Discound: $${Number(data.total_discount).toFixed(2)}</strong><br>
+                    <strong>Total Price After Discount: $${Number(data.discounded_price).toFixed(2)}</strong>
                 </div>
             `;
 
@@ -167,6 +192,7 @@
     }
 
 </script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Get all elements with the class 'nav-item'
@@ -184,5 +210,72 @@
         }
     });    
 </script>
+<script>
+    function retryPayment(orderId, event) {
+        event.stopPropagation();
+        
+        fetch(`/user_profile/prepare_razorpay_payment/${orderId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to prepare payment');
+                }
+                return response.json();
+            })
+            .then(data => {
+                var options = {
+                    "key": data.razorpay_key,
+                    "amount": data.amount,
+                    "currency": "INR",
+                    "name": "Chrono Crust",
+                    "description": `Retry Payment for Order ${orderId}`,
+                    
+                    "order_id": data.razorpay_order_id,
+                    "handler": function (response) {
+                        // Send payment verification to server
+                        fetch('/user_profile/verify_razorpay_payment/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                                order_id: orderId
+                            })
+                        })
+                        .then(verifyResponse => verifyResponse.json())
+                        .then(verifyData => {
+                            if (verifyData.status === 'success') {
+                                alert('Payment Successful');
+                                location.reload();
+                            } else {
+                                alert('Payment Failed');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Payment verification failed');
+                        });
+                    },
+                    "prefill": {
+                        "name": "{{ request.user.get_full_name }}",
+                        "email": "{{ request.user.email }}"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to prepasre payment');
+            });
+    }
+    </script>
 </body>
 </html>

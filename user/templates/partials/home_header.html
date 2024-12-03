@@ -65,10 +65,7 @@
                 <div class="nav-item">
                     <a href="/user_list_brand">Brands</a>
                     <span class="oblong"></span>
-                </div>
-                <div class="nav-item">
-                    <a href="/user_list_product_catogory">Boutiques</a>
-                    <span class="oblong"></span>
+                    <span class="oblong" {% if request.GET.gender_filter == 'brands' %}id="oblong"{% endif %} ></span>
                 </div>
                 <div class="nav-item">
                     <a href="/user_list_collection">Collections</a>

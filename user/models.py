@@ -25,6 +25,10 @@ class CustomUser(AbstractUser):
 
     objects = CustomUserManager()
 
+    def get_full_name(self):
+        # If first and last name are not provided, return email
+        return self.first_name + " " + self.last_name if self.first_name and self.last_name else self.email
+
     def __str__(self):
         return self.email
 

@@ -18,7 +18,7 @@ class Brand(models.Model):
 
 class Collection(models.Model):
     name = models.CharField(max_length=50)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, default=1)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, default=1, related_name="collection")
     logo_image = models.ImageField(upload_to='uploads/collection')
     banner_image = models.ImageField(upload_to='uploads/collection')
     is_listed = models.BooleanField(default=False)
@@ -34,7 +34,7 @@ class Product(models.Model):
     price = models.DecimalField(default=0, decimal_places=3, max_digits=9)
     offer_price = models.DecimalField(default=0, decimal_places=3, max_digits=9)
 
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, default=1)
+    collection = models.ForeignKey(Collection, on_delete=models.CASCADE, default=1, related_name="product")
 
     description = models.CharField(max_length=500, default='', blank=True, null=True)
     description1 = models.CharField(max_length=500, default='', blank=True, null=True)
@@ -200,6 +200,7 @@ class Order(models.Model):
         ('cod', 'Cod'),
         ('pwallet', 'Personal Wallet'),
         ('paid', 'Paid'),
+        ('failed', 'Failed'),
         ('refunded', 'Refunded'),
     ]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
@@ -272,34 +273,3 @@ class Coupen(models.Model):
 
     def __str__(self):
         return self.code
-
-
-class Offer(models.Model):
-    OFFER_TYPE_CHOICES = [
-        ('percentage', 'Percentage'),
-        ('fixed', 'Fixed Amount'),
-    ]
-
-    name = models.CharField(max_length=100)
-    discount_type = models.CharField(max_length=10, choices=OFFER_TYPE_CHOICES)
-    discount_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    
-    # Allow only one of these to be populated at a time
-    applicable_products = models.ManyToManyField(Product, blank=True)
-    applicable_collections = models.ManyToManyField(Collection, blank=True)
-    applicable_brands = models.ManyToManyField(Brand, blank=True)
-
-    def clean(self):
-        # Check that only one of the fields is populated
-        selected_types = sum(bool(getattr(self, field).exists()) for field in ['applicable_products', 'applicable_collections', 'applicable_brands'])
-        if selected_types > 1:
-            raise ValidationError("Only one of applicable_products, applicable_collections, or applicable_brands can be set.")
-
-    def is_active(self):
-        now = timezone.now()
-        return self.start_date <= now <= self.end_date
-
-    def __str__(self):
-        return self.name

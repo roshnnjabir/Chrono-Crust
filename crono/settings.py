@@ -197,8 +197,8 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-RAZOR_KEY_ID = 'rzp_test_ogXW1qOaXCrzZG'
-RAZOR_KEY_SECRET = 'xh7Hg2R6cJmhk7p02eCGhtZC'
+RAZOR_KEY_ID = config('RAZOR_KEY_ID')
+RAZOR_KEY_SECRET = config('RAZOR_KEY_SECRET')
 
 
 SOCIALACCOUNT_AUTO_SIGNUP = True  # Automatically create user on social login

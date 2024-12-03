@@ -225,7 +225,9 @@
     <header>
         <!-- First part of the header -->
         <div class="header-top d-flex justify-content-between align-items-center">
-            <div class="left-text">Free Shipping Worldwide</div>
+            <div class="left-text">
+                Free Shipping Worldwide
+            </div>
             <nav class="nav">
                 <a href="#" class="nav">Help & FAQs</a>
                 <a href="#" class="nav">Contact</a>
@@ -233,6 +235,7 @@
                 <a href="#" class="nav">About</a>
             </nav>
         </div>
+    
         <!-- Second part of the header -->
         <div class="header-bottom">
             <div class="header-background"></div> <!-- Background Image -->
@@ -243,17 +246,22 @@
                         <a href="#"><img src="{% static 'svg/phone.svg' %}" width="20" height="20" alt="Phone"> (1-866-273-3477)</a>
                     </div>
                     <div class="icon-container gap-4">
-                        <div class="icon">
+                        <!-- Cart Icon -->
+                        <a href="/user_profile/user_cart_view/"><div class="icon">
                             <img src="{% static 'svg/cart.svg' %}" alt="Cart Icon">
-                        </div>
+                        </div></a>
+                        <!-- Wishlist Icon -->
                         <div class="icon">
                             <img src="{% static 'svg/wishlist.svg' %}" alt="Wishlist Icon">
                         </div>
-                        <div class="icon open-modal" data-modal="login-modal">
+                        <!-- My Account Icon -->
+                        <a href="{% url 'user_profile' %}"><div class="icon">
                             <img src="{% static 'svg/myaccount.svg' %}" alt="My Account Icon">
-                        </div>
+                        </div></a>
                     </div>
                 </div>
+    
+                <!-- Navigation for categories and items -->
                 <div class="header-nav d-none d-lg-flex justify-content-around align-items-center py-3 px-5 w-90">
                     <nav class="left-nav d-flex gap-5">
                         <div class="nav-item">
@@ -270,34 +278,29 @@
                             </form>
                             <span class="oblong" {% if request.GET.gender_filter == 'women' %}id="oblong"{% endif %} ></span>
                         </div>
-                        <!-- <div class="nav-item">
-                            <a href="#">Unisex</a>
-                            <span class="oblong"></span>
-                        </div> -->
                     </nav>
                     <nav class="right-nav d-flex gap-5">
                         <div class="nav-item">
-                            <a href="#">Brands</a>
+                            <a href="/user_list_brand">Brands</a>
                             <span class="oblong"></span>
                         </div>
                         <div class="nav-item">
-                            <a href="#">Boutiques</a>
+                            <a href="/user_list_collection/">Collections</a>
                             <span class="oblong"></span>
                         </div>
-                        <!-- <div class="nav-item">
-                            <a href="#">Collections</a>
-                            <span class="oblong"></span>
-                        </div> -->
                     </nav>
                 </div>
+    
                 <!-- Logo in the center -->
                 <div class="header-logo position-absolute top-50 start-50 translate-middle" id="logo">
-                    <a href="/" title="Hoem"><img src="{% static 'images/logo1.png' %}" alt="ChronoCrest Logo" width="100%" height="100%"></a>
+                    <a href="/user_list_product" title="All Products"><img src="{% static 'images/logo1.png' %}" alt="ChronoCrest Logo" width="100%" height="100%"></a>
                 </div>
+    
                 <!-- Hamburger Menu for smaller screens -->
                 <div class="menu-icon-container d-lg-none position-absolute end-0 top-0 p-3" id="menuIcon">
                     <img src="{% static 'svg/menu.svg' %}" class="menu-icon" alt="Menu" width="30" height="30">
                 </div>
+    
                 <!-- Fullscreen Dropdown Menu -->
                 <div class="dropdown-overlay" id="dropdownMenu">
                     <div class="dropdown-close-container text-end p-3" id="closeIcon">
@@ -312,7 +315,12 @@
                     </div>
                 </div>
             </div>
-            <div style="width: 100%; height: 100vh; position: absolute; display: flex; align-items: baseline;"><img style="height: 100%; width: 100%; object-fit: cover;" src="{{ product.image.url }}" alt="admin"></div>
+            <!-- Background Image for the header -->
+            <div style="width: 100%; height: 100vh; position: absolute; display: flex; align-items: baseline;">
+                <img style="height: 100%; width: 100%; object-fit: cover;" src="{{ product.image.url }}" alt="admin">
+            </div>
+    
+            <!-- Product Description -->
             <div class="desc-container">
                 <div class="desc-text-container">
                     <h2>Presenting The New {{product.collection.brand.name}} {{product.collection.name}} {{product.name}} {% if product.limited_edition %} Limited Edition {% endif %}</h2>
@@ -321,7 +329,7 @@
                 </div>
             </div>
         </div>
-    </header>
+    </header>    
     <!-- New Product Hero Section -->
     <section class="product-hero">
         <div class="image-gallery">
@@ -335,7 +343,7 @@
                 <img src="{{ product.image1.url }}" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('{{ product.image1.url }}')">
                 <img src="{{ product.image2.url }}" alt="Thumbnail 3" class="thumbnail" onclick="changeImage('{{ product.image2.url }}')">
                 <img src="{{ product.image3.url }}" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('{{ product.image3.url }}')">
-                <img src="{{ product.collection.image.url }}" alt="Thumbnail 5" class="thumbnail" onclick="changeImage('{{ product.collection.image.url }}')">
+                <img src="{{ product.collection.logo_image.url }}" alt="Thumbnail 5" class="thumbnail" onclick="changeImage('{{ product.collection.logo_image.url }}')">
             </div>
         </div>
 
@@ -343,8 +351,8 @@
             <h1 class="product-name">The {{ product.collection.brand.name }} {{ product.collection.name }} {{ product.name }}</h1>
             
             {% if product.offer_price != 0 %}
-                <p style="font-size: 14px; color: #45a049;" class="price">Original Price: ₹ {{ product.price }}</p>
-                <p class="price">Offer Price: ₹ {{ product.offer_price }}</p>
+                <p style="font-size: 14px; color: #45a049;" class="price">Original Price: $ {{ product.price }}</p>
+                <p class="price">Offer Price: $ {{ product.offer_price }}</p>
             {% else %}
                 <p class="price">$ {{ product.price }}</p>
             {% endif %}
@@ -442,7 +450,7 @@
             '{{ product.image1.url }}',
             '{{ product.image2.url }}',
             '{{ product.image3.url }}',
-            '{{ product.collection.image.url }}'
+            '{{ product.collection.logo_image.url }}'
         ];
         
         let currentIndex = 0;

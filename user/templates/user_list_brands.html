@@ -17,8 +17,107 @@
     {% include 'partials/error_pop_up.html' %}
     {% load static %}
     <!-- Header Section -->
-    {% include 'partials/home_header.html' %}
-
+    <header>
+        <!-- First part of the header -->
+        <div class="header-top d-flex justify-content-between align-items-center">
+            <div class="left-text">
+                Free Shipping Worldwide
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav">Help & FAQs</a>
+                <a href="#" class="nav">Contact</a>
+                <a href="#" class="nav">Services</a>
+                <a href="#" class="nav">About</a>
+            </nav>
+        </div>
+    
+        <!-- Second part of the header -->
+        <div class="header-bottom border-bottom border-secondary">
+            <div class="header-upper d-flex justify-content-between pb-2">
+                <div class="left-options d-none d-lg-flex align-items-center gap-5">
+                    <a href="#"><img src="{% static 'svg/globe.svg' %}" width="20" height="20" alt="Globe"> English - USD</a>
+                    <a href="#"><img src="{% static 'svg/phone.svg' %}" width="20" height="20" alt="Phone"> (1-866-273-3477)</a>
+                </div>
+                <div class="icon-container gap-4">
+                    <!-- Cart Icon -->
+                    <a href="/user_profile/user_cart_view/"><div class="icon">
+                        <img src="{% static 'svg/cart.svg' %}" alt="Cart Icon">
+                    </div></a>
+                    <!-- Wishlist Icon -->
+                    <div class="icon">
+                        <img src="{% static 'svg/wishlist.svg' %}" alt="Wishlist Icon">
+                    </div>
+                    <!-- My Account Icon -->
+                    <a href="{% url 'user_profile' %}"><div class="icon">
+                        <img src="{% static 'svg/myaccount.svg' %}" alt="My Account Icon">
+                    </div></a>
+                </div>
+            </div>
+    
+    
+            <div class="header-nav d-none d-lg-flex justify-content-between align-items-center py-3 px-5">
+                <nav class="left-nav d-flex gap-5">
+                    <div class="nav-item">
+                        <form action="/user_list_product_catogory" method="GET">
+                            <input name="gender_filter" type="hidden" value="men">
+                            <button type="submit">For Men</button>
+                        </form>
+                        <span class="oblong" {% if request.GET.gender_filter == 'men' %}id="oblong"{% endif %} ></span>
+                    </div>
+                    <div class="nav-item">
+                        <form action="/user_list_product_catogory" method="GET">
+                            <input name="gender_filter" type="hidden" value="women">
+                            <button type="submit">For Women</button>
+                        </form>
+                        <span class="oblong" {% if request.GET.gender_filter == 'women' %}id="oblong"{% endif %} ></span>
+                    </div>
+                    <div class="nav-item">
+                        <form action="/user_list_product_catogory" method="GET">
+                            <input name="gender_filter" type="hidden" value="unisex">
+                            <button type="submit">Unisex</button>
+                        </form>
+                        <span class="oblong" {% if request.GET.gender_filter == 'unisex' %}id="oblong"{% endif %} ></span>
+                    </div>
+                </nav>
+                <nav class="right-nav d-flex gap-5">
+                    <div class="nav-item">
+                        <a href="/user_list_brand">Brands</a>
+                        <span class="oblong"></span>
+                        <span class="oblong" id="oblong"></span>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/user_list_collection">Collections</a>
+                        <span class="oblong"></span>
+                    </div>
+                </nav>
+            </div>
+    
+            <!-- Logo in the center -->
+            <div class="header-logo position-absolute top-50 start-50 translate-middle" id="logo">
+                <a href="/user_list_product" title="All Products"><img src="{% static 'images/logo.png' %}" alt="ChronoCrest Logo" width="100%" height="100%"></a>
+            </div>
+    
+            <!-- Hamburger Menu for smaller screens -->
+            <div class="menu-icon-container d-lg-none position-absolute end-0 top-0 p-3" id="menuIcon">
+                <img src="{% static 'svg/menu.svg' %}" class="menu-icon" alt="Menu" width="30" height="30">
+            </div>
+    
+            <!-- Fullscreen Dropdown Menu -->
+            <div class="dropdown-overlay" id="dropdownMenu">
+                <!-- Close Icon Inside the Menu -->
+                <div class="dropdown-close-container text-end p-3" id="closeIcon">
+                    <img src="{% static 'svg/close.svg' %}" class="close-icon" alt="Close" width="30" height="30">
+                </div>
+                <div class="dropdown-menu-mobile d-flex flex-column align-items-center">
+                    <a href="#">For Men</a>
+                    <a href="#">For Women</a>
+                    <a href="#">Unisex</a>
+                    <a href="#">Brands</a>
+                    <a href="#">Boutiques</a>
+                </div>
+            </div>
+        </div>
+    </header>
 
     <!-- Filter and Search Section -->
     <div class="header-upper d-flex justify-content-between px-4 pt-4">
@@ -47,7 +146,7 @@
             <div class="image-container">
                 <img src="{{ brand.logo_image.url }}" alt="{{ brand.name }}" class="product-image main-image">
                 <img src="{{ brand.banner_image.url }}" alt="{{ brand.name }} Hover Image" class="product-image hover-image">
-                <a href="/view_product/{{product.id}}">
+                <a href="/view_brand/{{brand.id}}">
                     <button class="btn-discover">Discover Now</button>
                 </a>
             </div>
@@ -62,6 +161,7 @@
         <div>No Products Found</div>
         {% endfor %}
     </div>    
+    {% include 'partials/footer.html' %}
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/body.js' %}"></script>
