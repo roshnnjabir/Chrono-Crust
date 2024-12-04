@@ -6,22 +6,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Include Cropper.js CSS and JS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/admin/togglebutton.css' %}">
 
     <style>
+        :root {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #ffffff;
+            --text-primary: #333;
+            --text-secondary: #888;
+            --border-color: #ddd;
+            --hover-bg: #e8e8e8;
+            --action-bg: #f0f0f0;
+            --action-hover-bg: #e0e0e0;
+            --button-bg: #f0f0f0;
+            --button-hover-bg: #e0e0e0;
+            --delete-bg: #ff4d4d;
+            --edit-bg: #ffd700;
+            --table-header-bg: #f8f8f8;
+        }
+
+        body.dark-theme {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: #444;
+            --hover-bg: #2a2a2a;
+            --action-bg: #5d5d5d;
+            --delete-bg: #ff6b6b;
+            --edit-bg: #ffd54f;
+            --dark-button-bg: #2c2c2c;
+            --dark-button-hover-bg: #3c3c3c;
+            --table-header-bg: #282828;
+        }
+
         body {
             font-family: 'Nunito', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f2f5;
-            color: #333;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         a {
             text-decoration: none;
-            color: #050505;
+            color: var(--text-primary);
         }
 
         .container {
@@ -35,7 +66,7 @@
         .breadcrumbs {
             font-size: 14px;
             margin-bottom: 20px;
-            color: #888;
+            color: var(--text-secondary);
         }
 
         .main-content {
@@ -47,7 +78,7 @@
         /* Sidebar Styles */
         .sidebar {
             width: 250px;
-            background-color: #ffffff;
+            background-color: var(--bg-secondary);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             padding: 20px;
@@ -63,18 +94,18 @@
         }
 
         .sidebar div:hover {
-            background-color: #e8e8e8;
+            background-color: var(--hover-bg);
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar div.selected {
-            background-color: #050505;
-            color: #fff;
+            background-color: var(--text-primary);
+            color: var(--bg-secondary);
         }
 
         .admin-container {
             flex: 1;
-            background-color: #ffffff;
+            background-color: var(--bg-secondary);
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
@@ -84,30 +115,10 @@
             margin-bottom: 20px;
         }
 
-        .search {
-            display: flex;
-            margin-bottom: 20px;
-            justify-content: end;
-        }
-
-        .search input[type="search"] {
-            max-width: 200px;
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-
-        /* Wrap for horizontal scroll */
         .table-container {
-            overflow-x: auto; /* Enable horizontal scrolling */
-            margin-bottom: 20px; /* Space below the table */
+            overflow-x: auto;
+            margin-bottom: 20px;
             max-width: 800px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
         }
 
         table {
@@ -119,25 +130,25 @@
         table th,
         table td {
             padding: 15px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             text-align: left;
         }
 
         table th {
-            background-color: #f8f8f8;
+            background-color: var(--table-header-bg);
         }
 
         .action-button {
             padding: 10px 15px;
             border-radius: 5px;
-            background-color: #f0f0f0;
+            background-color: var(--action-bg);
             border: none;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
         .action-button:hover {
-            background-color: #e0e0e0;
+            background-color: var(--action-hover-bg);
         }
 
         .messages {
@@ -154,7 +165,7 @@
         }
 
         .logout-button {
-            background-color: #ff4d4d;
+            background-color: var(--delete-bg);
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
@@ -166,24 +177,25 @@
         .logout-button:hover {
             background-color: #ff1a1a;
         }
-        /* Delete Button Style */
+
         .delete-button {
             padding: 10px 15px;
             border-radius: 5px;
-            background-color: #ff4d4d; /* Red for Delete */
+            background-color: var(--delete-bg);
             border: none;
             cursor: pointer;
             color: white;
             transition: background-color 0.3s ease;
         }
+
         .delete-button:hover {
-            background-color: #e60000; /* Darker Red on Hover */
+            background-color: #e60000;
         }
-         /* New Edit Button Style */
+
         .edit-button {
             padding: 10px 15px;
             border-radius: 5px;
-            background-color: #ffd700; /* Yellow Background */
+            background-color: var(--edit-bg);
             border: none;
             cursor: pointer;
             color: white;
@@ -191,9 +203,67 @@
         }
 
         .edit-button:hover {
-            background-color: #ffc107; /* Slightly darker yellow on hover */
+            background-color: #ffc107;
+        }
+        /* Theme Toggle Styles */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--button-bg);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
+        body.dark-theme .theme-toggle {
+            background-color: var(--dark-button-bg);
+            color: var(--dark-text-primary);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        body.dark-theme .theme-toggle:hover {
+            background-color: var(--dark-button-hover-bg);
+        }
+
+        /* Theme Toggle Button */
+        #theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--button-bg);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 1000;
+        }
+
+        #theme-toggle:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        body.dark-theme #theme-toggle{
+            background-color: var(--dark-button-bg);
+        }
+
+        body.dark-theme #theme-toggle:hover{
+            background-color: var(--dark-button-hover-bg);
+        }
+
+        body.dark-theme .logout-button {
+            background-color: #8B0000;
+        }
+
+        body.dark-theme .logout-button:hover {
+            background-color: #A52A2A;
+        }
 
         /* Responsive Styles */
         @media (max-width: 768px) {
@@ -203,18 +273,18 @@
             }
 
             .sidebar {
-                width: 100%; /* Make sidebar full-width */
+                width: 100%;
                 display: flex;
-                justify-content: space-around; /* Turn it into a horizontal bar */
+                justify-content: space-around;
                 gap: 0;
                 padding: 10px;
                 border-radius: 12px;
-                background-color: transparent; /* Make the background transparent */
+                background-color: transparent;
                 box-shadow: none;
             }
 
             .sidebar div {
-                padding: 12px 10px; /* Adjust padding for smaller screens */
+                padding: 12px 10px;
                 border-radius: 10px;
             }
 
@@ -228,7 +298,7 @@
                 font-size: 12px;
             }
 
-            .sidebar{
+            .sidebar {
                 font-size: 10px;
                 padding: 10px 3px;
             }
@@ -245,21 +315,22 @@
                 font-size: 10px;
             }
 
-            .search input[type="search"] {
-                padding: 8px;
-            }
-
             table th,
             table td {
                 padding: 8px;
             }
+
+            .action-button, .logout-button, .delete-button {
+                font-size: 9px;
+                padding: 5px 10px;
+            }
         }
 
-        @media (max-width: 380px){
-            body{
+        @media (max-width: 380px) {
+            body {
                 font-size: 10px;
             }
-            .sidebar{
+            .sidebar {
                 justify-content: space-between;
                 font-size: 8px;
             }
@@ -267,201 +338,17 @@
                 padding: 6px;
                 border-radius: 7px;
             }
-            .breadcrumbs{
+            .breadcrumbs {
                 font-size: 8px;
-            }
-            .search{
-                margin-bottom: 10px;
-            }
-            .search input[type="search"] {
-                padding: 7px;
-                font-size: 8px;
-            }
-            #live-search{
-                max-width: 100px;
-                max-height: 25px;
             }
             .admin-container h1 {
                 margin-bottom: 10px;
             }
         }
-
-        /* css for edit modal */
-        /* Modal Styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-            transition: all 0.3s ease-in-out;
-        }
-    
-        .modal-content {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 600px;
-            max-height: 500px;
-            width: 90%;
-            height: 90%;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow-x: auto;
-        }
-    
-        /* Close button */
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #555;
-            transition: color 0.3s;
-        }
-    
-        .close:hover {
-            color: #e60000;
-        }
-    
-        /* Form elements */
-        .modal-content form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-    
-        .modal-content label {
-            font-size: 16px;
-            color: #333;
-        }
-    
-        .modal-content input[type="text"],
-        .modal-content input[type="number"] {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-    
-        /* Image display */
-        #edit-product-image {
-            margin-top: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            max-width: 100%;
-            height: auto;
-        }
-    
-        /* Save button */
-        .save-button {
-            padding: 10px 15px;
-            border-radius: 8px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-    
-        .save-button:hover {
-            background-color: #218838;
-        }
-    
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .modal-content {
-                width: 95%;
-                padding: 15px;
-            }
-    
-            .modal-content label {
-                font-size: 14px;
-            }
-    
-            .modal-content input {
-                font-size: 14px;
-                padding: 8px;
-            }
-    
-            .save-button {
-                padding: 8px 12px;
-            }
-    
-            .close {
-                font-size: 20px;
-            }
-        }
-    
-        @media (max-width: 480px) {
-            .modal-content {
-                width: 100%;
-                padding: 10px;
-                border-radius: 0;
-            }
-    
-            .modal-content label {
-                font-size: 12px;
-            }
-    
-            .modal-content input {
-                font-size: 10px;
-                padding: 6px;
-            }
-    
-            .save-button {
-                padding: 6px 10px;
-                font-size: 12px;
-            }
-    
-            .close {
-                font-size: 18px;
-            }
-            .action-button, .logout-button, .delete-button{
-                font-size: 9px;
-                padding: 5px 10px;
-            }
-        }
-
-        /* Cropper Js functionality */
-        @media (max-width: 768px) {
-            #edit-product-image {
-                width: 80%;
-            }
-        
-            #cropped-image {
-                width: 80%;
-            }
-        
-            #upload-image {
-                width: 100%;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            #edit-product-image {
-                width: 70%;
-            }
-        
-            #cropped-image {
-                width: 70%;
-            }
-        
-            #upload-image {
-                width: 100%;
-            }
-        }        
     </style>
 </head>
 
 <body>
-    {% load static %}
     <div class="container">
         <div class="breadcrumbs">
             <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>List Brand </span>
@@ -472,9 +359,6 @@
 
             <div class="admin-container">
                 <h1>Brands</h1>
-                <div class="search">
-                    <input type="search" id="live-search" placeholder="Search..." autocomplete="off">
-                </div>
 
                 <div class="table-container">
                     <table id="products">
@@ -546,10 +430,23 @@
                 <a href="{% url 'admin_add_brand' %}" id="add-product-button">
                     <button class="action-button">Add Brand</button>
                 </a>
+
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" aria-label="Toggle Theme">
+                    <!-- Sun SVG (Light Mode) -->
+                    <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+                        <path d="M12 0v4M12 20v4M4.22 4.22l2.83 2.83M16.97 16.97l2.83 2.83M0 12h4M20 12h4M4.22 19.78l2.83-2.83M16.97 7.03l2.83-2.83"
+                            stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <!-- Moon SVG (Dark Mode) -->
+                    <svg id="moon-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M12 2a10 10 0 1 0 10 10 7 7 0 0 1-10-10z"></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
-
 
     <script>
         // Highlight selected nav item
@@ -560,66 +457,7 @@
                 item.classList.add('selected'); // Add selected to clicked item
             });
         });
-    </script>
 
-
-    <!-- script to live search -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            $('#live-search').on('input', function () {
-                var query = $(this).val();
-                $.ajax({
-                    url: "{% url 'admin_list_product' %}", // Send request to the same view
-                    data: { 'query': query },
-                    dataType: 'json',
-                    success: function (data) {
-                        $('#table-body').empty();
-                        if (data.length > 0) {
-                            $.each(data, function (index, product) {
-                                var row = '<tr>';
-                                row += '<td>' + product.product_id + '</td>';
-                                row += '<td><img src="' + product.image.url + '" alt="' + product.product_name + '"></td>';
-                                row += '<td>' + product.product_name + '</td>';
-                                row += '<td>' + product.collection__collection_name + '</td>';
-                                if (product.collection__is_listed) {
-                                    row += '<td>Listed</td>';
-                                } else {
-                                    row += '<td>Unlisted</td>';
-                                }
-                                row += '<td>' + product.brand_name__brand_name + '</td>';
-                                if (product.brand_name__is_listed) {
-                                    row += '<td>Listed</td>';
-                                } else {
-                                    row += '<td>Unlisted</td>';
-                                }
-                                row += '<td>' + product.stock + '</td>';
-                                // Check user.is_active in JavaScript and render the button accordingly
-                                console.log(product.is_listed)
-                                if (product.is_listed) {
-                                    row += '<td><a href="list_unlist_product/' + product.product_id + '"><button class="action-button">Unlist</button></a></td>';
-                                } else {
-                                    row += '<td><a href="list_unlist_product/' + product.product_id + '"><button class="action-button">List</button></a></td>';
-                                }
-                                row += '<td><a href="delete_product/' + product.product_id + '"><button class="delete-button">Delete</button></a></td>';
-                                row += '<td><button class="action-button edit-button" data-product-id="{{ product.product_id }}" data-product-name="{{ product.product_name }}" data-product-collection="{{ product.collection.collection_name }}" data-product-brand="{{ product.brand_name.brand_name }}" data-product-stock="{{ product.stock }}" data-product-image="{{ product.image.url }}">Edit</button></td>'
-                                row += '</tr>';
-                                $('#table-body').append(row);
-                            });
-                        } else {
-                            $('#table-body').append('<tr><td colspan="7">No products found</td></tr>');
-                        }
-                    },
-                    error: function () {
-                        $('#table-body').empty();
-                        $('#table-body').append('<tr><td colspan="7">Error retrieving data</td></tr>');
-                    }
-                });
-            });
-        });
-    </script>
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Get all elements with the class 'nav-item'
             var navItems = document.querySelectorAll('.sidebar .nav-item');
@@ -629,14 +467,36 @@
                 item.classList.remove('selected');
             });
         
-            
             // add to the current 
             var overviewLink = document.querySelector('.sidebar .brands');
             if (overviewLink) {
                 overviewLink.classList.add('selected');
             }
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+
+            // Check for saved theme preference or default to light mode
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-theme');
+            }
+
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-theme');
+
+                // Save theme preference
+                if (body.classList.contains('dark-theme')) {
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                }
+            });
         });
     </script>
+
+    <!-- Theme Toggle Script -->
+    <script src="{% static 'js/theme.js' %}"></script>
 </body>
 
 </html>

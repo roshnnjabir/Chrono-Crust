@@ -1,12 +1,13 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List Offers</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin_home.css">
+    <link rel="stylesheet" href="{% static 'css/admin/togglebutton.css' %}">
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -141,6 +142,19 @@
         .logout-button:hover {
             background-color: #e04343;
         }
+        .logout-button {
+            background-color: #ff4d4d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background-color: #ff1a1a;
+        }
 
         /* Responsive Styles */
         @media (max-width: 768px) {
@@ -164,6 +178,115 @@
                 padding: 15px;
             }
         }
+
+        /* Dark Theme Styles */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .container {
+            background-color: #1e1e1e;
+        }
+
+        body.dark-theme a {
+            color: #ffffff;
+        }
+
+        body.dark-theme .breadcrumbs {
+            color: #9E9E9E;
+        }
+
+        body.dark-theme .sidebar {
+            background-color: #2c2c2c;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-theme .sidebar div {
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .sidebar div:hover {
+            background-color: #3a3a3a;
+        }
+
+        body.dark-theme .sidebar div.selected {
+            background-color: #f0f0f0;
+            color: #1e1e1e;
+        }
+
+        body.dark-theme .admin-container {
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme table {
+            background-color: #1e1e1e;
+        }
+
+        body.dark-theme table th {
+            background-color: #3a3a3a;
+            color: #e0e0e0;
+            border-color: #4a4a4a;
+        }
+
+        body.dark-theme table td {
+            border-color: #4a4a4a;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .logout-button {
+            background-color: #8B0000;
+        }
+
+        body.dark-theme .logout-button:hover {
+            background-color: #A52A2A;
+        }
+
+        body.dark-theme .action-button {
+            background-color: #4CAF50;
+            color: #ffffff;
+        }
+
+        body.dark-theme .action-button:hover {
+            background-color: #45a049;
+        }
+
+        body.dark-theme .no-offers-message p {
+            color: #b0b0b0;
+        }
+
+        body.dark-theme .messages li {
+            color: #e0e0e0;
+            background-color: #3a3a3a;
+            border-color: #4a4a4a;
+        }
+
+        /* Theme Toggle Button */
+        #theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #f0f0f0;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 1000;
+        }
+
+        #theme-toggle:hover {
+            background-color: #e0e0e0;
+        }
+
+        body.dark-theme #theme-toggle{
+            background-color: #333;
+        }
+
+        body.dark-theme #theme-toggle:hover{
+            background-color: #444;
+        }
     </style>
 </head>
 
@@ -172,6 +295,22 @@
         <div class="breadcrumbs">
             <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>List Offers</span>
         </div>
+
+        <!-- Theme Toggle Button -->
+    <button id="theme-toggle" style="float: right;" aria-label="Toggle Theme">
+        <!-- Sun SVG (Light Mode) -->
+        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+            <path d="M12 0v4M12 20v4M4.22 4.22l2.83 2.83M16.97 16.97l2.83 2.83M0 12h4M20 12h4M4.22 19.78l2.83-2.83M16.97 7.03l2.83-2.83" 
+                stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+
+        <!-- Moon SVG (Dark Mode) -->
+        <svg id="moon-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M12 2a10 10 0 1 0 10 10 7 7 0 0 1-10-10z"></path>
+        </svg>
+        
+    </button>
 
         <div class="main-content">
             {% include 'partials/admin_sidebar.html' %}
@@ -210,6 +349,9 @@
                 </div>
                 {% endif %}
 
+                <a href="{% url 'admin_logout' %}">
+                    <button class="logout-button">Logout</button>
+                </a>
                 <a href="{% url 'admin_add_offer' %}" class="action-button edit-button">Add Or Edit An Offer</a>
             </div>
         </div>
@@ -245,6 +387,7 @@
             }
         });
     </script>
+    <!-- Theme Toggle Script -->
+    <script src="{% static 'js/theme.js' %}"></script>
 </body>
-
 </html>

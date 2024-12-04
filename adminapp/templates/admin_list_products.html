@@ -1,6 +1,6 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
     <!-- Include Cropper.js CSS and JS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-
+    <link rel="stylesheet" href="{% static 'css/admin/togglebutton.css' %}">
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -490,12 +490,181 @@
             #upload-image {
                 width: 100%;
             }
-        }        
+        }    
+        /* Dark Theme Styles */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .container {
+            background-color: transparent;
+        }
+
+        body.dark-theme a {
+            color: #ffffff;
+        }
+
+        body.dark-theme .breadcrumbs {
+            color: #9E9E9E;
+        }
+
+        body.dark-theme .sidebar {
+            background-color: #1E1E1E;
+            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-theme .sidebar div {
+            color: #E0E0E0;
+        }
+
+        body.dark-theme .sidebar div:hover {
+            background-color: #2C2C2C;
+        }
+
+        body.dark-theme .sidebar div.selected {
+            background-color: #f0f0f0;
+            color: #1e1e1e;
+        }
+
+        body.dark-theme .admin-container {
+            background-color: #1E1E1E;
+            color: #E0E0E0;
+        }
+
+        body.dark-theme .admin-container h1 {
+            color: #E0E0E0;
+        }
+
+        body.dark-theme .search input[type="search"],
+        body.dark-theme #brand-filter {
+            background-color: #2C2C2C;
+            border-color: #444;
+            color: #E0E0E0;
+        }
+
+        body.dark-theme table {
+            background-color: #1E1E1E;
+        }
+
+        body.dark-theme table th {
+            background-color: #2C2C2C;
+            color: #E0E0E0;
+        }
+
+        body.dark-theme table td {
+            border-color: #444;
+            color: #E0E0E0;
+        }
+
+        body.dark-theme .action-button {
+            background-color: #2C2C2C;
+            color: #E0E0E0;
+        }
+
+        body.dark-theme .action-button:hover {
+            background-color: #3C3C3C;
+        }
+
+        body.dark-theme .delete-button {
+            background-color: #8B0000;
+        }
+
+        body.dark-theme .delete-button:hover {
+            background-color: #A52A2A;
+        }
+
+        body.dark-theme .edit-button {
+            background-color: #DAA520;
+        }
+
+        body.dark-theme .edit-button:hover {
+            background-color: #CD853F;
+        }
+
+        body.dark-theme .logout-button {
+            background-color: #8B0000;
+        }
+
+        body.dark-theme .logout-button:hover {
+            background-color: #A52A2A;
+        }
+
+        body.dark-theme .messages li {
+            background-color: #2C2C2C;
+            border-left-color: #FF4D4D;
+            color: #E0E0E0;
+        }
+
+        /* Modal Styles for Dark Mode */
+        body.dark-theme .modal {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        body.dark-theme .modal-content {
+            background-color: #1E1E1E;
+            color: #E0E0E0;
+        }
+
+        body.dark-theme .modal-content input[type="text"],
+        body.dark-theme .modal-content input[type="number"] {
+            background-color: #2C2C2C;
+            border-color: #444;
+            color: #E0E0E0;
+        }
+
+        body.dark-theme .close {
+            color: #E0E0E0;
+        }
+
+        body.dark-theme .close:hover {
+            color: #FF4D4D;
+        }
+        /* Theme Toggle Button */
+        #theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #f0f0f0;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 1000;
+        }
+
+        #theme-toggle:hover {
+            background-color: #e0e0e0;
+        }
+
+        body.dark-theme #theme-toggle{
+            background-color: #333;
+        }
+
+        body.dark-theme #theme-toggle:hover{
+            background-color: #444;
+        }
     </style>
 </head>
 
 <body>
-    {% load static %}
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" style="float: right;" aria-label="Toggle Theme">
+        <!-- Sun SVG (Light Mode) -->
+        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+            <path d="M12 0v4M12 20v4M4.22 4.22l2.83 2.83M16.97 16.97l2.83 2.83M0 12h4M20 12h4M4.22 19.78l2.83-2.83M16.97 7.03l2.83-2.83" 
+                stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+
+        <!-- Moon SVG (Dark Mode) -->
+        <svg id="moon-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M12 2a10 10 0 1 0 10 10 7 7 0 0 1-10-10z"></path>
+        </svg>
+        
+    </button>
+
     <div class="container">
         <div class="breadcrumbs">
             <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>List Products </span>
@@ -714,6 +883,8 @@
             }
         });
     </script>
+    <!-- Theme Toggle Script -->
+    <script src="{% static 'js/theme.js' %}"></script>
 </body>
 
 </html>
