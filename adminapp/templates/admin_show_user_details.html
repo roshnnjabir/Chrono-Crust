@@ -7,7 +7,7 @@
     <title>User Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/order.css' %}">
-    <link rel="stylesheet" href="{% static 'css/admin_show_user_details.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin/admin_show_user_details.css' %}">
 </head>
 
 <body>
@@ -62,16 +62,10 @@
                         {% for order in orders %}
                             <div class="order-item">
                                 <p><strong>Order ID:</strong> {{ order.id }}</p>
-                                <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+                                <p><strong>Order Date:</strong> {{ order.created_at|date:"F d Y" }}</p>
                                 <p><strong>Status:</strong> {{ order.status }}</p>
-                                <p><strong>Total:</strong> ${{ order.total }}</p>
-                                <p><strong>Items:</strong></p>
-                                <ul>
-                                    {% for item in orders.items %}
-                                        <li>{{ item.product_name }} ({{ item.quantity }})</li>
-                                    {% endfor %}
-                                </ul>
-                                <a href="{% url 'admin_order_details' order.id %}" class="show-details-button">View Order Details</a>
+                                <p><strong>Total:</strong> ${{ order.discounted_amount }}</p>
+                                <a href="{% url 'admin_order_details' order.id %}" class="show-details-button">Details</a>
                             </div>
                         {% endfor %}
                     {% else %}

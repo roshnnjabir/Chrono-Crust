@@ -121,7 +121,7 @@ table th {
 }
 
 .show-details-button {
-    padding: 5px;
+    padding: 8px;
     border-radius: 5px;
     background-color: #007bff;
     color: white;
@@ -209,6 +209,13 @@ button {
 
 .hide-button:hover {
     background-color: #c82333;
+}
+
+.image-container{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .user-image {

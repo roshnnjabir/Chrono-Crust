@@ -29,11 +29,11 @@ urlpatterns = [
     
     path('user_list_brand/', views.user_list_brand, name='user_list_brand'),
     path('user_list_collection/', views.user_list_collection, name='user_list_collection'),
-    path('user_list_product_catogory/', views.user_list_product_catogory, name='user_list_product_catogory'),
 
     path('user_forgot_password/', views.user_forgot_password, name='user_forgot_password'),
     path('user_reset_password/', views.user_reset_password, name='user_reset_password'),
 
+    path('user_profile/user_profile_image_update', views.user_profile_image_update, name='user_profile_image_update'),
     path('user_profile/personal-wallet/', views.personal_wallet, name='user_personal_wallet'),
     path('user_profile/address-book/', views.address_book, name='user_address_book'),
     path('user_profile/address-book-edit', views.edit_user_address, name='user_address_book_edit'),

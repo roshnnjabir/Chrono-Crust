@@ -273,13 +273,7 @@
         </div>
 
         <div class="main-content">
-            <!-- Sidebar acting as Navbar on small screens -->
-            <div class="sidebar">
-                <div class="nav-item selected">User's Overview</div>
-                <a href="/admin/blocked_users"><div class="nav-item">Blocked Users</div></a>
-                <div class="nav-item">Order History</div>
-                <div class="nav-item">Settings</div>
-            </div>
+            {% include 'partials/admin_sidebar.html' %}
 
             <div class="admin-container">
                 <h1>Members</h1>
@@ -401,9 +395,24 @@
                 });
             });
         });
-        
     </script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all elements with the class 'nav-item'
+            var navItems = document.querySelectorAll('.sidebar .nav-item');
+        
+            // Remove the 'selected' class from all nav-items
+            navItems.forEach(function(item) {
+                item.classList.remove('selected');
+            });
+        
+            // Add the 'selected' class to the 'overview' nav-item
+            var overviewLink = document.querySelector('.sidebar .users');
+            if (overviewLink) {
+                overviewLink.classList.add('selected');
+            }
+        });
+    </script>
 </body>
 
 </html>

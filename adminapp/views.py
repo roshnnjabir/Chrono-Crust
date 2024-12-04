@@ -55,7 +55,6 @@ def admin_show_user_details(request, id):
     user = get_object_or_404(CustomUser, id=id)
     print(user.profile_image)
     addresses = user.addresses.all()
-    print(addresses)
     context = {
         'user': user,
         'addresses': addresses,
@@ -433,8 +432,10 @@ def admin_list_orders(request):
         orders = orders.filter(total_amount__range=[min_price, max_price])
 
     users = CustomUser.objects.all()
+    total_orders = orders.count()
     return render(request, 'admin_list_orders.html', {
         'orders': orders,
+        'total_orders': total_orders,
         'status_filter': status_filter,
         'users': users,
         'start_date': start_date,
@@ -604,20 +605,16 @@ def admin_delete_coupon(request, code):
 
 
 def admin_sales(request):
-    # Explicitly close any existing plots
     plt.close('all')
     
-    # Base queryset of paid orders
     orders = Order.objects.filter(payment_status='paid')
     
-    # Extract filter parameters
     time_frame = request.GET.get('time_frame')
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     
-    # Dynamic Time Filtering
     if time_frame:
         if time_frame == '1':
             start_date = timezone.now() - timedelta(days=1)
@@ -628,16 +625,13 @@ def admin_sales(request):
         
         if start_date:
             orders = orders.filter(updated_at__date__gte=start_date.date())
-    
-    # Optional Date Range Filtering
+
     if start_date and end_date:
         orders = orders.filter(updated_at__date__range=[start_date, end_date])
-    
-    # Price Range Filtering
+
     if min_price and max_price:
         orders = orders.filter(total_amount__range=[float(min_price), float(max_price)])
-    
-    # Sales Calculations
+
     total_amount = orders.aggregate(
         total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField())
     )['total']
@@ -647,11 +641,9 @@ def admin_sales(request):
     )['discount']
     
     order_count = orders.count()
-    
-    # Average Price Calculation
+
     average_price = round(total_amount / order_count, 2) if order_count > 0 else 0
-    
-    # Top 5 Popular Products Calculation
+
     total_product_sales = OrderItem.objects.filter(order__in=orders).aggregate(
         total_sales=Coalesce(Sum('quantity'), 0, output_field=DecimalField())  # Ensure no None values
     )['total_sales']
@@ -663,8 +655,7 @@ def admin_sales(request):
             FloatField()
         )
     ).order_by('-total_sales')[:5]
-    
-    # Top 5 Popular Collections Calculation
+
     total_collection_sales = OrderItem.objects.filter(order__in=orders).aggregate(
         total_sales=Coalesce(Sum('quantity'), 0, output_field=DecimalField())  # Ensure no None values
     )['total_sales']
@@ -676,8 +667,7 @@ def admin_sales(request):
             FloatField()
         )
     ).order_by('-total_sales')[:5]
-    
-    # Visualization Functions
+
     def generate_line_graph(data, title, x_label, y_label):
         try:
             fig, ax = plt.subplots(figsize=(10, 5))
@@ -704,8 +694,8 @@ def admin_sales(request):
         try:
             fig, ax = plt.subplots(figsize=(8, 8))
             ax.pie([item.sales_percentage for item in data], 
-                   labels=[item.name for item in data], 
-                   autopct='%1.1f%%')
+                    labels=[item.name for item in data], 
+                    autopct='%1.1f%%')
             ax.set_title(title)
             ax.axis('equal')
             
@@ -718,8 +708,7 @@ def admin_sales(request):
         except Exception as e:
             print(f"Error generating pie chart: {e}")
             return None
-    
-    # Generate Graphs (with data checks)
+
     product_line_graph = None
     product_pie_graph = None
     collection_line_graph = None
@@ -748,11 +737,9 @@ def admin_sales(request):
             collection_popularity, 
             'Collection Sales Percentage'
         )
-    
-    # Final cleanup
+
     plt.close('all')
-    
-    # Prepare Context
+
     context = {
         'sales': orders,
         'total_revenue': total_amount,

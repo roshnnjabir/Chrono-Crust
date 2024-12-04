@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List Offers</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin_home.css">
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -22,8 +23,8 @@
 
         .container {
             display: flex;
-            flex-direction: column;
             padding: 40px;
+            flex-direction: column;
             max-width: 1200px;
             margin: auto;
         }
@@ -34,6 +35,53 @@
             color: #888;
         }
 
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-direction: row;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .sidebar div {
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .sidebar div:hover {
+            background-color: #e8e8e8;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar div.selected {
+            background-color: #050505;
+            color: #fff;
+        }
+
+        .admin-container {
+            flex: 1;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-container h1 {
+            margin-bottom: 20px;
+        }
+
+        /* Table Styles */
         .table-container {
             overflow-x: auto;
             margin-bottom: 20px;
@@ -42,7 +90,6 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
         }
 
         table th,
@@ -56,52 +103,30 @@
             background-color: #f8f8f8;
         }
 
+        /* Action Button Styles */
         .action-button {
-            padding: 10px 15px;
-            border-radius: 5px;
-            background-color: #28a745;
+            font-family: 'Nunito', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
             color: white;
+            background-color: #28a745; /* Green background */
             border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
 
         .action-button:hover {
-            background-color: #218838;
+            background-color: #218838; /* Darker green */
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px); /* Slight lift effect */
         }
 
-        .add-offer-button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
-        }
-
-        .add-offer-button:hover {
-            background-color: #0056b3;
-        }
-
-        .messages {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            background-color: #ffefef;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: #ff4d4d;
-        }
-
-        .no-offers-message {
-            text-align: center;
-            margin: 20px;
-            font-size: 18px;
-            color: #888;
+        .action-button:active {
+            transform: translateY(0); /* Reset lift on click */
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
 
         .logout-button {
@@ -112,25 +137,33 @@
             color: #fff;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            text-decoration: none;
         }
-    
         .logout-button:hover {
-            background-color: #ff1a1a;
+            background-color: #e04343;
         }
 
         /* Responsive Styles */
         @media (max-width: 768px) {
-            table th, table td {
-                padding: 10px;
+            .main-content {
+                flex-direction: column;
+                gap: 0;
             }
 
-            .add-offer-button {
+            .sidebar {
                 width: 100%;
-                padding: 12px;
+                display: flex;
+                justify-content: space-around;
+                gap: 0;
+                padding: 10px;
+                border-radius: 12px;
+                background-color: transparent;
+                box-shadow: none;
+            }
+
+            .admin-container {
+                padding: 15px;
             }
         }
-
     </style>
 </head>
 
@@ -140,40 +173,46 @@
             <a href="/">Home </a> / <a href="/admin">Admin </a> / <span>List Offers</span>
         </div>
 
-        <h2>List of Offers</h2>
+        <div class="main-content">
+            {% include 'partials/admin_sidebar.html' %}
 
-        {% if not products %}
-        <div class="no-offers-message">
-            <p>No offers found. Please add some offers to products.</p>
-        </div>
-        {% else %}
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Original Price</th>
-                        <th>Offer Price</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for product in products %}
-                    {% if product.offer_price != product.price %}
-                    <tr>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.price }}</td>
-                        <td>{{ product.offer_price }}</td>
-                        <td><a href="{% url 'admin_delete_offer' product.id %}"><button class="logout-button">Delete</button></a></td>
-                    </tr>
-                    {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
+            <div class="admin-container">
+                <h2>List of Offers</h2>
 
-        <a href="{% url 'admin_add_offer' %}" class="add-offer-button">Add Or Edit An Offer</a>
+                {% if not products %}
+                <div class="no-offers-message">
+                    <p>No offers found. Please add some offers to products.</p>
+                </div>
+                {% else %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Original Price</th>
+                                <th>Offer Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            {% if product.offer_price != product.price %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.price }}</td>
+                                <td>{{ product.offer_price }}</td>
+                                <td><a href="{% url 'admin_delete_offer' product.id %}"><button class="logout-button">Delete</button></a></td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+
+                <a href="{% url 'admin_add_offer' %}" class="action-button edit-button">Add Or Edit An Offer</a>
+            </div>
+        </div>
 
         {% if messages %}
         <ul class="messages">
@@ -184,6 +223,28 @@
         {% endif %}
     </div>
 
+    <script>
+        document.getElementById('date-filter').addEventListener('change', function() {
+            this.form.submit(); // Submit the form when the selection changes
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all elements with the class 'nav-item'
+            var navItems = document.querySelectorAll('.sidebar .nav-item');
+        
+            // Remove the 'selected' class from all nav-items
+            navItems.forEach(function(item) {
+                item.classList.remove('selected');
+            });
+        
+            // Add the 'selected' class to the 'overview' nav-item
+            var overviewLink = document.querySelector('.sidebar .offers');
+            if (overviewLink) {
+                overviewLink.classList.add('selected');
+            }
+        });
+    </script>
 </body>
 
 </html>

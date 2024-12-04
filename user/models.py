@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .managers import CustomUserManager
+from django.utils import timezone
 
 
 # Create your models here.
@@ -12,7 +13,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(_("email address"), unique=True)
     date_of_birth = models.DateField(null=True)
     phone = models.CharField()
-    profile_image = models.ImageField(upload_to='uploads/profile', null=True)
+    profile_image = models.ImageField(upload_to='uploads/profile', null=True, default='uploads/profile/cropped-profile-image_gQgGyFW.jpg')
 
     THEME_CHOICES = [
         ('dark', 'Dark'),

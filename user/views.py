@@ -18,7 +18,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from datetime import timedelta
 from django.core.mail import send_mail
-from django.db.models import Q
+from django.db.models import Q, Sum
 from decimal import Decimal
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -52,7 +52,7 @@ def user_list_product(request):
         Q(collection__is_listed=True),
         Q(collection__brand__is_listed=True),
         Q(for_men=True) | Q(for_women=True)
-    )
+    ).order_by('name')
     return render(request, 'user_list_product.html', {'products': products})
 
 
@@ -62,24 +62,10 @@ def user_list_product_catogory(request):
         Q(collection__is_listed=True),
         Q(collection__brand__is_listed=True),
         Q(for_men=True) | Q(for_women=True)
-    )
-
-    # Handle sorting
-    sort_option = request.GET.get('sort')
-    if sort_option == 'name_asc':
-        products = products.order_by('name')  # A-Z
-    elif sort_option == 'name_desc':
-        products = products.order_by('-name')  # Z-A
-    elif sort_option == 'price_asc':
-        products = products.order_by('price')  # Low to High
-    elif sort_option == 'price_desc':
-        products = products.order_by('-price')  # High to Low
-    elif sort_option == 'newest':
-        products = products.order_by('-created_at')  # Newest first
-    elif sort_option == 'popularity':
-        products = products.order_by('-popularity')  # Assuming you have a popularity field
+    ).order_by('name')
 
     gender_filter = request.GET.get('gender_filter')
+    print(gender_filter)
 
     if gender_filter:
         if gender_filter == 'men':
@@ -106,13 +92,37 @@ def user_list_product_catogory(request):
                 Q(collection__is_listed=True),
                 Q(collection__brand__is_listed=True)
             )
+    
+    sort_option = request.GET.get('sort')
+    print(sort_option)
+    if sort_option == 'name_asc':
+        products = products.order_by('name')
+    elif sort_option == 'name_desc':
+        products = products.order_by('-name')
+    elif sort_option == 'price_asc':
+        products = products.order_by('price')
+    elif sort_option == 'price_desc':
+        products = products.order_by('-price')
+    elif sort_option == 'newest':
+        products = products.order_by('-created_at')
+    elif sort_option == 'popularity':
+        products = products.order_by('-popularity')
+
+    print(products)
     return render(request, 'user_list_product_catogory.html', {'products': products})
 
 
 def user_list_brand(request):
     brands = Brand.objects.filter(
         Q(is_listed=True)
-    )
+    ).order_by('name')
+
+    sort_option = request.GET.get('sort')
+    if sort_option == 'name_asc':
+        brands = brands.order_by('name')
+    elif sort_option == 'name_desc':
+        brands = brands.order_by('-name')
+    
     return render(request, 'user_list_brands.html', {'brands': brands})
 
 
@@ -120,7 +130,21 @@ def user_list_collection(request):
     collection = Collection.objects.filter(
         Q(is_listed=True),
         Q(brand__is_listed=True)
-    )
+    ).order_by('name')
+
+    # Handle sorting
+    sort_option = request.GET.get('sort')
+    if sort_option == 'name_asc':
+        collection = collection.order_by('name')
+    elif sort_option == 'name_desc':
+        collection = collection.order_by('-name')
+    elif sort_option == 'newest':
+        collection = collection.order_by('-created_at')
+    elif sort_option == 'popularity':
+        collection = Collection.objects.annotate(
+            total_popularity=Sum('product__popularity')
+        ).order_by('total_popularity')
+
     return render(request, 'user_list_collection.html', {'collections': collection})
 
 
@@ -402,6 +426,23 @@ def user_profile_update(request):
         user_data.phone = phone
         user_data.save()
     return redirect('user_profile')
+
+
+@require_POST
+def user_profile_image_update(request):
+    if 'profile_image' in request.FILES:
+        user = request.user
+        uploaded_image = request.FILES['profile_image']
+        
+        # Process and save the image
+        user.profile_image = uploaded_image
+        user.save()
+        
+        return JsonResponse({
+            'success': True, 
+            'image_url': user.profile_image.url
+        })
+    return JsonResponse({'success': False, 'error': 'No image uploaded'})
 
 
 @login_required(login_url='user_login')
@@ -959,96 +1000,13 @@ def user_move_to_order(request):
 
 
 def prepare_razorpay_payment(request, order_id):
-    try:
-        # Retrieve the specific order
-        order = Order.objects.get(id=order_id, user=request.user, payment_status='failed')
-        # Initialize Razorpay client
-        razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
-
-        # Create Razorpay order
-        razorpay_order = razorpay_client.order.create({
-            'amount': int(order.total_amount * 100),  # amount in paise
-            'currency': 'INR',
-            'payment_capture': 1  # Auto-capture payment
-        })
-
-        # Update order with Razorpay order ID
-        order.id = razorpay_order['id']
-        order.save()
-        
-        # Prepare response
-        return JsonResponse({
-            'razorpay_key': settings.RAZOR_KEY_ID,
-            'razorpay_order_id': razorpay_order['id'],
-            'amount': int(order.total_amount * 100),
-            'currency': 'INR'
-        })
-    
-    except Order.DoesNotExist:
-        print('dad400')
-        return JsonResponse({'status': 'error', 'message': 'Order not found'}, status=404)
-    except Exception as e:
-        print('dad400')
-        print(e)
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    pass
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def verify_razorpay_payment(request):
-    try:
-        # Get data from the request body
-        data = json.loads(request.body)
-
-        razorpay_payment_id = data.get('razorpay_payment_id')
-        razorpay_order_id = data.get('razorpay_order_id')
-        razorpay_signature = data.get('razorpay_signature')
-        order_id = data.get('order_id')
-
-        # Retrieve the order from the database
-        order = Order.objects.get(id=order_id, user=request.user, payment_status='failed')
-        print(order)
-
-        # Verify the payment signature with Razorpay
-        razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
-
-        # Construct the data for signature verification
-        params_dict = {
-            'razorpay_order_id': razorpay_order_id,
-            'razorpay_payment_id': razorpay_payment_id,
-            'razorpay_signature': razorpay_signature
-        }
-
-        # Verify the payment signature
-        try:
-            razorpay_client.utility.verify_payment_signature(params_dict)
-
-            # If payment signature verification is successful, we now check the payment status
-            # Confirm that Razorpay has marked the payment as successful
-            payment_details = razorpay_client.payment.fetch(razorpay_payment_id)
-
-            if payment_details['status'] == 'success':
-                # Update the order status to 'paid' if payment is successful
-                order.payment_status = 'paid'
-                
-                order.save()
-
-                # Respond with success
-                return JsonResponse({'status': 'success', 'message': 'Payment verified successfully'}, status=200)
-            else:
-                # If Razorpay payment status is not 'success', return failure response
-                return JsonResponse({'status': 'error', 'message': 'Payment failed'}, status=400)
-
-        except razorpay.errors.SignatureVerificationError:
-            # If signature verification fails, return error response
-            return JsonResponse({'status': 'error', 'message': 'Payment signature verification failed'}, status=400)
-
-    except Order.DoesNotExist:
-        # If the order does not exist, return an error
-        return JsonResponse({'status': 'error', 'message': 'Order not found'}, status=404)
-    except Exception as e:
-        # Handle any other exceptions
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    pass
 
 
 @login_required(login_url='user_login')
@@ -1109,7 +1067,23 @@ def user_cancel_order(request, order_id):
         payment = get_object_or_404(PersonalWallet, user=request.user)
 
         # Check the order status and set the appropriate message
-        if order.status == 'pending' or order.status == 'Pending' and order.payment_status == 'paid':
+        if order.status == 'pending' or order.status == 'Pending' and order.payment_status == 'cod':
+            try:
+                for order_item in order.items.all():
+                    product = order_item.product
+                    product.stock += order_item.quantity
+                    
+                    product.save()
+
+                # Update the order status to 'Cancelled'
+                order.status = 'cancelled'  # Use the correct choice value
+                order.save()  # Save the updated order
+        
+                messages.success(request, 'Order has been successfully cancelled.')
+            except Exception as e:
+                # If there is an error while updating the order
+                messages.error(request, f'Error canceling order: {e}')
+        elif order.status == 'pending' or order.status == 'Pending' and order.payment_status == 'paid':
             try:
                 # Loop through each OrderItem to update the stock
                 for order_item in order.items.all():  # Adjusted to use 'items'
@@ -1155,9 +1129,6 @@ def address_selection(request):
     return redirect('user_address_book')
 
 
-razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
-
-
 @never_cache
 def user_payment_method_selection(request):
     if request.method == 'POST':
@@ -1169,7 +1140,7 @@ def user_payment_method_selection(request):
 
         item_ids = item_ids.split(',') if item_ids else []
 
-        client = razorpay.Client(auth=("rzp_test_ogXW1qOaXCrzZG", "xh7Hg2R6cJmhk7p02eCGhtZC"))
+        client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
         if total_amount:
             amount = int(float(total_amount) * 100)
             personal_wallet = PersonalWallet.objects.get(user=request.user)
@@ -1179,7 +1150,7 @@ def user_payment_method_selection(request):
             payment = client.order.create(data=data)
             order_id = payment['id']
             return render(request, 'checkout/payment_method.html', {'order_id': order_id, 'total_amount': amount, 'personal_wallet_balance': personal_wallet})
-    return redirect('user_profile')
+    return redirect('user_order_history')
 
 
 @login_required(login_url='user_login')

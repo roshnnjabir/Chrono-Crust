@@ -152,30 +152,30 @@
         }
 
         /* Action Button Styles */
-.action-button {
-    font-family: 'Nunito', sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-    background-color: #28a745; /* Green background */
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-}
+        .action-button {
+            font-family: 'Nunito', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #28a745; /* Green background */
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
 
-.action-button:hover {
-    background-color: #218838; /* Darker green */
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px); /* Slight lift effect */
-}
+        .action-button:hover {
+            background-color: #218838; /* Darker green */
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px); /* Slight lift effect */
+        }
 
-.action-button:active {
-    transform: translateY(0); /* Reset lift on click */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-}
+        .action-button:active {
+            transform: translateY(0); /* Reset lift on click */
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
 
         .logout-button {
             background-color: #ff4d4d;
@@ -239,7 +239,7 @@
         .graphs-container {
             display: flex;
             justify-content: space-between;
-            margin-top: 30px;
+            margin: 30px 0px;
         }
         
         .product-popularity-graph,
@@ -285,13 +285,7 @@
         </div>
 
         <div class="main-content">
-            <div class="sidebar">
-                <div class="nav-item">User's Overview</div>
-                <div class="nav-item">Blocked Users</div>
-                <a href="/admin/orders"><div class="nav-item">Order History</div></a>
-                <div class="nav-item selected">Sales Report</div>
-                <div class="nav-item">Settings</div>
-            </div>
+            {% include 'partials/admin_sidebar.html' %}
 
             <div class="admin-container">
                 <h1>Sales Report</h1>
@@ -395,7 +389,7 @@
                         </table>
                     </div>
                 </div>
-                <a href="?download_pdf=1">Download Sales Report (PDF)</a>
+                <a class="action-button" href="?download_pdf=1">Download Sales Report (PDF)</a>
             
                 {% if messages %}
                 <ul class="messages">
@@ -442,7 +436,22 @@
             }
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all elements with the class 'nav-item'
+            var navItems = document.querySelectorAll('.sidebar .nav-item');
+        
+            // Remove the 'selected' class from all nav-items
+            navItems.forEach(function(item) {
+                item.classList.remove('selected');
+            });
+        
+            // Add the 'selected' class to the 'overview' nav-item
+            var overviewLink = document.querySelector('.sidebar .sales');
+            if (overviewLink) {
+                overviewLink.classList.add('selected');
+            }
+        });
+    </script>
 </body>
-
 </html>
-total_amount

@@ -22,7 +22,12 @@ class Collection(models.Model):
     logo_image = models.ImageField(upload_to='uploads/collection')
     banner_image = models.ImageField(upload_to='uploads/collection')
     is_listed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def total_popularity(self):
+        total_pop = self.product.aggregate(total_popularity=Sum('popularity'))['total_popularity'] or 0 # 'product' is related name
+        return total_pop
+    
     def __str__(self):
         return self.name
 
@@ -219,11 +224,6 @@ class Order(models.Model):
             self.total_discount = float(self.total_amount) - float(self.discounted_amount)
         # calling the save of parent class
         super().save(*args, **kwargs)
-
-    # def calculate_total(self):
-    #     total = sum(item.price for item in self.items.all())
-    #     self.total_amount = total
-    #     self.save()
 
     def __str__(self):
         return f"Order #{self.id} by {self.user.email} on {self.created_at} - Status: {self.status}"

@@ -179,6 +179,9 @@
             background-color: rgb(0,0,0); /* Fallback color */
             background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
         }
+        #filterButton{
+            margin: 20px 10px;
+        }
 
         .modal-content {
             background-color: #fefefe;
@@ -272,7 +275,7 @@
                         </form>
                     </div>
                 </div>
-            
+                <span>Total Orders: {{ total_orders }}</span>
                 <div class="table-container">
                     <table id="customers">
                         <thead>
@@ -287,7 +290,7 @@
                             </tr>
                         </thead>
                         <tbody id="table-body">
-                            {% for order in orders %}
+                            {% for order in orders if show_all else |slice:'10' endif %}
                             <tr>
                                 <td>{{ order.id }}</td>
                                 <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
@@ -352,6 +355,24 @@
             }
         }
     </script>    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all elements with the class 'nav-item'
+            var navItems = document.querySelectorAll('.sidebar .nav-item');
+        
+            // Remove the 'selected' class from all nav-items
+            navItems.forEach(function(item) {
+                item.classList.remove('selected');
+            });
+        
+            
+            // add to the current 
+            var overviewLink = document.querySelector('.sidebar .orders');
+            if (overviewLink) {
+                overviewLink.classList.add('selected');
+            }
+        });
+    </script>
 </body>
 
 </html>

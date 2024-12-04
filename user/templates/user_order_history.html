@@ -64,6 +64,7 @@
                                     <li>No products in this order.</li>
                                 {% endfor %}
                             </ul>
+                            <p>Payment Status: {{ order.payment_status|capfirst }}</p>
                         </div>
                         <div class="order-actions">
                             <button type="button" class="view-details-button" onclick="openOrderDetails({{ order.id }})">View Details</button>
@@ -118,8 +119,7 @@
     function openOrderDetails(orderId) {
         const modal = document.getElementById("orderDetailsModal");
         const content = document.getElementById("order-details-content");
-    
-        // Fetch order details using AJAX
+
         // Fetch order details using AJAX
     fetch(`/user_profile/user_order_details/${orderId}/`)
         .then(response => {

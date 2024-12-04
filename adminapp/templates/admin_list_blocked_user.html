@@ -379,7 +379,23 @@
         });
         
     </script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all elements with the class 'nav-item'
+            var navItems = document.querySelectorAll('.sidebar .nav-item');
+        
+            // Remove the 'selected' class from all nav-items
+            navItems.forEach(function(item) {
+                item.classList.remove('selected');
+            });
+        
+            // add to the current 
+            var overviewLink = document.querySelector('.sidebar .users');
+            if (overviewLink) {
+                overviewLink.classList.add('selected');
+            }
+        });
+    </script>
 </body>
 
 </html>

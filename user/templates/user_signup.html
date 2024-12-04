@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -18,14 +19,58 @@
         <img src="{% static 'images/image2.png' %}" alt="Sign Up Image">
         <div class="form-container">
             <h2>Sign Up</h2>
-            <form id="signup-form" action="{% url 'user_signup' %}" method="post">
+            <form id="signup-form" action="{% url 'user_signup' %}" method="post" novalidate>
                 {% csrf_token %}
-                <input type="text" name="FirstName" placeholder="First Name" value="{{ user.FirstName }}" required>
-                <input type="text" name="LastName" placeholder="Last Name" value="{{ user.LastName }}" required>
-                <input type="email" name="email" placeholder="Email" value="{{ user.email }}" required>
-                <input type="password" name="password1" placeholder="Password" value="{{ user.pass1 }}" required>
-                <input type="password" name="password2" placeholder="Confirm Password" value="{{ user.pass2 }}" required>
-                <span id="passwordError" style="color: red;"></span>
+                <div class="input-group">
+                    <input type="text" id="first-name" name="FirstName" placeholder="First Name" 
+                           value="{{ user.FirstName }}" required 
+                           minlength="2" maxlength="50"
+                           pattern="[A-Za-z\s]+"
+                           title="First name can only contain letters and spaces">
+                    <span class="error" id="first-name-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="last-name" name="LastName" placeholder="Last Name" 
+                           value="{{ user.LastName }}" required 
+                           minlength="2" maxlength="50"
+                           pattern="[A-Za-z\s]+"
+                           title="Last name can only contain letters and spaces">
+                    <span class="error" id="last-name-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="email" id="email" name="email" placeholder="Email" 
+                           value="{{ user.email }}" required 
+                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                           title="Please enter a valid email address">
+                    <span class="error" id="email-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="password1" name="password1" placeholder="Password" 
+                           required minlength="8" maxlength="128"
+                           pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+                           title="Password must be 8-128 characters, include letters, numbers, and a special character">
+                    <span class="error" id="password1-error"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="password2" name="password2" placeholder="Confirm Password" 
+                           required minlength="8" maxlength="128">
+                    <span class="error" id="password2-error"></span>
+                </div>
+
+                <div class="password-requirements">
+                    <p>Password must:</p>
+                    <ul>
+                        <li id="length-req">Be at least 8 characters long</li>
+                        <li id="letter-req">Contain at least one letter</li>
+                        <li id="number-req">Contain at least one number</li>
+                        <li id="special-req">Contain at least one special character (@$!%*#?&)</li>
+                    </ul>
+                </div>
+
                 <button type="submit">Sign Up</button>
             </form>
             <div class="redirect-link">
@@ -47,29 +92,150 @@
     </div>
 
     <script>
-        document.getElementById("signupForm").addEventListener("submit", function(event) {
-            const password1 = document.getElementById("password1").value;
-            const password2 = document.getElementById("password2").value;
-            const errorSpan = document.getElementById("passwordError");
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signup-form');
+            const firstName = document.getElementById('first-name');
+            const lastName = document.getElementById('last-name');
+            const email = document.getElementById('email');
+            const password1 = document.getElementById('password1');
+            const password2 = document.getElementById('password2');
+
+            // Error elements
+            const firstNameError = document.getElementById('first-name-error');
+            const lastNameError = document.getElementById('last-name-error');
+            const emailError = document.getElementById('email-error');
+            const password1Error = document.getElementById('password1-error');
+            const password2Error = document.getElementById('password2-error');
+
+            // Password requirement elements
+            const lengthReq = document.getElementById('length-req');
+            const letterReq = document.getElementById('letter-req');
+            const numberReq = document.getElementById('number-req');
+            const specialReq = document.getElementById('special-req');
+
+            // Validation functions
+            function validateName(nameInput, errorElement) {
+                const nameValue = nameInput.value.trim();
+                const namePattern = /^[A-Za-z\s]{2,50}$/;
+                
+                if (nameValue === '') {
+                    errorElement.textContent = 'This field is required';
+                    return false;
+                }
+                
+                if (!namePattern.test(nameValue)) {
+                    errorElement.textContent = 'Name must be 2-50 letters and spaces only';
+                    return false;
+                }
+                
+                errorElement.textContent = '';
+                return true;
+            }
+
+            function validateEmail(emailInput, errorElement) {
+                const emailValue = emailInput.value.trim();
+                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+                
+                if (emailValue === '') {
+                    errorElement.textContent = 'Email is required';
+                    return false;
+                }
+                
+                if (!emailPattern.test(emailValue)) {
+                    errorElement.textContent = 'Please enter a valid email address';
+                    return false;
+                }
+                
+                errorElement.textContent = '';
+                return true;
+            }
+
+            function validatePassword(passwordInput, errorElement) {
+                const passwordValue = passwordInput.value;
+                const hasLength = passwordValue.length >= 8;
+                const hasLetter = /[A-Za-z]/.test(passwordValue);
+                const hasNumber = /\d/.test(passwordValue);
+                const hasSpecialChar = /[@$!%*#?&]/.test(passwordValue);
+
+                // Update requirement indicators
+                lengthReq.style.color = hasLength ? 'green' : 'red';
+                letterReq.style.color = hasLetter ? 'green' : 'red';
+                numberReq.style.color = hasNumber ? 'green' : 'red';
+                specialReq.style.color = hasSpecialChar ? 'green' : 'red';
+
+                if (!hasLength || !hasLetter || !hasNumber || !hasSpecialChar) {
+                    errorElement.textContent = 'Password does not meet requirements';
+                    return false;
+                }
+                
+                errorElement.textContent = '';
+                return true;
+            }
+
+            function validatePasswordMatch(password1Input, password2Input, errorElement) {
+                if (password1Input.value !== password2Input.value) {
+                    errorElement.textContent = 'Passwords do not match';
+                    return false;
+                }
+                
+                errorElement.textContent = '';
+                return true;
+            }
+
+            // Real-time validation
+            firstName.addEventListener('input', () => validateName(firstName, firstNameError));
+            lastName.addEventListener('input', () => validateName(lastName, lastNameError));
+            email.addEventListener('input', () => validateEmail(email, emailError));
             
-            // Reset the error message
-            errorSpan.textContent = "";
-    
-            // Check if password length is at least 6 characters
-            if (password1.length < 6) {
-                errorSpan.textContent = "Password must be at least 6 characters long.";
-                event.preventDefault(); // Prevent form submission
-                return;
-            }
-    
-            // Optionally: Check if the password contains digits
-            const hasDigits = /\d/.test(password1);
-            if (!hasDigits) {
-                errorSpan.textContent = "Password must contain at least one digit.";
-                event.preventDefault(); // Prevent form submission
-                return;
-            }
+            password1.addEventListener('input', () => {
+                validatePassword(password1, password1Error);
+                if (password2.value) {
+                    validatePasswordMatch(password1, password2, password2Error);
+                }
+            });
+
+            password2.addEventListener('input', () => {
+                validatePasswordMatch(password1, password2, password2Error);
+            });
+
+            // Form submission validation
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const isFirstNameValid = validateName(firstName, firstNameError);
+                const isLastNameValid = validateName(lastName, lastNameError);
+                const isEmailValid = validateEmail(email, emailError);
+                const isPassword1Valid = validatePassword(password1, password1Error);
+                const isPassword2Valid = validatePasswordMatch(password1, password2, password2Error);
+
+                if (isFirstNameValid && isLastNameValid && isEmailValid && isPassword1Valid && isPassword2Valid) {
+                    form.submit();
+                }
+            });
         });
     </script>
+    <style>
+        .error {
+            color: red;
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: block;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .password-requirements {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .password-requirements ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        .password-requirements li {
+            margin-bottom: 5px;
+        }
+    </style>
 </body>
 </html>

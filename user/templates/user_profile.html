@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link rel="stylesheet" href="{% static 'css/user_profile.css' %}">
 </head>
 <body>
@@ -24,9 +25,13 @@
         <div class="content" >
             <h2>My Account</h2>
             <div class="box">
+                <div class="image-container">
+                    <img class="user-image" src="{{ user.profile_image.url }}" alt="{{ user.first_name }}">
+                    <button class="image-edit-overlay-btn" onclick="openImageCropModal()">Edit Image</button>
+                </div>
                 <div class="box-header">
                     <h3>Account Overview</h3>
-                    <button  class="edit_button" id="edit_button" onclick="openModal()">Edit</button>
+                    <button class="edit_button" id="edit_button" onclick="openModal()">Edit</button>
                 </div>
                 <div class="info-layout">
                     <div class="info-label">First Name:</div>
@@ -95,11 +100,27 @@
     </div>
 </div>
 
+<!-- Image Crop Modal -->
+<div id="image-crop-modal">
+    <div id="image-crop-modal-content">
+        <h3>Crop Profile Image</h3>
+        <input type="file" id="image-crop-input" accept="image/*">
+        <div id="image-crop-container">
+            <img id="image-to-crop" src="" alt="Image to crop" style="max-width: 100%;">
+        </div>
+        <div>
+            <button onclick="cropImage()">Crop and Save</button>
+            <button onclick="closeImageCropModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
     function navigateTo(value) {
-        const baseUrl = '/user_profile'; // Change this to the base URL for your user profile
-        const url = `${baseUrl}/${value}`; // Append the selected value to the base URL
-        window.location.href = url; // Redirect to the new URL
+        const baseUrl = '/user_profile'; 
+        const url = `${baseUrl}/${value}`; 
+        window.location.href = url; 
     }
 
     function openModal() {
@@ -111,6 +132,100 @@
         document.getElementById("errorModal").style.display = "none";
     }
 
+    // Image Cropping Functionality
+    let cropper;
+    const existingImageUrl = "{{ user.profile_image.url }}";
+
+    function openImageCropModal() {
+        const imageToCrop = document.getElementById('image-to-crop');
+        imageToCrop.src = existingImageUrl;
+        document.getElementById('image-crop-modal').style.display = 'flex';
+        document.getElementById('image-crop-input').value = ''; // Clear any previous selection
+
+        // Destroy previous cropper instance if exists
+        if (cropper) {
+            cropper.destroy();
+        }
+
+        // Initialize Cropper with existing image
+        cropper = new Cropper(imageToCrop, {
+            aspectRatio: 1, // Square crop
+            viewMode: 1,
+            dragMode: 'move',
+            guides: true,
+            background: false
+        });
+    }
+
+    function closeImageCropModal() {
+        document.getElementById('image-crop-modal').style.display = 'none';
+        if (cropper) {
+            cropper.destroy();
+        }
+    }
+
+    document.getElementById('image-crop-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+            const img = document.getElementById('image-to-crop');
+            img.src = event.target.result;
+
+            // Destroy previous cropper instance if exists
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            // Initialize Cropper
+            cropper = new Cropper(img, {
+                aspectRatio: 1, // Square crop
+                viewMode: 1,
+                dragMode: 'move',
+                guides: true,
+                background: false
+            });
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    function cropImage() {
+        if (!cropper) {
+            alert('Please select an image first');
+            return;
+        }
+
+        // Get the cropped image as a blob
+        cropper.getCroppedCanvas().toBlob((blob) => {
+            // Create form data to send to server
+            const formData = new FormData();
+            formData.append('profile_image', blob, 'cropped-profile-image.jpg');
+
+            // Send to server using fetch or XMLHttpRequest
+            fetch('{% url "user_profile_image_update" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the profile image in the page
+                    document.querySelector('.user-image').src = data.image_url;
+                    closeImageCropModal();
+                } else {
+                    alert('Failed to update profile image');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the profile image');
+            });
+        });
+    }
 </script>
 
 <script>
