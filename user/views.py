@@ -65,7 +65,6 @@ def user_list_product_catogory(request):
     ).order_by('name')
 
     gender_filter = request.GET.get('gender_filter')
-    print(gender_filter)
 
     if gender_filter:
         if gender_filter == 'men':
@@ -94,7 +93,6 @@ def user_list_product_catogory(request):
             )
     
     sort_option = request.GET.get('sort')
-    print(sort_option)
     if sort_option == 'name_asc':
         products = products.order_by('name')
     elif sort_option == 'name_desc':
@@ -108,7 +106,6 @@ def user_list_product_catogory(request):
     elif sort_option == 'popularity':
         products = products.order_by('-popularity')
 
-    print(products)
     return render(request, 'user_list_product_catogory.html', {'products': products})
 
 
@@ -1178,7 +1175,6 @@ def view_collection(request, id):
     lis = []
     for product_list in collection.product.filter(is_listed=True):
         lis.append(product_list)
-    print(lis)
     return render(request, 'user_list_product.html', {'products': lis})
 
 

@@ -53,7 +53,6 @@ def admin_list_user(request):
 @staff_member_required(login_url="admin_login")
 def admin_show_user_details(request, id):
     user = get_object_or_404(CustomUser, id=id)
-    print(user.profile_image)
     addresses = user.addresses.all()
     context = {
         'user': user,
@@ -66,10 +65,8 @@ def admin_show_user_details(request, id):
 @staff_member_required(login_url="admin_login")
 def admin_show_order_of_specific_user(request, id):
     user = get_object_or_404(CustomUser, id=id)
-    print(user.profile_image)
     orders = user.orders.all()
     addresses = user.addresses.all()
-    print(orders)
     context = {
         'user': user,
         'orders': orders,
@@ -123,10 +120,8 @@ def admin_login(request):
 def admin_block_unblock_user(request, id):
     user_data = CustomUser.objects.get(id=id)
     if user_data.is_active:
-        print('Is active')
         user_data.is_active = False
     else:
-        print('Is not active')
         user_data.is_active = True
 
     user_data.save()
@@ -186,7 +181,6 @@ def admin_add_product(request):
         collect = request.POST['collection']
         stock = request.POST['stock']
         reference_no = request.POST['reference_no']
-        print(request.POST['collection'], 'hrh')
         image1 = request.POST['image1']
         image2 = request.POST['image2']
         image3 = request.POST['image3']
@@ -235,7 +229,6 @@ def admin_edit_product(request, id):
         image1 = request.POST['image1']
         image2 = request.POST['image2']
         image3 = request.POST['image3']
-        print(limited_edition)
 
         product = Product.objects.get(id=productid)
         collection = Collection.objects.get(id=collection_id)
@@ -252,7 +245,6 @@ def admin_edit_product(request, id):
         product.limited_edition = limited_edition
         product.for_men = for_men
         product.for_women = for_women
-        print(product.limited_edition)
         product.image = image1
         product.image1 = image2
         product.image2 = image3
@@ -459,7 +451,6 @@ def admin_order_details(request, order_id):
 
 def update_order_status(request, order_id):
     if request.method == 'POST':
-        print('admin_order_details')
         try:
             # Parse the JSON data
             data = json.loads(request.body)
@@ -470,7 +461,6 @@ def update_order_status(request, order_id):
                 order = Order.objects.get(id=order_id)
                 order.status = new_status
                 order.save()
-                print(order.status)
                 return JsonResponse({'message': 'Order status updated successfully'})
             else:
                 return JsonResponse({'error': 'Invalid status'}, status=400)
@@ -484,7 +474,6 @@ def update_order_status(request, order_id):
 
 def update_payment_status(request, order_id):
     if request.method == 'POST':
-        print('admin_order_details')
         try:
             data = json.loads(request.body)
             new_payment_status = data.get('payment_status')
@@ -511,12 +500,6 @@ def admin_coupons(request):
     return render(request, 'admin_list_coupon.html', {'coupons': coupons})
 
 
-# def admin_coupon_details(request, code):
-#     coupen = Coupen.objects.get(code=code)
-#     print(coupen)
-#     return HttpResponse('ahj')
-
-
 def admin_add_coupon(request):
     if request.method == "POST":
         # Get form data from the POST request
@@ -528,7 +511,6 @@ def admin_add_coupon(request):
         valid_from = request.POST.get('valid_from')
         valid_to = request.POST.get('valid_to')
         active = request.POST.get('active') == 'on'  # Checkbox returns 'on' when checked
-        print(active)
 
         if Coupen.objects.filter(code=code).exists():
             messages.error(request, ' This Coupen Code Already Exist')
@@ -687,7 +669,6 @@ def admin_sales(request):
             plt.close(fig)  # Close the specific figure
             return graph
         except Exception as e:
-            print(f"Error generating line graph: {e}")
             return None
     
     def generate_pie_chart(data, title):
@@ -706,7 +687,6 @@ def admin_sales(request):
             plt.close(fig)  # Close the specific figure
             return chart
         except Exception as e:
-            print(f"Error generating pie chart: {e}")
             return None
 
     product_line_graph = None
