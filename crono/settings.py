@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = ['chronocrust.zapto.org', '127.0.0.1']
+ALLOWED_HOSTS = []
 
 
 # Application definition

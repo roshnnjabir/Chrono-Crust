@@ -669,6 +669,7 @@ def admin_sales(request):
             plt.close(fig)  # Close the specific figure
             return graph
         except Exception as e:
+            
             return None
     
     def generate_pie_chart(data, title):
