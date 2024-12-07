@@ -462,104 +462,203 @@
         const cropperImage = document.getElementById('cropperImage');
         const progressBar = document.querySelector('.progress-bar');
         const progressContainer = document.querySelector('.upload-progress');
-
-        // Form submission handler
-        document.getElementById('edit-form').onsubmit = function() {
-            ['image1', 'image2', 'image3', 'image4'].forEach(imageId => {
-                const imageSrc = document.getElementById(imageId).src;
+            
+        // Improved image validation function
+        function isValidImage(img) {
+            return img.src && 
+                   img.src !== '#' && 
+                   img.src !== window.location.href;
+        }
+        
+        // Form submission handler with comprehensive validation
+        document.getElementById('edit-form').onsubmit = function(e) {
+            // Get all images
+            const images = [
+                document.getElementById('image1'),
+                document.getElementById('image2'),
+                document.getElementById('image3'),
+                document.getElementById('image4')
+            ];
+            
+            // Check if all images are selected
+            const allImagesSelected = images.every(isValidImage);
+            
+            if (!allImagesSelected) {
+                // Create or get the messages container
+                let messagesContainer = document.querySelector('.messages');
+                if (!messagesContainer) {
+                    messagesContainer = document.createElement('div');
+                    messagesContainer.className = 'messages';
+                    const form = document.getElementById('edit-form');
+                    form.insertBefore(messagesContainer, form.querySelector('.save-button'));
+                }
+                
+                // Clear previous messages
+                messagesContainer.innerHTML = '';
+                
+                // Add error message
+                const errorMessage = document.createElement('p');
+                errorMessage.style.color = 'red';
+                errorMessage.style.textAlign = 'center';
+                errorMessage.innerHTML = 'Please select all four images before submitting.';
+                messagesContainer.appendChild(errorMessage);
+                
+                // Highlight unselected images with red border
+                images.forEach(img => {
+                    if (!isValidImage(img)) {
+                        img.style.border = '2px solid #ff4d4d';
+                    }
+                });
+                
+                // Prevent form submission
+                e.preventDefault();
+                return false;
+            }
+            
+            // If validation passes, update hidden inputs
+            images.forEach((img, index) => {
+                const imageSrc = img.src;
                 if (imageSrc && imageSrc !== '#') {
-                    const url = new URL(imageSrc);
-                    document.getElementById('h' + imageId).value = url.pathname.replace('/media/', '');
+                    try {
+                        const url = new URL(imageSrc);
+                        document.getElementById(`himage${index + 1}`).value = url.pathname.replace('/media/', '');
+                    } catch (error) {
+                        console.error(`Error processing image ${index + 1}:`, error);
+                    }
                 }
             });
+            
             return true;
         };
-
+        
         // Image selection handler
         function chooseImage(imageId) {
             selectedImageId = imageId;
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
-            input.onchange = (e) => handleImageUpload(e.target.files[0]);
+            input.onchange = (e) => {
+                // Reset border color when new image is selected
+                const selectedImage = document.getElementById(imageId);
+                selectedImage.style.border = '1px solid #ddd';
+                
+                handleImageUpload(e.target.files[0]);
+            };
             input.click();
         }
-
+        
         // Image upload handler
         function handleImageUpload(file) {
             if (!file) return;
-
+        
             const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
             if (!validTypes.includes(file.type)) {
-                alert('Please upload a valid image file (JPEG, PNG, or WebP)');
+                alert('Please upload a valid image file (JPEG, PNG, WebP, or AVIF)');
                 return;
             }
-
+        
             const reader = new FileReader();
             reader.onload = (e) => {
-                cropperImage.src = e.target.result;
+                // Ensure the modal is displayed
                 modal.style.display = 'flex';
+                modal.style.opacity = '1';
                 
+                // Set the image source
+                cropperImage.src = e.target.result;
+                
+                // Destroy existing cropper if it exists
                 if (cropper) {
                     cropper.destroy();
                 }
-
-                cropper = new Cropper(cropperImage, {
-                    viewMode: 2,
-                    background: true,
-                    rotatable: true,
-                    scalable: true,
-                    zoomable: true,
-                    cropBoxResizable: true,
-                    cropBoxMovable: true,
-                    guides: true,
-                    center: true,
-                    autoCropArea: 0.8,
-                    aspectRatio: NaN  // This removes the aspect ratio constraint
-                });
+            
+                // Wait for image to load before initializing cropper
+                cropperImage.onload = () => {
+                    // Initialize Cropper with more flexible options
+                    cropper = new Cropper(cropperImage, {
+                        viewMode: 1,  // Restrict crop box to not exceed canvas
+                        dragMode: 'move',
+                        aspectRatio: NaN,  // No fixed aspect ratio
+                        autoCropArea: 0.8, // Initial crop area
+                        background: true,
+                        movable: true,
+                        rotatable: true,
+                        scalable: true,
+                        zoomable: true,
+                        cropBoxResizable: true,
+                        cropBoxMovable: true,
+                        guides: true,
+                        center: true,
+                        
+                        // Added error handling
+                        ready: function() {
+                            console.log('Cropper is ready');
+                        },
+                        error: function(err) {
+                            console.error('Cropper error:', err);
+                            alert('There was an issue with the image cropper. Please try again.');
+                        }
+                    });
+                };
             };
+            
+            reader.onerror = (error) => {
+                console.error('FileReader error:', error);
+                alert('Error reading the image file. Please try again.');
+            };
+            
             reader.readAsDataURL(file);
         }
-
+        
         // Rotation handler
         function rotateCropper(degrees) {
             if (cropper) {
                 cropper.rotate(degrees);
             }
         }
-
+        
         // Reset cropper
         function resetCropper() {
             if (cropper) {
                 cropper.reset();
             }
         }
-
+        
         // Close modal handler
         function closeCropper() {
             modal.style.display = 'none';
+            modal.style.opacity = '0';
             if (cropper) {
                 cropper.destroy();
             }
         }
-
+        
         // Save cropped image handler
         function saveCroppedImage() {
-            if (!cropper) return;
-
+            if (!cropper) {
+                alert('No image to crop. Please select an image first.');
+                return;
+            }
+        
             progressContainer.style.display = 'block';
             progressBar.style.width = '0%';
-
+        
             const canvas = cropper.getCroppedCanvas({
                 imageSmoothingEnabled: true,
                 imageSmoothingQuality: 'high',
+                maxWidth: 2000,  // Limit max width to prevent extremely large images
+                maxHeight: 2000 // Limit max height to prevent extremely large images
             });
-
+        
             canvas.toBlob(async (blob) => {
+                if (!blob) {
+                    alert('Failed to create image blob. Please try again.');
+                    return;
+                }
+            
                 const formData = new FormData();
-                const filename = `cropped_${Date.now()}.png`;
+                const filename = `cropped_${selectedImageId}_${Date.now()}.png`;
                 formData.append('image', blob, filename);
-
+            
                 try {
                     const xhr = new XMLHttpRequest();
                     xhr.open('POST', '/upload_cropped_image/', true);
@@ -567,44 +666,136 @@
                     xhr.upload.onprogress = (e) => {
                         if (e.lengthComputable) {
                             const percentComplete = (e.loaded / e.total) * 100;
-                            progressBar.style.width = percentComplete + '%';
+                            progressBar.style.width = `${percentComplete}%`;
                         }
                     };
-
+                
                     xhr.onload = function() {
+                        progressContainer.style.display = 'none';
+                        
                         if (xhr.status === 200) {
-                            const response = JSON.parse(xhr.responseText);
-                            if (response.status === 'success') {
-                                const selectedImage = document.getElementById(selectedImageId);
-                                selectedImage.src = response.file_url;
-                                closeCropper();
-                                progressContainer.style.display = 'none';
-                            } else {
-                                alert('Error uploading image');
+                            try {
+                                const response = JSON.parse(xhr.responseText);
+                                if (response.status === 'success') {
+                                    const selectedImage = document.getElementById(selectedImageId);
+                                    selectedImage.src = response.file_url;
+                                    selectedImage.style.border = '1px solid #ddd';
+                                    closeCropper();
+                                } else {
+                                    alert('Error uploading image: ' + (response.message || 'Unknown error'));
+                                }
+                            } catch (parseError) {
+                                console.error('Error parsing response:', parseError);
+                                alert('Error processing server response');
                             }
+                        } else {
+                            alert(`Upload failed with status ${xhr.status}`);
                         }
                     };
-
+                
                     xhr.onerror = function() {
-                        alert('Error uploading image');
                         progressContainer.style.display = 'none';
+                        alert('Network error during image upload');
                     };
-
+                
                     xhr.send(formData);
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('Error uploading image');
                     progressContainer.style.display = 'none';
+                    alert('Unexpected error uploading image');
                 }
             }, 'image/png', 0.9);
         }
-
+        
         // Close modal when clicking outside
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 closeCropper();
             }
         });
+        
+        // Optional: Keyboard support for closing modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                closeCropper();
+            }
+        });
+        // Form submission handler with validation
+        document.getElementById('edit-form').onsubmit = function(e) {
+            // Get all four images
+            const images = [
+                document.getElementById('image1'),
+                document.getElementById('image2'),
+                document.getElementById('image3'),
+                document.getElementById('image4')
+            ];
+            
+            // Function to check if an image is valid
+            const isImageValid = (img) => {
+                return img.src && 
+                       !img.src.endsWith('#') && 
+                       img.src !== window.location.href;
+            };
+            
+            // Check if all images are selected
+            const allImagesSelected = images.every(isImageValid);
+            
+            if (!allImagesSelected) {
+                // Create or get the messages container
+                let messagesContainer = document.querySelector('.messages');
+                if (!messagesContainer) {
+                    messagesContainer = document.createElement('ul');
+                    messagesContainer.className = 'messages';
+                    const form = document.getElementById('edit-form');
+                    form.insertBefore(messagesContainer, form.querySelector('.save-button'));
+                }
+                
+                // Clear previous messages
+                messagesContainer.innerHTML = '';
+                
+                // Add error message
+                const errorMessage = document.createElement('li');
+                errorMessage.style.listStyle = 'none';
+                errorMessage.innerHTML = 'Warning: Please select all four images before submitting.';
+                messagesContainer.appendChild(errorMessage);
+                
+                // Highlight unselected images with red border
+                images.forEach(img => {
+                    if (!isImageValid(img)) {
+                        img.style.border = '2px solid #ff4d4d';
+                    }
+                });
+                
+                // Prevent form submission
+                e.preventDefault();
+                return false;
+            }
+            
+            // If validation passes, update hidden inputs and submit
+            images.forEach((img, index) => {
+                const imageSrc = img.src;
+                if (imageSrc && imageSrc !== '#') {
+                    const url = new URL(imageSrc);
+                    document.getElementById(`himage${index + 1}`).value = url.pathname.replace('/media/', '');
+                }
+            });
+            
+            return true;
+        };
+        
+        // Image selection handler
+        function chooseImage(imageId) {
+            selectedImageId = imageId;
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (e) => {
+                // Reset border color when new image is selected
+                document.getElementById(imageId).style.border = '1px solid #ddd';
+                handleImageUpload(e.target.files[0]);
+            };
+            input.click();
+        }
     </script>
 </body>
 </html>

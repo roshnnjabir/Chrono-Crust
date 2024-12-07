@@ -101,7 +101,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'roshanjabir7@gmail.com'
-EMAIL_HOST_PASSWORD = 'qhlx hkry cyil vbqn'  # Use an App-specific password from Google
+EMAIL_HOST_PASSWORD = 'anvw zrac yeqs wnpu'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

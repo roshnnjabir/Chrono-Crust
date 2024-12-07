@@ -28,6 +28,11 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.views.decorators.http import require_http_methods
 from itertools import chain
+from django.db import transaction
+from django.contrib import messages
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def user_home(request):
@@ -1061,49 +1066,71 @@ def user_cancel_order(request, order_id):
     if request.method == 'POST':
         # Fetch the order to be canceled
         order = get_object_or_404(Order, id=order_id)
-        payment = get_object_or_404(PersonalWallet, user=request.user)
-
-        # Check the order status and set the appropriate message
-        if order.status == 'pending' or order.status == 'Pending' and order.payment_status == 'cod':
-            try:
-                for order_item in order.items.all():
-                    product = order_item.product
-                    product.stock += order_item.quantity
-                    
-                    product.save()
-
-                # Update the order status to 'Cancelled'
-                order.status = 'cancelled'  # Use the correct choice value
-                order.save()  # Save the updated order
         
-                messages.success(request, 'Order has been successfully cancelled.')
-            except Exception as e:
-                # If there is an error while updating the order
-                messages.error(request, f'Error canceling order: {e}')
-        elif order.status == 'pending' or order.status == 'Pending' and order.payment_status == 'paid':
-            try:
-                # Loop through each OrderItem to update the stock
-                for order_item in order.items.all():  # Adjusted to use 'items'
-                    product = order_item.product
-                    product.stock += order_item.quantity  # Restore the stock
-                    
-                    product.save()
+        try:
+            # Fetch the user's wallet, with error handling
+            payment = PersonalWallet.objects.get(user=request.user)
+        except PersonalWallet.DoesNotExist:
+            messages.error(request, 'Personal wallet not found.')
+            return redirect('user_order_history')
 
-                # Update the order status to 'Cancelled'
-                order.status = 'cancelled'  # Use the correct choice value
-                order.payment_status = 'refunded'
-                order.save()  # Save the updated order
-                payment.balance += order.total_amount
-                payment.save()
+        # Check the order status and payment status
+        if order.status in ['pending', 'Pending']:
+            if order.payment_status == 'cod':
+                # Handle Cash on Delivery cancellation
+                try:
+                    with transaction.atomic():
+                        # Restore product stock
+                        for order_item in order.items.all():
+                            product = order_item.product
+                            product.stock += order_item.quantity
+                            product.save()
+
+                        # Update order status
+                        order.status = 'cancelled'
+                        order.save()
+                
+                    messages.success(request, 'Order has been successfully cancelled.')
+                except Exception as e:
+                    messages.error(request, f'Error canceling order: {e}')
+            
+            elif order.payment_status == 'paid':
+                try:
+                    with transaction.atomic():
+                        # Restore product stock
+                        for order_item in order.items.all():
+                            product = order_item.product
+                            product.stock += order_item.quantity
+                            product.save()
+
+                        # Update order status and payment status
+                        order.status = 'cancelled'
+                        order.payment_status = 'refunded'
+                        
+                        # Use precise logging for debugging
+                        logger.info(f"Refunding order {order_id} with total amount {order.total_amount}")
+                        
+                        # Ensure wallet exists and update balance
+                        payment.balance += order.total_amount
+                        payment.save()
+                        
+                        # Save the updated order
+                        order.save()
+                
+                    messages.success(request, 'Order has been successfully cancelled and refunded.')
+                except Exception as e:
+                    logger.error(f"Error canceling order {order_id}: {e}")
+                    messages.error(request, f'Error canceling order: {e}')
+            
+            else:
+                messages.error(request, 'Invalid payment status for cancellation.')
         
-                messages.success(request, 'Order has been successfully cancelled.')
-            except Exception as e:
-                # If there is an error while updating the order
-                messages.error(request, f'Error canceling order: {e}')
         elif order.status == 'delivered':
             messages.error(request, f'Product already delivered to address {order.address}.')
+        
         elif order.status == 'shipped':
             messages.error(request, 'Order has been shipped and cannot be cancelled.')
+        
         else:
             messages.error(request, 'This order cannot be canceled.')
 
