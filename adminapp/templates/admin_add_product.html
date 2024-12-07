@@ -605,6 +605,82 @@
                 closeCropper();
             }
         });
+        // Form submission handler with validation
+        document.getElementById('edit-form').onsubmit = function(e) {
+            // Get all four images
+            const images = [
+                document.getElementById('image1'),
+                document.getElementById('image2'),
+                document.getElementById('image3'),
+                document.getElementById('image4')
+            ];
+            
+            // Function to check if an image is valid
+            const isImageValid = (img) => {
+                return img.src && 
+                       !img.src.endsWith('#') && 
+                       img.src !== window.location.href;
+            };
+            
+            // Check if all images are selected
+            const allImagesSelected = images.every(isImageValid);
+            
+            if (!allImagesSelected) {
+                // Create or get the messages container
+                let messagesContainer = document.querySelector('.messages');
+                if (!messagesContainer) {
+                    messagesContainer = document.createElement('ul');
+                    messagesContainer.className = 'messages';
+                    const form = document.getElementById('edit-form');
+                    form.insertBefore(messagesContainer, form.querySelector('.save-button'));
+                }
+                
+                // Clear previous messages
+                messagesContainer.innerHTML = '';
+                
+                // Add error message
+                const errorMessage = document.createElement('li');
+                errorMessage.style.listStyle = 'none';
+                errorMessage.innerHTML = 'Warning: Please select all four images before submitting.';
+                messagesContainer.appendChild(errorMessage);
+                
+                // Highlight unselected images with red border
+                images.forEach(img => {
+                    if (!isImageValid(img)) {
+                        img.style.border = '2px solid #ff4d4d';
+                    }
+                });
+                
+                // Prevent form submission
+                e.preventDefault();
+                return false;
+            }
+            
+            // If validation passes, update hidden inputs and submit
+            images.forEach((img, index) => {
+                const imageSrc = img.src;
+                if (imageSrc && imageSrc !== '#') {
+                    const url = new URL(imageSrc);
+                    document.getElementById(`himage${index + 1}`).value = url.pathname.replace('/media/', '');
+                }
+            });
+            
+            return true;
+        };
+        
+        // Image selection handler
+        function chooseImage(imageId) {
+            selectedImageId = imageId;
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (e) => {
+                // Reset border color when new image is selected
+                document.getElementById(imageId).style.border = '1px solid #ddd';
+                handleImageUpload(e.target.files[0]);
+            };
+            input.click();
+        }
     </script>
 </body>
 </html>

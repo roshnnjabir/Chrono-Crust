@@ -24,36 +24,9 @@ from django.shortcuts import redirect
 from allauth.socialaccount.models import SocialApp
 
 
-def direct_google_login(request):
-    try:
-        social_app = SocialApp.objects.get(provider='google')
-
-        authorization_url = 'https://accounts.google.com/o/oauth2/v2/auth'
-
-        redirect_uri = request.build_absolute_uri('/accounts/google/login/callback/')
-
-        params = {
-            'client_id': social_app.client_id,
-            'response_type': 'code',
-            'scope': 'openid email profile',
-            'redirect_uri': redirect_uri,
-            'state': 'random_state_to_prevent_csrf',  # Optional but recommended
-        }
-
-        # Create full URL with parameters
-        full_url = f"{authorization_url}?{'&'.join(f'{k}={v}' for k, v in params.items())}"
-
-        return redirect(full_url)
-
-    except SocialApp.DoesNotExist:
-        # Handle case where Google Social App is not configured
-        return redirect('login_error')  # Or handle as appropriate
-
-
 urlpatterns = [
     path('adminn/', admin.site.urls),
     path('', include('adminapp.urls')),
     path('', include('user.urls')),
     path('accounts/', include('allauth.urls')),
-    path('accounts/google/direct/', direct_google_login, name='direct_google_login'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] +  static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

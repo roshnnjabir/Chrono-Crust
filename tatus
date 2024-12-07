@@ -1,0 +1,96 @@
+[33mcommit 2e7915ada9c76e7d82ba0c022397c2c9626f3201[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 957bb63 c6d4635
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Fri Dec 6 16:50:59 2024 +0530
+
+    deploy last 2nd deploy
+
+[33mcommit 957bb63d21b8dfee0b001c30efa62bd4a22717b0[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Fri Dec 6 16:44:45 2024 +0530
+
+    deploy once again
+
+[33mcommit c6d46358613d40e414c711782eb5110a5e8df002[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Wed Dec 4 17:22:48 2024 +0530
+
+    private wallet
+
+[33mcommit 7c6581b2c6d4efd889ddfbd0bdbc230d80b991de[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Wed Dec 4 16:33:47 2024 +0530
+
+    before deploy, requirement.txt done
+
+[33mcommit 8b5f55c6143bfc780578e960192245794a995ef6[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Wed Dec 4 09:32:57 2024 +0530
+
+    Dark mode, sidebar
+
+[33mcommit 127b1f759202c5e18f1ebbc4b1baf1215d6d07f7[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Tue Dec 3 10:48:01 2024 +0530
+
+    last commit before deploy, return order, pay in wallet
+
+[33mcommit 6b8b9c1d742c5eadcd8a2a2bd7d695eee7aa50c5[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Thu Nov 28 06:24:22 2024 +0530
+
+    Razorpay Change In Starting
+
+[33mcommit bd48296f7a009d437bec10f21c6be4d1a5684a89[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Tue Nov 26 14:25:48 2024 +0530
+
+    first commit
+
+[33mcommit f3db471880c0a28c1dc92da3f0bf9c9a350a5090[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Tue Nov 26 14:14:53 2024 +0530
+
+    first commit
+
+[33mcommit c96adf8e1ae2726cabfac40885a5fb6d22eb4280[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Tue Nov 19 11:53:48 2024 +0530
+
+    finish coupen and offer on product, now offer on catogories
+
+[33mcommit 0474eb29ca32a01043946f1d049a920611a902da[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Tue Nov 12 09:42:19 2024 +0530
+
+    Week 11,Razorpay, stripe is yet to be, offer yet to be, coupen confusion
+
+[33mcommit 9ec9a3211304456cfa59a9639ba27ccf720441f7[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Fri Oct 25 20:10:42 2024 +0530
+
+    week2
+
+[33mcommit 55032fedb3c4cd1530e7930ccc99bfe835b8a51d[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Thu Oct 24 17:14:15 2024 +0530
+
+    resetpasswordandaddress
+
+[33mcommit ac7628ccc09e78b418aa6f09f94c4b329183521f[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Wed Oct 23 09:34:35 2024 +0530
+
+    week1complete
+
+[33mcommit 6a0d953c854324962ed57226b60b0f82f9536a3e[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Fri Oct 18 18:37:54 2024 +0530
+
+    Added Verifications
+
+[33mcommit bc51841aee61345aec176b63a6bd797e545e3036[m
+Author: Roshan Jabir <roshanjabir7@gmail.com>
+Date:   Fri Oct 18 18:34:43 2024 +0530
+
+    first commit

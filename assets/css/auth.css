@@ -1,10 +1,10 @@
 /* General Styles for Login, Signup, and Reset Password pages */
-
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 110vh;
     background-color: #f4f4f4;
     font-family: 'Nunito', sans-serif;
     margin: 0;
@@ -13,18 +13,19 @@ body {
 
 .container {
     display: flex;
-    width: 80%;
+    width: 100%;
     max-width: 1000px;
     background-color: white;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow: hidden;
-    margin: 40px 0;
+    flex-direction: row;
 }
 
 .container img {
     width: 50%;
     object-fit: cover;
+    display: block;
 }
 
 .form-container {
@@ -33,6 +34,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background-color: #fff;
 }
 
 h2 {
@@ -49,7 +51,7 @@ h2 {
     text-align: center;
 }
 
-/* Updated input styles from the first CSS */
+/* Input Fields */
 input[type="email"],
 input[type="password"],
 input[type="text"],
@@ -65,12 +67,13 @@ input[type="number"] {
 input[type="email"]:focus,
 input[type="password"]:focus,
 input[type="text"]:focus,
-input[type="number"] {
-    border-color: #ccc;
+input[type="number"]:focus {
+    border-color: #007bff;
     outline: none;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
 }
 
+/* Button */
 button {
     width: 100%;
     padding: 14px;
@@ -88,7 +91,7 @@ button:hover {
 }
 
 button:focus {
-    outline: 0.5px solid #0056b3; /* Added subtle focus outline from the first CSS */
+    outline: 0.5px solid #0056b3; /* Added subtle focus outline */
 }
 
 button[disabled] {
@@ -96,6 +99,7 @@ button[disabled] {
     cursor: not-allowed;
 }
 
+/* Redirect Links */
 .redirect-link {
     margin-top: 25px;
     margin-bottom: 20px;
@@ -120,7 +124,7 @@ button[disabled] {
     color: #0056b3;
 }
 
-/* Added Google login button styles from the first CSS */
+/* Google Login Button */
 .google-login-btn {
     display: flex;
     align-items: center;
@@ -133,6 +137,7 @@ button[disabled] {
     margin-top: 20px;
     text-decoration: none;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
 }
 
 .google-login-btn:hover {
@@ -141,9 +146,10 @@ button[disabled] {
 }
 
 .google-login-btn img {
-    width: 24px;
-    height: 24px;
+    width: 24px;   /* Default size of the logo */
+    height: 24px;  /* Maintain square aspect ratio */
     margin-right: 10px;
+    object-fit: contain;  /* Ensures logo aspect ratio is preserved */
 }
 
 .google-login-btn span {
@@ -152,10 +158,23 @@ button[disabled] {
     font-weight: bold;
 }
 
-/* Media Query for smaller screens */
-@media (max-width: 768px) {
+.breadcrumbs {
+    font-size: 14px;
+    margin: 20px 0px;
+    color: #888;
+}
+a {
+    text-decoration: none;
+    color: #050505;
+}
+
+/* Media Queries for Responsiveness */
+
+/* For small to medium screens (tablet and mobile devices) */
+@media (max-width: 1024px) {
     .container {
         flex-direction: column;
+        margin: 20px;
     }
 
     .container img {
@@ -171,16 +190,119 @@ button[disabled] {
         font-size: 24px;
     }
 
-    input[type="password"] {
+    input[type="email"], input[type="password"] {
         font-size: 14px;
-        padding: 10px;
+        padding: 12px;
     }
 
     button {
         font-size: 16px;
     }
 
-    .greeting, .confirmation {
+    .google-login-btn {
         font-size: 14px;
+        padding: 12px;
+    }
+
+    .google-login-btn img {
+        width: 20px;   /* Make the logo slightly smaller on smaller screens */
+        height: 20px;
+    }
+
+    .google-login-btn span {
+        font-size: 14px;  /* Adjust text size to match the smaller logo */
+    }
+
+    .redirect-link {
+        margin-top: 20px;
+    }
+}
+
+/* For extra small screens (mobile phones) */
+@media (max-width: 480px) {
+    body {
+        padding: 0 10px;
+    }
+
+    .container {
+        flex-direction: column;
+        width: 100%;
+        margin: 20px 0;
+    }
+
+    .container img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .form-container {
+        align-items: center;
+        padding: 5px;
+        flex-grow: 0;
+    }
+
+    #login-form, #signup-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    h2 {
+        font-size: 22px;
+        text-align: center;
+    }
+    p {
+        font-size: 12px;
+    }
+
+    input[type="email"], input[type="password"] {
+        font-size: 14px;
+        padding: 12px;
+        width: 100%;
+    }
+
+    button {
+        font-size: 16px;
+        padding: 12px 0px;
+    }
+
+    .google-login-btn {
+        width: 90%;
+        font-size: 14px;
+        padding: 10px 0px;
+    }
+
+    .google-login-btn img {
+        width: 18px;   /* Further reduce the size of the logo on very small screens */
+        height: 18px;
+    }
+
+    .google-login-btn span {
+        font-size: 14px;
+    }
+
+    .redirect-link {
+        margin-top: 15px;
+    }
+
+    .link {
+        font-size: 14px;
+    }
+}
+
+/* For very large screens (larger than desktop) */
+@media (min-width: 1600px) {
+    .container {
+        width: 70%;
+        max-width: 1200px;
+    }
+
+    h2 {
+        font-size: 32px;
+    }
+
+    .form-container {
+        padding: 60px;
     }
 }

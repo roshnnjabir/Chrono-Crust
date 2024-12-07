@@ -158,4 +158,92 @@
             event.preventDefault(); // Prevent form submission if validation fails
         }
     });
+    // Specific validation for building name
+    function validateBuildingName(buildingName) {
+        // Trim the input to remove leading and trailing whitespaces
+        const trimmedName = buildingName.trim();
+
+        // Check if building name is empty after trimming
+        if (trimmedName.length === 0) {
+            return { 
+                isValid: false, 
+                message: "Building Name cannot be empty." 
+            };
+        }
+
+        // Check minimum length (at least 2 characters)
+        if (trimmedName.length < 2) {
+            return { 
+                isValid: false, 
+                message: "Building Name must be at least 2 characters long." 
+            };
+        }
+
+        // Check maximum length (optional, prevents extremely long inputs)
+        if (trimmedName.length > 100) {
+            return {
+                isValid: false,
+                message: "Building Name cannot exceed 100 characters."
+            };
+        }
+
+        // Validate characters (allows letters, numbers, spaces, and some special characters)
+        const buildingNameRegex = /^[a-zA-Z0-9\s\-.,#'()]+$/;
+        if (!buildingNameRegex.test(trimmedName)) {
+            return {
+                isValid: false,
+                message: "Building Name contains invalid characters. Only letters, numbers, spaces, and -.,#'() are allowed."
+            };
+        }
+
+        return { isValid: true };
+    }
+
+    // Modify the existing form validation function to include building name specific checks
+    function validateAndSanitizeForm(formId) {
+        const form = document.getElementById(formId);
+        const textInputs = form.querySelectorAll("input[type='text']");
+        let isValid = true;
+
+        textInputs.forEach(input => {
+            const sanitizedValue = input.value.trim();
+
+            // Special validation for building name
+            if (input.name === 'building_name') {
+                const buildingNameValidation = validateBuildingName(sanitizedValue);
+                if (!buildingNameValidation.isValid) {
+                    alert(buildingNameValidation.message);
+                    input.focus();
+                    isValid = false;
+                    return; // Exit the loop
+                }
+            }
+
+            // General validation for other fields
+            if (!sanitizedValue) {
+                alert(`${input.previousElementSibling.textContent} cannot be empty or just spaces.`);
+                input.focus();
+                isValid = false;
+                return; // Exit the loop
+            }
+
+            // Update the input value to remove extra spaces
+            input.value = sanitizedValue;
+        });
+
+        return isValid;
+    }
+
+    // Keep the existing event listeners
+    document.getElementById("addAddressForm").addEventListener("submit", function (event) {
+        if (!validateAndSanitizeForm("addAddressForm")) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
+
+    document.getElementById("editAddressForm").addEventListener("submit", function (event) {
+        if (!validateAndSanitizeForm("editAddressForm")) {
+            event.preventDefault(); // Prevent form submission if validation fails
+        }
+    });
 </script>

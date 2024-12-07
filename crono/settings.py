@@ -22,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', cast=bool, default=False)
+SECRET_KEY = ''
+DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 ]
 
-SITE_ID = 3
+SITE_ID = 5
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -101,7 +101,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'roshanjabir7@gmail.com'
-EMAIL_HOST_PASSWORD = 'qhlx hkry cyil vbqn'  # Use an App-specific password from Google
+EMAIL_HOST_PASSWORD = 'scpa ftpf dzta wpob'  # Use an App-specific password from Google
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -109,9 +109,9 @@ EMAIL_HOST_PASSWORD = 'qhlx hkry cyil vbqn'  # Use an App-specific password from
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db',    # Replace with your database name
-        'USER': 'postgres',          # Replace with your database username
-        'PASSWORD': '123',      # Replace with your database password
+        'NAME': 'chronodbnew',    # Replace with your database name
+        'USER': 'admin',          # Replace with your database username
+        'PASSWORD': 'chrono123',      # Replace with your database password
         'HOST': 'localhost',              # Or your database host
         'PORT': '5432',                   # Default PostgreSQL port
     }
@@ -188,7 +188,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'roshanjabir7@gmail.com'
 EMAIL_HOST_PASSWORD = 'pupf ufpm oqgz wxms'  # Use an App-specific password from Google
 DEFAULT_FROM_EMAIL = 'roshanjabir7@gmail.com'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 AUTHENTICATION_BACKENDS = [
@@ -197,12 +196,11 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-RAZOR_KEY_ID = config('RAZOR_KEY_ID')
-RAZOR_KEY_SECRET = config('RAZOR_KEY_SECRET')
+RAZOR_KEY_ID = ''
+RAZOR_KEY_SECRET = ''
 
 
 SOCIALACCOUNT_AUTO_SIGNUP = True  # Automatically create user on social login
-SOCIALACCOUNT_EMAIL_VERIFICATION = False  # Optional
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
