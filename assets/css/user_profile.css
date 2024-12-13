@@ -1,3 +1,4 @@
+/* Global Styles */
 body {
     font-family: 'Nunito', sans-serif;
     margin: 0;
@@ -5,14 +6,25 @@ body {
     background-color: #f0f2f5;
     color: #333;
 }
-button{
+
+button {
     font-family: 'Nunito', sans-serif;
+    font-weight: 600;
     padding: 8px 20px;
+    border: none;
+    cursor: pointer;
 }
+
 a {
     text-decoration: none;
     color: #050505;
 }
+
+p {
+    padding: 10px 25px;
+    margin: 0;
+}
+
 .container {
     display: flex;
     padding: 40px;
@@ -20,15 +32,19 @@ a {
     max-width: 1200px;
     margin: auto;
 }
+
 .breadcrumbs {
     font-size: 14px;
     margin-bottom: 20px;
     color: #888;
 }
+
 .main-content {
     display: flex;
     gap: 30px;
+    flex-wrap: wrap;
 }
+
 .sidebar {
     display: flex;
     flex-direction: column;
@@ -38,6 +54,7 @@ a {
     border-radius: 12px;
     padding: 20px;
 }
+
 .sidebar a {
     padding: 15px;
     border-radius: 8px;
@@ -45,17 +62,21 @@ a {
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     margin-bottom: 15px;
 }
+
 .sidebar a:hover {
     background-color: #e8e8e8;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
+
 .sidebar a.selected {
     background-color: #050505;
     color: #fff;
 }
+
 .dropdown {
     display: none;
 }
+
 .content {
     flex: 1;
     background-color: #ffffff;
@@ -63,16 +84,19 @@ a {
     border-radius: 12px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
+
 h2 {
     color: #050505;
     margin-bottom: 20px;
 }
+
 .box {
     background-color: #f9f9f9;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
+
 .box-header {
     display: flex;
     justify-content: space-between;
@@ -82,6 +106,7 @@ h2 {
     padding: 15px;
     border-radius: 10px 10px 0 0;
 }
+
 .info-layout {
     display: flex;
     justify-content: space-between;
@@ -89,24 +114,26 @@ h2 {
     border-bottom: 1px solid #ddd;
     align-items: center;
 }
+
 .info-label {
-    flex: 1;
     font-weight: 600;
     text-align: left;
     color: #555;
 }
+
 .info-value {
-    flex: 1;
     text-align: right;
     color: #666;
     padding-left: 20px;
 }
+
 .logout {
     margin-top: 30px;
     text-align: center;
     display: flex;
     gap: 10px;
 }
+
 .logout-button {
     color: #ff4d4d;
     font-weight: bold;
@@ -117,17 +144,23 @@ h2 {
     border: none;
     cursor: pointer;
 }
+
 .logout-button:hover {
     background-color: #ff4d4d;
     color: #fff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
+button {
+    border-radius: 15px;
+}
+
 button.change-password {
     color: #45a049;
     font-weight: bold;
     padding: 10px 20px;
     border-radius: 8px;
-    background-color: #4caf4f21; /* A calming green color */
+    background-color: #4caf4f21;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     border: none;
     cursor: pointer;
@@ -143,21 +176,244 @@ button.change-password:hover {
 
 button.change-password:focus {
     outline: none;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); /* Green shadow focus */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
-#editbutton{
+
+.image-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+}
+
+.user-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+
+.image-edit-overlay-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0;
+    font-size: 12px;
+}
+
+.image-container:hover .image-edit-overlay-btn {
+    opacity: 1;
+}
+
+.image-container:hover .user-image {
+    opacity: 0.7;
+}
+
+#editbutton {
     background-color: #d0d0d0;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    max-width: 60px;
     max-width: 90px;
 }
-#editbutton:hover{
+
+#editbutton:hover {
     background-color: #ebebeb;
     transform: scale(1.05);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    align-items: center;
+    justify-self: center;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    margin: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.close {
+    color: #aaa;
+    cursor: pointer;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#savechanges {
+    margin-top: 20px;
+    margin-left: 10px;
+    padding: 8px 20px;
+    border-radius: 5px;
+    background-color: #28221E;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#savechanges:hover {
+    background-color: #4A423E;
+}
+
+/* Add Address Button */
+.add-address-button {
+    background-color: #28221E;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.add-address-button:hover {
+    background-color: #4A423E;
+}
+
+/* Delete Button */
+.deletebutton {
+    color: #ff4d4d;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: #ffecec;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.deletebutton:hover {
+    background-color: #ff4d4d;
+    color: #fff;
+}
+
+/* Image Crop Modal Specific Styles */
+#image-crop-modal {
+    display: none;
+    position: fixed;
+    z-index: 1100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#image-crop-modal-content {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    scrollbar-width: thin;
+    padding: 25px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#image-crop-modal-content h3 {
+    color: #050505;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#image-crop-input {
+    margin-bottom: 20px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+#image-crop-container {
+    max-height: 400px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+#image-crop-modal-content button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#image-crop-modal-content button:first-of-type {
+    background-color: #050505;
+    color: white;
+}
+
+#image-crop-modal-content button:first-of-type:hover {
+    background-color: #28221E;
+}
+
+#image-crop-modal-content button:last-of-type {
+    background-color: #f0f0f0;
+    color: #050505;
+}
+
+#image-crop-modal-content button:last-of-type:hover {
+    background-color: #e0e0e0;
+}
+
+#image-crop-modal-content button:active {
+    transform: scale(0.98);
 }
 
 /* Responsive Styles */
@@ -185,42 +441,38 @@ button.change-password:focus {
         text-align: center;
         margin-top: 20px;
     }
+    .content {
+        padding: 20px;
+    }
 }
 
-/* Styles for Max-Width 480px */
 @media (max-width: 480px) {
     .container {
-        padding: 20px;
+        padding: 15px;
     }
     .box {
         padding: 15px;
     }
     .box-header {
         padding: 10px;
-        flex-direction: row;
-        align-items: flex-start;
-    }
-    .box-header button {
-        margin-top: 10px;
-    }
-    h3{
-        margin: 15px;
+        justify-content: space-between;
     }
     .info-layout {
-        flex-direction: row;
-        text-align: left;
+        justify-content: space-between;
         padding: 12px;
     }
+    .info-label,
     .info-value {
-        text-align: left;
-        padding-left: 0;
+        font-size: 14px;
     }
     h2 {
         font-size: 20px;
     }
+    h3 {
+        font-size: 18px;
+    }
 }
 
-/* Styles for Max-Width 400px */
 @media (max-width: 400px) {
     .container {
         padding: 10px;
@@ -231,221 +483,36 @@ button.change-password:focus {
     .box-header {
         padding: 8px;
     }
-    .box-header button {
-        padding: 8px 12px;
-    }
     .info-layout {
         padding: 10px;
     }
     h2 {
-        font-size: 20px;
+        font-size: 17px;
     }
-    .info-value {
+    h3 {
         font-size: 14px;
     }
-    .logout a {
-        padding: 8px 12px;
+    p {
+        font-size: 10px;
+        padding: 5px 15px;
     }
-}
-
-
-/* styles for modal */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    align-items: center;
-    justify-self: center;
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-}
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-.modal-header {
-    margin: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.modal-header h3 {
-    margin: 0;
-}
-.close {
-    color: #aaa;
-    cursor: pointer;
-    font-size: 28px;
-    font-weight: bold;
-}
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-#savechanges{
-    margin-top: 20px;
-    margin-left: 10px;
-    padding: 8px 20px;
-    border-radius: 5px;
-    background-color: #28221E;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-#savechanges:hover{
-    background-color: #4A423E;
-}
-.add-address-button {
-    background-color: #28221E; /* Button background color */
-    color: white; /* Text color */
-    padding: 10px 20px; /* Padding for the button */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor */
-    transition: background-color 0.3s ease; /* Transition for hover effect */
-    margin-bottom: 20px; /* Space below the button */
-}
-.add-address-button:hover {
-    background-color: #4A423E; /* Darker shade on hover */
-}
-.deletebutton {
-    color: #ff4d4d;
-    font-weight: bold;
-    padding: 10px 15px;
-    border-radius: 5px;
-    background-color: #ffecec;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    border: none;
-    cursor: pointer;
-    margin-left: 10px; /* Space between edit and delete button */
-}
-
-.deletebutton:hover {
-    background-color: #ff4d4d;
-    color: #fff;
-}        
-
-@media (max-width: 480px) {
-    /* Modal Overlay */
-    .modal-overlay {
-        padding: 20px; /* Add some padding for smaller screens */
+    .info-label,
+    .info-value {
+        font-size: 12px;
     }
-
-    /* Modal Content */
-    .modal-content {
-        width: 90%; /* Use 90% of the screen width */
-        max-width: 400px; /* Set a max width for the modal */
-        margin: 10% auto; /* Center the modal with some margin from the top */
-        padding: 15px; /* Add padding inside the modal */
-        border-radius: 10px; /* Rounded corners */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-    }
-
-    /* Modal Header */
-    .modal-header {
-        font-size: 20px; /* Adjust header font size */
-        margin-bottom: 15px; /* Space below header */
-    }
-
-    /* Modal Form Inputs */
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-        width: 100%;/* Full width for inputs */
-        max-width: 280px; 
-        padding: 10px; /* Add padding */
-        border-radius: 5px; /* Rounded corners */
-        border: 1px solid #ccc; /* Border styling */
-    }
-
-    /* Modal Button */
     button {
-        padding: 10px; /* Add padding */
-        border-radius: 5px; /* Rounded corners */
-        background-color: #28221E; /* Button color */
-        color: white; /* Text color */
-        border: none; /* No border */
-        cursor: pointer; /* Pointer cursor */
+        font-size: 10px;
+        padding: 5px 10px;
+        border-radius: 15px;
     }
-
-    button:hover {
-        background-color: #4A423E; /* Darker shade on hover */
+    .logout-button,
+    .deletebutton,
+    .add-address-button {
+        padding: 8px 15px;
+        font-size: 12px;
     }
-
-    /* Close Button */
-    .close-btn {
-        font-size: 18px; /* Adjust close button font size */
-    }
-
-    #savechanges{
-        margin-top: 15px;
-        margin-left: 5px;
-    }
-    #savechanges:hover{
-        background-color: #4A423E;
-    }
-    /* Info Layout Adjustments */
-    .info-layout {
-        flex-direction: column; /* Change flex direction to column */
-        align-items: flex-start;
-        border: none; /* Remove border */
-    }
-}
-
-@media (max-width: 400px) {
-    /* Modal Overlay */
-    .modal-overlay {
-        padding: 15px; /* Reduce padding for smaller screens */
-    }
-
-    /* Modal Content */
-    .modal-content {
-        width: 95%; /* Use 95% of the screen width */
-        max-width: 350px; /* Set a max width for the modal */
-        margin: 15% auto; /* Center the modal with more margin from the top */
-        padding: 10px; /* Add padding inside the modal */
-        border-radius: 8px; /* Rounded corners */
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-    }
-
-    /* Modal Header */
-    .modal-header {
-        font-size: 18px; /* Adjust header font size */
-        margin-bottom: 10px; /* Space below header */
-    }
-
-    /* Modal Form Inputs */
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-        max-width: 250px;
-        padding: 8px; /* Reduce padding for inputs */
-        font-size: 14px; /* Adjust font size for inputs */
-    }
-
-    /* Modal Button */
-    button {
-        padding: 8px; /* Reduce padding for the button */
-        font-size: 16px; /* Adjust font size for the button */
-    }
-
-    /* Close Button */
-    .close-btn {
-        font-size: 16px; /* Adjust close button font size */
-    }
-
-    #savechanges{
-        margin-top: 10px;
-        margin-left: 0px;
+    button.chage-password {
+        padding: 8px 15px;
+        font-size: 12px;
     }
 }

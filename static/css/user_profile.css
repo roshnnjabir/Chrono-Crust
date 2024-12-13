@@ -415,6 +415,36 @@ button.change-password:focus {
 #image-crop-modal-content button:active {
     transform: scale(0.98);
 }
+/* Validation Styling */
+#editForm .info-layout input.input-error {
+    border: 2px solid #ff4136;
+    background-color: #fff5f5;
+    transition: all 0.3s ease;
+}
+
+#editForm .error-message {
+    color: #ff4136;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Optional: Disable save button when form is invalid */
+#savechanges:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 
 /* Responsive Styles */
 @media (max-width: 768px) {

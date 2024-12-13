@@ -203,26 +203,23 @@
                     <input type="radio" id="stripe" name="payment_method" value="stripe">
                     <label for="stripe">Pay with Stripe</label>
                 </div> -->
-                {% if total_amount >= 1000 %}
-                <div class="payment-option">
-                    <input type="radio" id="cod" name="payment_method" value="cod">
-                    <label for="cod">Cash On Delivery</label>
-                </div>
-                {% else %}
-                <div class="payment-option">
-                    <label>Cash On Delivery is not available for orders above $1000</label>
-                </div>
-                {% endif %}
-                {% if personal_wallet_balance.balance >= total_amount %}
-                <div class="payment-option">
-                    <input type="radio" id="pwallet" name="payment_method" value="pwallet">
-                    <label for="pwallet">Pay Using Personal Wallet</label>
-                </div>
-                {% else %}
-                <div class="payment-option">
-                    <label>Cash On Delivery is not available for orders above $1000</label>
-                </div>
-                {% endif %}
+                {% if total_amount < 1000 %}
+<div class="payment-option">
+    <input type="radio" id="cod" name="payment_method" value="cod">
+    <label for="cod">Cash On Delivery</label>
+</div>
+{% endif %}
+
+{% if personal_wallet_balance.balance >= total_amount %}
+<div class="payment-option">
+    <input type="radio" id="pwallet" name="payment_method" value="pwallet">
+    <label for="pwallet">Pay Using Personal Wallet (Balance: ${{ personal_wallet_balance.balance }})</label>
+</div>
+{% else %}
+<div class="payment-option">
+    <label>Insufficient Wallet Balance (Current Balance: ${{ personal_wallet_balance.balance }})</label>
+</div>
+{% endif %}
             </div>
 
             <div class="button-container">

@@ -60,7 +60,7 @@
                 {% if transactions %}
                     <ul>
                         {% for transaction in transactions %}
-                            <li>{{ transaction.date }} - {{ transaction.amount }} - {{ transaction.description }}</li>
+                            <li> {{ transaction.transaction_type }} ${{ transaction.amount }} - {{ transaction.description }} - {{ transaction.timestamp }} - Balance: ${{ transaction.balance }}</li>
                         {% endfor %}
                     </ul>
                 {% else %}
@@ -72,9 +72,9 @@
                 <a href="{% url 'user_logout' %}">
                     <button class="logout-button">Logout</button>
                 </a>
-                <!-- <a>
+                <a>
                     <button onclick="openModal()" class="change-password">Add Money To Wallet</button>
-                </a> -->
+                </a>
             </div>  
         </div>
     </div>
@@ -95,7 +95,7 @@
             </div>
             <div class="info-layout">
                 <div class="info-label">Amount To Be Added In Dollars:</div>
-                <input id="" type="number" min="0" max="10000" maxlength="5" name="total_amount" data-total_amount="{{ total_amount }}" placeholder="In USD $" required>
+                <input id="" type="number" min="10" max="10000" maxlength="5" name="total_amount" data-total_amount="{{ total_amount }}" placeholder="In USD $" required>
             </div>
             <input type="hidden" name="Email" id="editEmail" value="{{ user.email }}" required>
             <button id="savechanges" type="submit">Confirm Amount</button>
@@ -105,62 +105,80 @@
 
 <p id="span" data-order_id="{{ order_id }}" data-wallet="{{ wallet }}">{{order_id}}{{wallet}}</p>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-let input = document.getElementById('span');
-var options = {
-    "key": 'rzp_test_ogXW1qOaXCrzZG', // Enter the Key ID generated from the Dashboard
-    "amount": input.dataset.total_amount,
-    "name": "Chrono Crust",
-    "description": "Test Transaction",
-    // "image": "https://example.com/your_logo",
-    "order_id": input.dataset.order_id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    "handler": function (response){
-        location.reload()
+    let input = document.getElementById('span');
+    var options = {
+        "key": '{{ RAZOR_KEY_ID }}',
+        "amount": input.dataset.total_amount * 100,
+        "name": "Chrono Crust",
+        "description": "Wallet Top-up",
+        "order_id": input.dataset.order_id,
+        "handler": function (response){
+            $.ajax({
+                url: "{% url 'verify_razorpay_payment' %}",
+                method: "POST",
+                dataType: "json",
+                data: {
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature,
+                    amount: input.dataset.total_amount
+                },
+                success: function(verifyResponse) {
+                    if (verifyResponse.status === 'success') {
+                        alert('Money Added Successfully!');
+                        location.reload();
+                    } else {
+                        alert('Payment verification failed');
+                    }
+                },
+                error: function() {
+                    alert('Error verifying payment');
+                }
+            });
+        },
+        "prefill": {
+            "name": "{{ user.get_full_name }}",
+            "email": "{{ user.email }}",
+            "contact": "{{ user.phone_number }}"
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response){
+        alert('Payment failed: ' + response.error.description);
+    });
+    document.getElementById('rzp-button1').onsubmit = function(e){
+        e.preventDefault();
+        
         $.ajax({
-            url: "https://formspree.io/f/YOUR_FORM_ID",
+            url: "{% url 'prepare_razorpay_payment' %}",
             method: "POST",
-            dataType: "json",
             data: {
-                email: "a.visitor@email.com",
-                message: "Hello!"
+                total_amount: $('input[name="total_amount"]').val()
+            },
+            success: function(response) {
+                options.order_id = response.order_id;
+                options.amount = response.amount * 100;
+
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            },
+            error: function() {
+                alert('Failed to prepare payment');
             }
         });
-        alert('Money Added Successfully!')
-    },
-    "prefill": {
-        "name": "Gaurav Kumar",
-        "email": "gaurav.kumar@example.com",
-        "contact": "9000090000"
-    },
-    "notes": {
-        "address": "Razorpay Corporate Office"
-    },
-    "theme": {
-        "color": "#3399cc"
-    }
-};
-console.log(options.order_id)
-var rzp1 = new Razorpay(options);
-rzp1.on('payment.failed', function (response){
-        alert(response.error.code);
-        alert(response.error.description);
-        alert(response.error.source);
-        alert(response.error.step);
-        alert(response.error.reason);
-        alert(response.error.metadata.order_id);
-        alert(response.error.metadata.payment_id);
-});
-document.getElementById('rzp-button1').onsubmit = function(e){
-    rzp1.open();
-    e.preventDefault();
-}
-</script>
+    };
+    </script>
 
 <script>
     function navigateTo(value) {
-        const baseUrl = '/user_profile'; // Change this to the base URL for your user profile
-        const url = `${baseUrl}/${value}`; // Append the selected value to the base URL
-        window.location.href = url; // Redirect to the new URL
+        const baseUrl = '/user_profile'; 
+        const url = `${baseUrl}/${value}`; 
+        window.location.href = url;
     }
 
     function openModal() {

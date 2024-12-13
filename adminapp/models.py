@@ -248,16 +248,50 @@ class PersonalWallet(models.Model):
     balance = models.IntegerField(default=0)
 
 
-class PersonalWalletTransactions(models.Model):
-    personal_wallet = models.ForeignKey(PersonalWallet, on_delete=models.PROTECT, related_name="items")
-    created_at = models.DateTimeField(auto_now_add=True)
-    method_choices = [
-        ('cancelled', 'Cancelled'),
-        ('refunded', 'Refunded'),
-        ('debited', 'Debited'),
-        ('credited', 'Credited')
+class TransactionHistory(models.Model):
+    TRANSACTION_TYPES = [
+        ('DEPOSIT', 'Wallet Deposit'),
+        ('WITHDRAWAL', 'Wallet Withdrawal'),
+        ('PURCHASE', 'Purchase'),
+        ('REFUND', 'Refund')
     ]
-    method = models.CharField(choices=method_choices, default='cancelled')
+
+    PAYMENT_METHODS = [
+        ('RAZORPAY', 'Razorpay'),
+        ('STRIPE', 'Stripe'),
+        ('PAYPAL', 'PayPal'),
+        ('BANK_TRANSFER', 'Bank Transfer')
+    ]
+
+    TRANSACTION_STATUSES = [
+        ('PENDING', 'Pending'),
+        ('SUCCESS', 'Successful'),
+        ('FAILED', 'Failed'),
+        ('CANCELLED', 'Cancelled')
+    ]
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='transactions')
+    wallet = models.ForeignKey(PersonalWallet, on_delete=models.CASCADE, related_name='transactions')
+    balance = models.IntegerField(default=0)
+    
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
+    status = models.CharField(max_length=20, choices=TRANSACTION_STATUSES)
+    
+    # Razorpay-specific fields
+    razorpay_payment_id = models.CharField(max_length=100, null=True, blank=True)
+    razorpay_order_id = models.CharField(max_length=100, null=True, blank=True)
+    
+    description = models.TextField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.transaction_type} - {self.amount}"
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name_plural = 'Transaction Histories'
 
 
 class Coupen(models.Model):

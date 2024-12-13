@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 ]
 
-SITE_ID = 3
+SITE_ID = 5
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -101,7 +101,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'roshanjabir7@gmail.com'
-EMAIL_HOST_PASSWORD = 'anvw zrac yeqs wnpu'
+EMAIL_HOST_PASSWORD = 'tlmx vnmk pgpd ymyf'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -180,17 +180,6 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 
-# Email settings in settings.py
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'roshanjabir7@gmail.com'
-EMAIL_HOST_PASSWORD = 'pupf ufpm oqgz wxms'  # Use an App-specific password from Google
-DEFAULT_FROM_EMAIL = 'roshanjabir7@gmail.com'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default backend
     'allauth.account.auth_backends.AuthenticationBackend',  # Allauth
@@ -202,7 +191,3 @@ RAZOR_KEY_SECRET = config('RAZOR_KEY_SECRET')
 
 
 SOCIALACCOUNT_AUTO_SIGNUP = True  # Automatically create user on social login
-SOCIALACCOUNT_EMAIL_VERIFICATION = False  # Optional
-
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
