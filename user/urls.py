@@ -58,6 +58,7 @@ urlpatterns = [
     path('user_profile/user_order_history', views.user_order_history, name='user_order_history'),
     path('user_profile/user_order_details/<str:order_id>/', views.user_order_details, name='user_order_details'),
     path('user_order_cancel/<str:order_id>/', views.user_cancel_order, name='user_order_cancel'),
+    path('user_order_return/<str:order_id>/', views.user_return_order, name='user_order_return'),
     path('address/selection/', views.address_selection, name='user_address_selection'),
     path('user_payment_method_selection/', views.user_payment_method_selection, name='user_payment_method_selection'),  # after payment is made...redirect to move to order...
     path('user_logout/', views.user_logout, name='user_logout'),

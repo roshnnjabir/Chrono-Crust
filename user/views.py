@@ -560,7 +560,7 @@ def add_user_address(request):
         try:
             address.save()  # saving the address
             messages.success(request, "Address created successfully!")
-            return redirect('user_address_book')
+            return redirect('address_selection')
         except ValidationError as e:
             messages.error(request, str(e))  # error mesage
 
@@ -935,8 +935,8 @@ def user_move_to_order(request):
             # Respond with success
             return JsonResponse({'status': 'success'})
 
-        # Handle non-JSON requests (Cash on Delivery or Wallet)
         else:
+            # Handle non-JSON requests (Cash on Delivery or Wallet)
             payment_method = request.POST.get('payment_method')
             item_ids = request.session.get('item_ids')
             selected_address_id = request.session.get('selected_address')
@@ -955,6 +955,12 @@ def user_move_to_order(request):
             except Address.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'No Address Selected'}, status=400)
 
+            try:
+                # Fetch the user's wallet, with error handling
+                payment = PersonalWallet.objects.get(user=request.user)
+            except PersonalWallet.DoesNotExist:
+                payment = None  # If the wallet doesn't exist, handle it later if needed
+
             with transaction.atomic():
                 # Create a new order for COD or Wallet
                 order = Order.objects.create(
@@ -965,7 +971,7 @@ def user_move_to_order(request):
                     total_amount=total_price, 
                     discounted_amount=discounted_amount
                 )
-                
+
                 # Clear session data
                 del request.session['discount']
                 del request.session['total_price']
@@ -997,8 +1003,41 @@ def user_move_to_order(request):
 
                     except CartItem.DoesNotExist:
                         continue
+                    
+                # Handle payment methods
+                if payment_method == 'cod':
+                    # No wallet deduction required for COD, just proceed
+                    pass
+                elif payment_method == 'pwallet':
+                    # Ensure wallet exists and update balance if sufficient funds are available
+                    if payment and payment.balance >= int(float(order.total_amount)):
+                        payment.balance -= int(float(order.total_amount))
+                        payment.save()
+
+                        # Record the transaction history for the refund
+                        transaction_history = TransactionHistory(
+                            user=request.user,
+                            wallet=payment,
+                            balance=payment.balance,
+                            amount=order.total_amount,
+                            transaction_type='PURCHASE',
+                            payment_method='PWALLET',  # This indicates refund via wallet
+                            status='SUCCESS',  # Assuming the refund was successful
+                            description=f"Purchase for order {order_id}",
+                        )
+                        transaction_history.save()
+                    elif payment:
+                        # Insufficient balance in wallet
+                        messages.error(request, 'Insufficient funds in the wallet.')
+                        return redirect('user_order_history')
+                    else:
+                        # Handle case if wallet is not found (you can show an error message here if needed)
+                        messages.error(request, 'Personal wallet not found.')
+                        return redirect('user_order_history')
+
                 return redirect('user_order_history')
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+            return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 
 import logging
@@ -1324,7 +1363,6 @@ def user_cancel_order(request, order_id):
 
         # Check the order status and payment status
         if order.status in ['pending', 'Pending']:
-            print(order.payment_status)
             if order.payment_status == 'cod':
                 # Handle Cash on Delivery cancellation
                 try:
@@ -1436,6 +1474,25 @@ def user_cancel_order(request, order_id):
 
     # Redirect back to the order history page
     return redirect('user_order_history')
+
+
+def user_return_order(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
+        
+        try:
+            payment = PersonalWallet.objects.get(user=request.user)
+        except PersonalWallet.DoesNotExist:
+            messages.error(request, 'Personal wallet not found. Please Create One')
+            return redirect('user_order_history')
+        
+        if order.status in ['delivered', 'Delivered', 'shipped', 'Shipped']:
+            order.status = 'return_requested'
+            order.save()
+
+            messages.info(request, 'Order has been send for review, we will connect with you as soon as possible')
+    return redirect('user_order_history')
+
 
 
 def address_selection(request):
