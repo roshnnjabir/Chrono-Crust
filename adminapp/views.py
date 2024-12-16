@@ -1,6 +1,16 @@
 from django.shortcuts import render, redirect
 from user.models import CustomUser
-from .models import Product, Brand, Collection, Order, OrderItem, Coupen
+from .models import Product, Brand, Collection, Order, OrderItem, Coupen, PersonalWallet, TransactionHistory
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib import colors
+import datetime
+from django.core.mail import send_mail
+from django.db import transaction
+from PIL import Image as PILImage
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from io import BytesIO
 from django.contrib.auth import logout, login, authenticate
 from django.db.models import Q, Count, Sum, F, FloatField
 from django.contrib import messages
@@ -10,6 +20,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.conf import settings
 import json
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
@@ -459,6 +470,15 @@ def update_order_status(request, order_id):
             # Validate the new status against the model's status choices
             if new_status in dict(Order.STATUS_CHOICES):
                 order = Order.objects.get(id=order_id)
+
+                # If the status is 'returned', apply return order logic
+                if new_status == 'returned':
+                    try:
+                        return_order(order)
+                    except Exception as e:
+                        print(f"Error in return_order: {e}")
+                        raise
+
                 order.status = new_status
                 order.save()
                 return JsonResponse({'message': 'Order status updated successfully'})
@@ -491,6 +511,124 @@ def update_payment_status(request, order_id):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@staff_member_required(login_url='/')
+def admin_list_return_orders(request):
+    orders = Order.objects.filter(Q(status='return_requested') | Q(status='returned'))
+    print(orders)
+    return render(request, 'admin_list_return_orders.html', {'orders':orders})
+
+
+def return_order(order):
+    print(order.status)
+    print(order.payment_status)
+    try:
+        payment = PersonalWallet.objects.get(user=order.user)
+    except PersonalWallet.DoesNotExist:
+        raise ValueError('Personal wallet not found.')
+
+    if order.status in ['return_requested', 'Return Requested']:
+        if order.payment_status == 'cod':
+            # For COD orders: update stock, refund via wallet.
+            with transaction.atomic():
+                for order_item in order.items.all():
+                    product = order_item.product
+                    product.stock += order_item.quantity
+                    product.save()
+                order.payment_status = 'refunded'
+                order.status = 'returned'
+                order.save()
+
+                # Send email to user
+                send_mail(
+                    subject=f"Your order {order.id} has been initiated for return",
+                    message=f"Dear {order.user.first_name},\n\n"
+                            f"Your order {order.id} has been initiated for return successfully. You will be contacted by our delivery partner soon.\n\n"
+                            "Thank you for shopping with Chrono Crust!",
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[order.user.email],
+                )
+        elif order.payment_status == 'paid':
+            # For Paid orders: refund to wallet, update stock.
+            with transaction.atomic():
+                for order_item in order.items.all():
+                    product = order_item.product
+                    product.stock += order_item.quantity
+                    product.save()
+                order.status = 'returned'
+                order.payment_status = 'refunded'
+                payment.balance += order.total_amount
+                payment.save()
+
+                # Log the transaction for the refund
+                transaction_history = TransactionHistory(
+                    user=order.user,
+                    wallet=payment,
+                    balance=payment.balance,
+                    amount=order.total_amount,
+                    transaction_type='REFUND',
+                    payment_method='RAZORPAY',  # Assuming Razorpay or adjust as necessary
+                    status='SUCCESS',
+                    description=f"Refund for Returned order {order.id}",
+                )
+                transaction_history.save()
+
+                order.save()
+
+                # Send email to user
+                send_mail(
+                    subject=f"Order {order.id} Cancelled and Refunded",
+                    message=f"Dear {order.user.first_name},\n\n"
+                            f"Your order {order.id} has been successfully cancelled and refunded.\n\n"
+                            "The amount has been refunded to your in-site personal wallet.\n\n"
+                            "Thank you for shopping with Chrono Crust!",
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[order.user.email],
+                )
+
+        elif order.payment_status == 'pwallet':
+            # For wallet payments: similar refund process to paid
+            with transaction.atomic():
+                for order_item in order.items.all():
+                    product = order_item.product
+                    product.stock += order_item.quantity
+                    product.save()
+                order.status = 'returned'
+                order.payment_status = 'refunded'
+
+                payment.balance += order.total_amount
+                payment.save()
+
+                order.save()
+
+                # Log the transaction for the refund
+                transaction_history = TransactionHistory(
+                    user=order.user,
+                    wallet=payment,
+                    balance=payment.balance,
+                    amount=order.total_amount,
+                    transaction_type='REFUND',
+                    payment_method='PWALLET',  # Wallet refund method
+                    status='SUCCESS',
+                    description=f"Refund for Returned order {order.id}",
+                )
+                transaction_history.save()
+
+                # Send email to user
+                send_mail(
+                    subject=f"Order {order.id} Cancelled and Refunded to Wallet",
+                    message=f"Dear {order.user.first_name},\n\n"
+                            f"Your order {order.id} has been successfully cancelled and refunded to your wallet.\n\n"
+                            "The refund has been credited to your personal wallet.\n\n"
+                            "Thank you for shopping with us!",
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[order.user.email],
+                )
+        else:
+            raise ValueError('Invalid payment status for cancellation.')
+    else:
+        raise ValueError('This order cannot be returned.')
 
 
 @staff_member_required(login_url="admin_login")
@@ -586,6 +724,183 @@ def admin_delete_coupon(request, code):
     return redirect('admin_list_coupons')
 
 
+def generate_sales_pdf(request, context):
+    """
+    Generate a comprehensive PDF sales report with date filtering and graphs
+    
+    Args:
+        request: Django request object
+        context: Dictionary containing sales report data
+    
+    Returns:
+        HttpResponse with PDF content
+    """
+    time_frame = request.GET.get('time_frame', 'Custom')
+    
+    # If a specific time frame was used, show that
+    if time_frame in ['1', '7', '30']:
+        start_date = timezone.now() - timedelta(days=int(time_frame))
+        end_date = timezone.now()
+    else:
+        # Use the dates from GET parameters if available
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+    # Create a file-like buffer to receive PDF data
+    buffer = BytesIO()
+    
+    # Create the PDF document (landscape for better graph visibility)
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
+    
+    # Container for the 'Flowable' objects
+    elements = []
+    
+    # Get sample stylesheet
+    styles = getSampleStyleSheet()
+    
+    # Title
+    title = Paragraph("Detailed Sales Report", styles['Title'])
+    elements.append(title)
+    
+    # Create filter data using actual dates
+    # Create filter data using actual dates
+    filter_data = [
+        ['Filter Type', 'Value'],
+        ['Time Frame', f"{time_frame} days" if time_frame in ['1', '7', '30'] else time_frame],
+        ['Start Date', start_date.strftime('%Y-%m-%d') if hasattr(start_date, 'strftime') else str(start_date or 'N/A')],
+        ['End Date', end_date.strftime('%Y-%m-%d') if hasattr(end_date, 'strftime') else str(end_date or 'N/A')],
+        ['Minimum Price', request.GET.get('min_price', 'N/A')],
+        ['Maximum Price', request.GET.get('max_price', 'N/A')]
+    ]
+    filter_table = Table(filter_data, colWidths=[200, 300])
+    filter_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.grey),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+        ('GRID', (0,0), (-1,-1), 1, colors.black)
+    ]))
+    elements.append(filter_table)
+    elements.append(Spacer(1, 12))
+    
+    # Sales Summary Section
+    summary_data = [
+        ['Metric', 'Value'],
+        ['Total Sales', str(context['total_sales'])],
+        ['Average Price', f"${context['average_price']:.2f}"],
+        ['Total Revenue', f"${context['total_revenue']:.2f}"],
+        ['Total Discount', f"${context['total_sale_discount']:.2f}"]
+    ]
+    summary_table = Table(summary_data, colWidths=[200, 300])
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.grey),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+        ('GRID', (0,0), (-1,-1), 1, colors.black)
+    ]))
+    elements.append(summary_table)
+    elements.append(Spacer(1, 12))
+    
+    def add_graph_to_pdf(graph_base64, title, is_pie_chart=False):
+        if graph_base64:
+            
+            graph_data = base64.b64decode(graph_base64)
+            graph_image = PILImage.open(io.BytesIO(graph_data))
+            
+            graph_path = f"{title.lower().replace(' ', '_')}_graph.png"
+            graph_image.save(graph_path, quality=95, optimize=True)
+            
+            if is_pie_chart:
+                width = height = 4*inch
+            else:
+                width = 6*inch
+                height = 3*inch
+            
+            graph_img = Image(graph_path, width=width, height=height)
+            graph_title = Paragraph(title, styles['Heading3'])
+            elements.append(graph_title)
+            elements.append(graph_img)
+            elements.append(Spacer(1, 12))
+
+    add_graph_to_pdf(context.get('product_line_graph'), "Product Sales Trend")
+    add_graph_to_pdf(context.get('product_pie_graph'), "Product Sales Percentage", is_pie_chart=True)
+    
+    add_graph_to_pdf(context.get('collection_line_graph'), "Collection Sales Trend")
+    add_graph_to_pdf(context.get('collection_pie_graph'), "Collection Sales Percentage", is_pie_chart=True)
+        
+    # Product Popularity Section
+    product_header = Paragraph("Top 5 Product Sales", styles['Heading2'])
+    elements.append(product_header)
+    
+    product_data = [['Product', 'Total Sales', 'Percentage']]
+    for product in context['product_popularity']:
+        product_data.append([
+            product.name, 
+            str(product.total_sales), 
+            f"{product.sales_percentage:.2f}%"
+        ])
+    
+    product_table = Table(product_data, colWidths=[200, 150, 150])
+    product_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.grey),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+        ('GRID', (0,0), (-1,-1), 1, colors.black)
+    ]))
+    elements.append(product_table)
+    elements.append(Spacer(1, 12))
+    
+    # Collection Popularity Section
+    collection_header = Paragraph("Top 5 Collection Sales", styles['Heading2'])
+    elements.append(collection_header)
+    
+    collection_data = [['Collection', 'Total Sales', 'Percentage']]
+    for collection in context['collection_popularity']:
+        collection_data.append([
+            collection.name, 
+            str(collection.total_sales), 
+            f"{collection.sales_percentage:.2f}%"
+        ])
+    
+    collection_table = Table(collection_data, colWidths=[200, 150, 150])
+    collection_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.grey),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+        ('GRID', (0,0), (-1,-1), 1, colors.black)
+    ]))
+    elements.append(collection_table)
+    
+    # Build PDF
+    doc.build(elements)
+    
+    # Get the value of the BytesIO buffer and write it to the response
+    pdf = buffer.getvalue()
+    buffer.close()
+    
+    response = HttpResponse(content_type='application/pdf')
+    
+    # Customize filename based on filtering
+    if time_frame in ['1', '7', '30']:
+        filename = f"sales_report_{time_frame}_days.pdf"
+    elif start_date and end_date:
+        filename = f"sales_report_{start_date}_to_{end_date}.pdf"
+    else:
+        filename = "sales_report.pdf"
+    
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response.write(pdf)
+    
+    return response
+
+
 def admin_sales(request):
     plt.close('all')
     
@@ -596,23 +911,21 @@ def admin_sales(request):
     end_date = request.GET.get('end_date')
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
-    
-    if time_frame:
-        if time_frame == '1':
-            start_date = timezone.now() - timedelta(days=1)
-        elif time_frame == '7':
-            start_date = timezone.now() - timedelta(days=7)
-        elif time_frame == '30':
-            start_date = timezone.now() - timedelta(days=30)
-        
-        if start_date:
-            orders = orders.filter(updated_at__date__gte=start_date.date())
+
+    if time_frame in ['1', '7', '30', '90']:
+        start_date = timezone.now() - timedelta(days=int(time_frame))
+        orders = orders.filter(updated_at__date__gte=start_date.date())
 
     if start_date and end_date:
         orders = orders.filter(updated_at__date__range=[start_date, end_date])
 
     if min_price and max_price:
-        orders = orders.filter(total_amount__range=[float(min_price), float(max_price)])
+        try:
+            min_price = float(min_price)
+            max_price = float(max_price)
+            orders = orders.filter(total_amount__range=[min_price, max_price])
+        except ValueError:
+            pass
 
     total_amount = orders.aggregate(
         total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField())
@@ -652,7 +965,7 @@ def admin_sales(request):
 
     def generate_line_graph(data, title, x_label, y_label):
         try:
-            fig, ax = plt.subplots(figsize=(10, 5))
+            fig, ax = plt.subplots(figsize=(10, 5))  # Notice the different width and height
             ax.plot([item.name for item in data], 
                     [item.total_sales for item in data], 
                     marker='o')
@@ -661,7 +974,7 @@ def admin_sales(request):
             ax.set_ylabel(y_label)
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
-            
+
             buffer = io.BytesIO()
             fig.savefig(buffer, format='png')
             buffer.seek(0)
@@ -669,18 +982,17 @@ def admin_sales(request):
             plt.close(fig)  # Close the specific figure
             return graph
         except Exception as e:
-            
             return None
-    
+
     def generate_pie_chart(data, title):
         try:
-            fig, ax = plt.subplots(figsize=(8, 8))
+            fig, ax = plt.subplots(figsize=(8, 8))  # Equal width and height
             ax.pie([item.sales_percentage for item in data], 
                     labels=[item.name for item in data], 
                     autopct='%1.1f%%')
             ax.set_title(title)
             ax.axis('equal')
-            
+
             buffer = io.BytesIO()
             fig.savefig(buffer, format='png')
             buffer.seek(0)
@@ -734,6 +1046,9 @@ def admin_sales(request):
         'product_popularity': product_popularity,
         'collection_popularity': collection_popularity
     }
+
+    if request.GET.get('download_pdf') == '1':
+        return generate_sales_pdf(request, context)
     
     return render(request, 'admin_sales.html', context=context)
 

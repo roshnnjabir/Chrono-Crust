@@ -53,7 +53,8 @@ urlpatterns = [
     path('admin/order/<str:order_id>/', views.admin_order_details, name='admin_order_details'),
     path('admin/update_order_status/<str:order_id>/', views.update_order_status, name='update_order_status'),
     path('admin/update_payment_status/<str:order_id>/', views.update_payment_status, name='update_payment_status'),
-    
+    path('admin/list_return_orders', views.admin_list_return_orders, name='admin_return_order' ),
+
     path('admin/list_coupons', views.admin_coupons, name='admin_list_coupons'),
     # path('admin/coupon_details/<str:code>', views.admin_coupon_details, name="admin_coupon_details"), # commmnted cause no use now, add later
     path('admin/delete_coupon/<str:code>', views.admin_delete_coupon, name="admin_delete_coupon"),

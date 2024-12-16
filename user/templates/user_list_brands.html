@@ -121,6 +121,11 @@
 
     <!-- Filter and Search Section -->
     <div class="header-upper d-flex justify-content-end px-4 pt-4">
+        <div class="header-upper d-flex justify-content-end">
+            <div class="right-options d-flex align-items-center justify-content-md-end gap-1 p-1">
+                <input type="text" id="live-search" class="form-control" placeholder="Search Brands..." onkeyup="liveSearch()">
+            </div>
+        </div>
         <div class="right-options d-flex align-items-center justify-content-md-end gap-1 p-1">
             <form method="GET" action="/user_list_brand" class="d-flex">
                 <select name="sort" class="form-select me-2" onchange="this.form.submit()">
@@ -132,9 +137,10 @@
     </div>
 
     <!-- Products -->
+    <!-- Products -->
     <div class="product-list" id="product-list">
         {% for brand in brands %}
-        <div class="card">
+        <div class="card product-card" data-name="{{ brand.name | lower }}">
             <div class="image-container">
                 <img src="{{ brand.logo_image.url }}" alt="{{ brand.name }}" class="product-image main-image">
                 <img src="{{ brand.banner_image.url }}" alt="{{ brand.name }} Hover Image" class="product-image hover-image">
@@ -142,7 +148,6 @@
                     <button class="btn-discover">Discover Now</button>
                 </a>
             </div>
-            
             <div class="details-container">      
                 <div class="product-details-container">
                     <h3 class="name">{{ brand.name }}</h3>
@@ -154,6 +159,25 @@
         {% endfor %}
     </div>    
     {% include 'partials/footer.html' %}
+
+    <script>
+        // Live search function
+        function liveSearch() {
+            let query = document.getElementById('live-search').value.toLowerCase();
+            let productCards = document.querySelectorAll('.product-card');
+
+            productCards.forEach(function(card) {
+                let productName = card.getAttribute('data-name');
+                
+                // Show or hide product based on search query match
+                if (productName.includes(query)) {
+                    card.style.display = 'block'; // Show card
+                } else {
+                    card.style.display = 'none'; // Hide card
+                }
+            });
+        }
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/body.js' %}"></script>

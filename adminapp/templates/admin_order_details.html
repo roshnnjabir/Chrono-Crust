@@ -125,6 +125,13 @@
                             <!-- Show 'delivered' and 'refunded' if status is 'delivered' -->
                             <option value="delivered" selected>Delivered</option>
                             <option value="refunded" {% if order.status == 'refunded' %}selected{% endif %}>Refunded</option>
+                        {% elif order.status == 'return_requested' %}
+                            <!-- Only show 'returned','return_requested' if status is 'return_requested' -->
+                            <option value="return_requested" selected>Return Requested</option>
+                            <option value="returned">Returned</option>
+                        {% elif order.status == 'returned' %}
+                            <!-- Only show 'returned' if status is 'returned' -->
+                            <option value="returned" selected>Returned</option>
                         {% elif order.status == 'cancelled' %}
                             <!-- Only show 'cancelled' if status is 'cancelled' -->
                             <option value="cancelled" selected>Cancelled</option>
@@ -150,6 +157,10 @@
                                 {% endif %}
                             {% endfor %}
                         {% elif order.payment_status == 'paid' %}
+                            <!-- Show 'paid' and 'refunded' if payment_status is 'paid' -->
+                            <option value="paid" selected>Paid</option>
+                            <option value="refunded" {% if order.payment_status == 'refunded' %}selected{% endif %}>Refunded</option>
+                        {% elif order.payment_status == 'pwallet' %}
                             <!-- Show 'paid' and 'refunded' if payment_status is 'paid' -->
                             <option value="paid" selected>Paid</option>
                             <option value="refunded" {% if order.payment_status == 'refunded' %}selected{% endif %}>Refunded</option>

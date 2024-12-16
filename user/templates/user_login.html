@@ -28,17 +28,23 @@
             <div class="redirect-link">
                 <p>Don't have an account? <a href="{% url 'user_signup' %}" class="link">Sign up</a></p>
             </div>
-	    
-            <a href="" class="google-login-btn">
+
+            <a href="{% url 'google_login' %}" class="google-login-btn">
                 <img src="{% static 'images/Google_logo.png' %}" alt="Google Logo">
                 <span>Continue with Google</span>
             </a>
 
+<<<<<<< HEAD
 
             <p style="width: 100%; display: flex; justify-content: center;">OR</p>
 
                   <div style="margin: 0; margin-top: 10px;" class="redirect-link">
                 <p>Forgot your password? <a href="{% url 'user_forgot_password' %}" class="link">Reset Password</a></p>
+=======
+            <p style="width: 100%; display: flex; justify-content: center;">OR</p>
+                <div style="margin: 0; margin-top: 10px;" class="redirect-link">
+            <p>Forgot your password? <a href="{% url 'user_forgot_password' %}" class="link">Reset Password</a></p>
+>>>>>>> 91dc8958d61a7914f9019b2756acd9bc892b1ce6
             </div>
         </div>
     </div>    

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import CustomUser, Address
-from adminapp.models import Product, Product_Slider, Collection, Brand, Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem, PersonalWallet, Coupen, PersonalWalletTransactions
+from adminapp.models import Product, Product_Slider, Collection, Brand, Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem, PersonalWallet, Coupen, TransactionHistory 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -453,8 +453,8 @@ def personal_wallet(request):
         personal_wallet = PersonalWallet.objects.get(user=request.user)
     except PersonalWallet.DoesNotExist:
         personal_wallet = PersonalWallet.objects.create(user=request.user)
-    transactions = personal_wallet.items.all()
-    return render(request, 'user_wallet_chrono_crust.html', {'personal_wallet': personal_wallet, 'transactions': transactions})
+    transactions = personal_wallet.transactions.all()
+    return render(request, 'user_wallet_chrono_crust.html', {'personal_wallet': personal_wallet, 'transactions': transactions, 'RAZOR_KEY_ID': settings.RAZOR_KEY_ID, 'user': CustomUser.objects.get(email=request.user.email)})
 
 
 @never_cache
@@ -560,7 +560,7 @@ def add_user_address(request):
         try:
             address.save()  # saving the address
             messages.success(request, "Address created successfully!")
-            return redirect('user_address_book')
+            return redirect('address_selection')
         except ValidationError as e:
             messages.error(request, str(e))  # error mesage
 
@@ -935,8 +935,8 @@ def user_move_to_order(request):
             # Respond with success
             return JsonResponse({'status': 'success'})
 
-        # Handle non-JSON requests (Cash on Delivery or Wallet)
         else:
+            # Handle non-JSON requests (Cash on Delivery or Wallet)
             payment_method = request.POST.get('payment_method')
             item_ids = request.session.get('item_ids')
             selected_address_id = request.session.get('selected_address')
@@ -955,6 +955,12 @@ def user_move_to_order(request):
             except Address.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'No Address Selected'}, status=400)
 
+            try:
+                # Fetch the user's wallet, with error handling
+                payment = PersonalWallet.objects.get(user=request.user)
+            except PersonalWallet.DoesNotExist:
+                payment = None  # If the wallet doesn't exist, handle it later if needed
+
             with transaction.atomic():
                 # Create a new order for COD or Wallet
                 order = Order.objects.create(
@@ -965,7 +971,7 @@ def user_move_to_order(request):
                     total_amount=total_price, 
                     discounted_amount=discounted_amount
                 )
-                
+
                 # Clear session data
                 del request.session['discount']
                 del request.session['total_price']
@@ -997,18 +1003,299 @@ def user_move_to_order(request):
 
                     except CartItem.DoesNotExist:
                         continue
+                    
+                # Handle payment methods
+                if payment_method == 'cod':
+                    # No wallet deduction required for COD, just proceed
+                    pass
+                elif payment_method == 'pwallet':
+                    # Ensure wallet exists and update balance if sufficient funds are available
+                    if payment and payment.balance >= int(float(order.total_amount)):
+                        payment.balance -= int(float(order.total_amount))
+                        payment.save()
+
+                        # Record the transaction history for the refund
+                        transaction_history = TransactionHistory(
+                            user=request.user,
+                            wallet=payment,
+                            balance=payment.balance,
+                            amount=order.total_amount,
+                            transaction_type='PURCHASE',
+                            payment_method='PWALLET',  # This indicates refund via wallet
+                            status='SUCCESS',  # Assuming the refund was successful
+                            description=f"Purchase for order {order_id}",
+                        )
+                        transaction_history.save()
+                    elif payment:
+                        # Insufficient balance in wallet
+                        messages.error(request, 'Insufficient funds in the wallet.')
+                        return redirect('user_order_history')
+                    else:
+                        # Handle case if wallet is not found (you can show an error message here if needed)
+                        messages.error(request, 'Personal wallet not found.')
+                        return redirect('user_order_history')
+
                 return redirect('user_order_history')
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+            return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 
-def prepare_razorpay_payment(request, order_id):
-    pass
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
-@require_http_methods(["POST"])
+@login_required
+def prepare_razorpay_payment(request):
+    try:
+        # Initialize Razorpay client
+        client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+        
+        # Get the amount from the request (ensure it's validated)
+        amount = float(request.POST.get('total_amount', 0))
+        
+        # Validate amount
+        if amount <= 0 or amount > 10000:
+            print('Num error')
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'Invalid amount. Must be between 0 and 10,000.'
+            }, status=400)
+        
+        # Convert amount to paisa (Razorpay requires amount in smallest currency unit)
+        amount_in_paisa = int(amount * 100)
+        
+        # Create Razorpay order
+        order_data = {
+            'amount': amount_in_paisa,
+            'currency': 'INR',
+            'receipt': f'wallet_topup_{request.user.id}_{timezone.now().timestamp()}',
+            'payment_capture': 1
+        }
+        
+        order = client.order.create(data=order_data)
+        print(order)
+        
+        return JsonResponse({
+            'order_id': order['id'],
+            'amount': amount,
+            'key': settings.RAZOR_KEY_ID
+        })
+    
+    except Exception as e:
+        logger.error(f"Error creating Razorpay order: {str(e)}")
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Failed to create payment order'
+        }, status=500)
+
+@csrf_exempt
+@login_required
 def verify_razorpay_payment(request):
-    pass
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    
+    try:
+        # Initialize Razorpay client
+        client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+        
+        # Get payment details from the request
+        payment_id = request.POST.get('razorpay_payment_id')
+        order_id = request.POST.get('razorpay_order_id')
+        signature = request.POST.get('razorpay_signature')
+        
+        # Validate input
+        if not all([payment_id, order_id, signature]):
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'Missing payment details'
+            }, status=400)
+        
+        # Prepare signature verification parameters
+        params_dict = {
+            'razorpay_payment_id': payment_id,
+            'razorpay_order_id': order_id,
+            'razorpay_signature': signature
+        }
+        
+        try:
+            # Verify the payment signature
+            client.utility.verify_payment_signature(params_dict)
+        except razorpay.errors.SignatureVerificationError:
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'Payment signature verification failed'
+            }, status=400)
+        
+        # Fetch payment details
+        payment_details = client.payment.fetch(payment_id)
+        
+        # Extract amount (convert back from paisa to dollars)
+        amount = payment_details['amount'] / 100
+        
+        # Use database transaction to ensure atomicity
+        with transaction.atomic():
+            # Get or create the user's wallet
+            wallet, created = PersonalWallet.objects.get_or_create(user=request.user)
+            
+            # Update wallet balance
+            wallet.balance += amount
+            wallet.save()
+            
+            # Create transaction history record
+            TransactionHistory.objects.create(
+                user=request.user,
+                wallet=wallet,
+                amount=amount,
+                balance=wallet.balance,
+                transaction_type='DEPOSIT',
+                payment_method='RAZORPAY',
+                status='SUCCESS',
+                razorpay_payment_id=payment_id,
+                razorpay_order_id=order_id,
+                description=f'Wallet top-up via Razorpay'
+            )
+        
+        return JsonResponse({
+            'status': 'success', 
+            'message': 'Payment verified and wallet updated',
+            'new_balance': wallet.balance
+        })
+    
+    except Exception as e:
+        # Log the error and return a generic error response
+        logger.error(f"Payment verification error: {str(e)}")
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Payment verification failed'
+        }, status=500)
+
+
+@csrf_exempt
+@login_required
+def prepare_razorpay_payment_for_order(request, order_id):
+    try:
+        # Fetch the specific order
+        order = Order.objects.get(id=order_id, user=request.user)
+        
+        # Initialize Razorpay client
+        client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+        
+        # Use the total price of the order
+        amount = order.total_amount
+        
+        # Validate amount
+        if amount <= 0:
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'Invalid order amount.'
+            }, status=400)
+        
+        # Convert amount to paisa (Razorpay requires amount in smallest currency unit)
+        amount_in_paisa = int(amount * 100)
+        
+        # Create Razorpay order
+        order_data = {
+            'amount': amount_in_paisa,
+            'currency': 'INR',
+            'payment_capture': 1
+        }
+        
+        razorpay_order = client.order.create(data=order_data)
+        print(razorpay_order)
+        return JsonResponse({
+            'razorpay_order_id': razorpay_order['id'],
+            'amount': amount,
+            'razorpay_key': settings.RAZOR_KEY_ID
+        })
+    
+    except Order.DoesNotExist:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Order not found'
+        }, status=404)
+    
+    except Exception as e:
+        logger.error(f"Error creating Razorpay order for retry: {str(e)}")
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Failed to create payment order'
+        }, status=500)
+
+@csrf_exempt
+@login_required
+def verify_razorpay_payment_for_order(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    
+    try:
+        # Parse JSON data
+        data = json.loads(request.body)
+        
+        # Extract payment and order details
+        payment_id = data.get('razorpay_payment_id')
+        order_id = data.get('razorpay_order_id')
+        signature = data.get('razorpay_signature')
+        order_pk = data.get('order_id')
+        
+        # Validate input
+        if not all([payment_id, order_id, signature, order_pk]):
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'Missing payment details'
+            }, status=400)
+        
+        # Initialize Razorpay client
+        client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+        
+        # Prepare signature verification parameters
+        params_dict = {
+            'razorpay_payment_id': payment_id,
+            'razorpay_order_id': order_id,
+            'razorpay_signature': signature
+        }
+        
+        try:
+            # Verify the payment signature
+            client.utility.verify_payment_signature(params_dict)
+        except razorpay.errors.SignatureVerificationError:
+            return JsonResponse({
+                'status': 'error', 
+                'message': 'Payment signature verification failed'
+            }, status=400)
+        
+        # Fetch payment details
+        payment_details = client.payment.fetch(payment_id)
+        
+        # Fetch the specific order
+        order = Order.objects.get(id=order_pk, user=request.user)
+        
+        # Use database transaction to ensure atomicity
+        with transaction.atomic():
+            # Update order payment status
+            order.payment_status = 'paid'
+            order.updated_at = timezone.now()
+            order.save()
+        
+        return JsonResponse({
+            'status': 'success', 
+            'message': 'Payment verified and order updated'
+        })
+    
+    except Order.DoesNotExist:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Order not found'
+        }, status=404)
+    
+    except Exception as e:
+        # Log the error and return a generic error response
+        logger.error(f"Payment verification error: {str(e)}")
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Payment verification failed'
+        }, status=500)
 
 
 @login_required(login_url='user_login')
@@ -1116,11 +1403,68 @@ def user_cancel_order(request, order_id):
                         
                         # Save the updated order
                         order.save()
+<<<<<<< HEAD
+=======
+
+                        # Record the transaction history for the refund
+                        transaction_history = TransactionHistory(
+                            user=request.user,
+                            wallet=payment,
+                            balance=payment.balance,
+                            amount=order.total_amount,
+                            transaction_type='REFUND',
+                            payment_method='RAZORPAY',  # or another payment method based on the original payment
+                            status='SUCCESS',  # Assuming the refund was successful
+                            description=f"Refund for order {order_id}",
+                        )
+                        transaction_history.save()
+>>>>>>> 91dc8958d61a7914f9019b2756acd9bc892b1ce6
                 
                     messages.success(request, 'Order has been successfully cancelled and refunded.')
                 except Exception as e:
                     logger.error(f"Error canceling order {order_id}: {e}")
                     messages.error(request, f'Error canceling order: {e}')
+<<<<<<< HEAD
+=======
+            elif order.payment_status == 'pwallet':
+                # Handle payment via wallet (pwallet)
+                try:
+                    with transaction.atomic():
+                        # Restore product stock
+                        for order_item in order.items.all():
+                            product = order_item.product
+                            product.stock += order_item.quantity
+                            product.save()
+
+                        # Update order status and payment status
+                        order.status = 'cancelled'
+                        order.payment_status = 'refunded'
+                        
+                        # Ensure wallet exists and update balance
+                        payment.balance += order.total_amount
+                        payment.save()
+                        
+                        # Save the updated order
+                        order.save()
+
+                        # Record the transaction history for the refund
+                        transaction_history = TransactionHistory(
+                            user=request.user,
+                            wallet=payment,
+                            balance=payment.balance,
+                            amount=order.total_amount,
+                            transaction_type='REFUND',
+                            payment_method='PWALLET',  # This indicates refund via wallet
+                            status='SUCCESS',  # Assuming the refund was successful
+                            description=f"Refund for order {order_id}",
+                        )
+                        transaction_history.save()
+                
+                    messages.success(request, 'Order has been successfully cancelled and refunded to your wallet.')
+                except Exception as e:
+                    logger.error(f"Error canceling order {order_id}: {e}")
+                    messages.error(request, f'Error canceling order: {e}')
+>>>>>>> 91dc8958d61a7914f9019b2756acd9bc892b1ce6
             
             else:
                 messages.error(request, 'Invalid payment status for cancellation.')
@@ -1136,6 +1480,25 @@ def user_cancel_order(request, order_id):
 
     # Redirect back to the order history page
     return redirect('user_order_history')
+
+
+def user_return_order(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
+        
+        try:
+            payment = PersonalWallet.objects.get(user=request.user)
+        except PersonalWallet.DoesNotExist:
+            messages.error(request, 'Personal wallet not found. Please Create One')
+            return redirect('user_order_history')
+        
+        if order.status in ['delivered', 'Delivered', 'shipped', 'Shipped']:
+            order.status = 'return_requested'
+            order.save()
+
+            messages.info(request, 'Order has been send for review, we will connect with you as soon as possible')
+    return redirect('user_order_history')
+
 
 
 def address_selection(request):

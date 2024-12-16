@@ -101,7 +101,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'roshanjabir7@gmail.com'
-EMAIL_HOST_PASSWORD = 'anvw zrac yeqs wnpu'
+EMAIL_HOST_PASSWORD = 'tlmx vnmk pgpd ymyf'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -180,6 +180,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 
+<<<<<<< HEAD
 # Email settings in settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -190,6 +191,8 @@ EMAIL_HOST_PASSWORD = 'pupf ufpm oqgz wxms'  # Use an App-specific password from
 DEFAULT_FROM_EMAIL = 'roshanjabir7@gmail.com'
 
 
+=======
+>>>>>>> 91dc8958d61a7914f9019b2756acd9bc892b1ce6
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default backend
     'allauth.account.auth_backends.AuthenticationBackend',  # Allauth
@@ -200,7 +203,11 @@ RAZOR_KEY_ID = ''
 RAZOR_KEY_SECRET = ''
 
 
+<<<<<<< HEAD
 SOCIALACCOUNT_AUTO_SIGNUP = True  # Automatically create user on social login
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+=======
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Automatically create user on social login
+>>>>>>> 91dc8958d61a7914f9019b2756acd9bc892b1ce6

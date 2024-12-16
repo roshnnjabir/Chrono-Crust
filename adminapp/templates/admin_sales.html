@@ -540,7 +540,7 @@
                         </table>
                     </div>
                 </div>
-                <a class="action-button" href="?download_pdf=1">Download Sales Report (PDF)</a>
+                <a class="action-button" href="?download_pdf=1&time_frame={{ request.GET.time_frame }}&start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">Download Sales Report (PDF)</a>
             
                 {% if messages %}
                 <ul class="messages">

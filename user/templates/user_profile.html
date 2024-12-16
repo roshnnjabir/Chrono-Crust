@@ -78,21 +78,29 @@
             {% csrf_token %}
             <div class="info-layout">
                 <div class="info-label">First Name:</div>
-                <input type="text" name="FirstName" id="editFirstName" value="{{ user.first_name }}" required>
+                <div class="input">
+                    <input type="text" name="FirstName" id="editFirstName" value="{{ user.first_name }}" required>
+                </div>
             </div>
             <div class="info-layout">
                 <div class="info-label">Last Name:</div>
-                <input type="text" name="LastName" id="editLastName" value="{{ user.last_name }}" required>
+                <div class="input">
+                    <input type="text" name="LastName" id="editLastName" value="{{ user.last_name }}" required>
+                </div>
             </div>
             <div class="info-layout">
                 <div class="info-label">Date of Birth:</div>
-                <input type="date" name="Date_of_birth" id="editDob" value="{{ date_of_birth }}" required>
+                <div class="input">
+                    <input type="date" name="Date_of_birth" id="editDob" value="{{ date_of_birth }}" required>
+                </div>
             </div>
             <div class="info-layout">
                 <div class="info-label">Phone Number:</div>
-                <input type="tel" id="editphone" name="Phone" maxlength="10" pattern="\d{10}" inputmode="numeric" value="{{ user.phone }}" required  oninvalid="this.setCustomValidity('Integer only, 10 digits')" 
-                oninput="this.setCustomValidity('')" 
-                title="Integer only, 10 digits">
+                <div class="input">
+                    <input type="tel" id="editphone" name="Phone" maxlength="10" pattern="\d{10}" inputmode="numeric" value="{{ user.phone }}" required  oninvalid="this.setCustomValidity('Integer only, 10 digits')" 
+                    oninput="this.setCustomValidity('')" 
+                    title="Integer only, 10 digits">
+                </div>
             </div>
             <input type="hidden" name="Email" id="editEmail" value="{{ user.email }}" required>
             <button id="savechanges" type="submit">Save Changes</button>
@@ -226,6 +234,164 @@
             });
         });
     }
+    document.addEventListener('DOMContentLoaded', function() {
+        const editForm = document.getElementById('editForm');
+        const firstNameInput = document.getElementById('editFirstName');
+        const lastNameInput = document.getElementById('editLastName');
+        const dobInput = document.getElementById('editDob');
+        const phoneInput = document.getElementById('editphone');
+        const saveChangesButton = document.getElementById('savechanges');
+    
+        // Validation functions
+        function validateFirstName() {
+            const firstName = firstNameInput.value.trim();
+            const nameRegex = /^[A-Za-z\s'-]{2,50}$/;
+            
+            if (firstName === '') {
+                showError(firstNameInput, 'First name is required');
+                return false;
+            }
+            
+            if (!nameRegex.test(firstName)) {
+                showError(firstNameInput, 'First name must be 2-50 characters, only letters, spaces, hyphens, and apostrophes allowed');
+                return false;
+            }
+            
+            clearError(firstNameInput);
+            return true;
+        }
+    
+        function validateLastName() {
+            const lastName = lastNameInput.value.trim();
+            const nameRegex = /^[A-Za-z\s'-]{2,50}$/;
+            
+            if (lastName === '') {
+                showError(lastNameInput, 'Last name is required');
+                return false;
+            }
+            
+            if (!nameRegex.test(lastName)) {
+                showError(lastNameInput, 'Last name must be 2-50 characters, only letters, spaces, hyphens, and apostrophes allowed');
+                return false;
+            }
+            
+            clearError(lastNameInput);
+            return true;
+        }
+    
+        function validateDateOfBirth() {
+            const dob = new Date(dobInput.value);
+            const today = new Date();
+            const minAge = 13; // Minimum age requirement
+            const maxAge = 120; // Maximum reasonable age
+            
+            if (!dobInput.value) {
+                showError(dobInput, 'Date of birth is required');
+                return false;
+            }
+            
+            const age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+            const dayDiff = today.getDate() - dob.getDate();
+            
+            // Adjust age calculation
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+            
+            if (age < minAge) {
+                showError(dobInput, `You must be at least ${minAge} years old`);
+                return false;
+            }
+            
+            if (age > maxAge) {
+                showError(dobInput, `Please enter a valid date of birth`);
+                return false;
+            }
+            
+            clearError(dobInput);
+            return true;
+        }
+    
+        function validatePhoneNumber() {
+            const phone = phoneInput.value.trim();
+            const phoneRegex = /^[0-9]{10}$/;
+            
+            if (phone === '') {
+                showError(phoneInput, 'Phone number is required');
+                return false;
+            }
+            
+            if (!phoneRegex.test(phone)) {
+                showError(phoneInput, 'Phone number must be exactly 10 digits');
+                return false;
+            }
+            
+            clearError(phoneInput);
+            return true;
+        }
+    
+        // Error handling functions
+        function showError(input, message) {
+            // Remove any existing error elements
+            const existingError = input.nextElementSibling;
+            if (existingError && existingError.classList.contains('error-message')) {
+                existingError.remove();
+            }
+            
+            // Create and insert error message
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error-message';
+            errorElement.style.color = 'red';
+            errorElement.style.fontSize = '0.8rem';
+            errorElement.style.marginTop = '5px';
+            errorElement.textContent = message;
+            
+            input.parentNode.insertBefore(errorElement, input.nextSibling);
+            input.classList.add('input-error');
+        }
+    
+        function clearError(input) {
+            const errorElement = input.nextElementSibling;
+            if (errorElement && errorElement.classList.contains('error-message')) {
+                errorElement.remove();
+            }
+            input.classList.remove('input-error');
+        }
+    
+        // Real-time validation event listeners
+        firstNameInput.addEventListener('input', validateFirstName);
+        lastNameInput.addEventListener('input', validateLastName);
+        dobInput.addEventListener('change', validateDateOfBirth);
+        phoneInput.addEventListener('input', validatePhoneNumber);
+    
+        // Form submission validation
+        editForm.addEventListener('submit', function(event) {
+            // Prevent form submission if validation fails
+            const isFirstNameValid = validateFirstName();
+            const isLastNameValid = validateLastName();
+            const isDobValid = validateDateOfBirth();
+            const isPhoneValid = validatePhoneNumber();
+    
+            if (!(isFirstNameValid && isLastNameValid && isDobValid && isPhoneValid)) {
+                event.preventDefault();
+            }
+        });
+    
+        // Optional: Add CSS for input errors
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+            .input-error {
+                border: 2px solid red;
+            }
+            .error-message {
+                color: red;
+                font-size: 0.8rem;
+                margin-top: 5px;
+            }
+        `;
+        document.head.appendChild(styleElement);
+    });
 </script>
 
 <script>

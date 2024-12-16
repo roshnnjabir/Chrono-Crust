@@ -79,12 +79,7 @@
             </div>
 
             <p style="width: 100%; display: flex; justify-content: center;">OR</p>
-<<<<<<< HEAD
-	    
-=======
-
->>>>>>> 849b0b1 (Google login working, local system commit)
-            <a href="" class="google-login-btn">
+            <a href="{% provider_login_url 'google' %}?login_hint={{ user.email }}" class="google-login-btn">
                 <img src="{% static 'images/Google_logo.png' %}" alt="Google Logo">
                 <span>Sign up with Google</span>
             </a>

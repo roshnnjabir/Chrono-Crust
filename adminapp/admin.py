@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Brand, Collection, Product, Product_Slider, Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem, PersonalWallet, PersonalWalletTransactions, Coupen
+from .models import Brand, Collection, Product, Product_Slider, Cart, CartItem, Wishlist, WishlistItem, Order, OrderItem, PersonalWallet, TransactionHistory, Coupen
 # Register your models here.
 
 
@@ -14,5 +14,5 @@ admin.site.register(WishlistItem)
 admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(PersonalWallet)
-admin.site.register(PersonalWalletTransactions)
+admin.site.register(TransactionHistory)
 admin.site.register(Coupen)
